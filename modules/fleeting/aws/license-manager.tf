@@ -1,12 +1,4 @@
-resource "aws_iam_service_linked_role" "license-manager" {
-  aws_service_name = "license-manager.amazonaws.com"
-}
-
 resource "aws_licensemanager_license_configuration" "license-config" {
-  depends_on = [
-    aws_iam_service_linked_role.license-manager
-  ]
-
   name                     = "required-license"
   license_count            = var.required_license_count_per_asg * var.cores_per_license * length(var.autoscaling_groups)
   license_count_hard_limit = false

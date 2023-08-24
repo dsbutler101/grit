@@ -15,4 +15,6 @@ module "dev" {
   }
 
   aws_vpc_cidr = "10.0.0.0/24"
+
+  labels = var.labels
 }

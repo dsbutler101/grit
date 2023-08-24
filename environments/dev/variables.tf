@@ -1,5 +1,6 @@
 variable "ami" {
   type = string
+  default = "ami-0fcd5ff1c92b00231"
 }
 
 variable "region" {
@@ -9,7 +10,9 @@ variable "region" {
 
 variable "labels" {
   type = map
-  default = {}
+  default = {
+    env = "dev"
+  }
 }
 
 variable "autoscaling_group_max" {

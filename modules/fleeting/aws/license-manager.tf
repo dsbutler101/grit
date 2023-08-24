@@ -7,22 +7,22 @@ resource "aws_licensemanager_license_configuration" "license-config" {
     aws_iam_service_linked_role.license-manager
   ]
 
-  name                     = "${var.shard}-required-license"
+  name                     = "required-license"
   license_count            = var.required_license_count_per_asg * var.cores_per_license * length(var.autoscaling_groups)
   license_count_hard_limit = false
   license_counting_type    = "Core"
 
-  tags = local.tags
+  tags = var.labels
 }
 
 locals {
-  jobs_host_resource_group = "${var.shard}-host-resource-group"
+  jobs_host_resource_group = "host-resource-group"
 }
 
 resource "aws_cloudformation_stack" "jobs-host-resource-group" {
   name = local.jobs_host_resource_group
 
-  tags = local.tags
+  tags = var.labels
 
   template_body = <<EOS
     {

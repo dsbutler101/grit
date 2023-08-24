@@ -23,15 +23,3 @@ output "fleeting_service_account_secret_access_key" {
   description = "The secret access key for access to the fleeting service account"
   sensitive   = true
 }
-
-output "cache_service_account_access_key_id" {
-  value       = aws_iam_access_key.cache-service-account-key.id
-  description = "The access key ID for access to the s3 cache service account"
-  sensitive   = true
-}
-
-output "cache_service_account_secret_access_key" {
-  value       = aws_iam_access_key.cache-service-account-key.secret
-  description = "The secret access key for access to the s3 cache service account"
-  sensitive   = true
-}

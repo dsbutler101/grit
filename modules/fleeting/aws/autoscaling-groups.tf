@@ -3,7 +3,7 @@ resource "aws_launch_template" "fleeting-asg" {
 
   description = "Launch template for GitLab Runner fleeting configuration for ${each.key}"
 
-  tags = local.tags
+  tags = var.labels
 
   image_id      = each.value.ami_id
   instance_type = each.value.instance_type
@@ -32,16 +32,12 @@ resource "aws_launch_template" "fleeting-asg" {
 
   network_interfaces {
     subnet_id = aws_subnet.jobs-vpc-subnet[each.key].id
-
-    security_groups = [
-      aws_security_group.jobs-security-group.id
-    ]
   }
 
   tag_specifications {
     resource_type = "instance"
 
-    tags = local.tags
+    tags = var.labels
   }
 
   lifecycle {
@@ -56,14 +52,14 @@ resource "aws_autoscaling_group" "fleeting-asg" {
   for_each = var.autoscaling_groups
 
   name = each.key
-
+       
   launch_template {
     id      = aws_launch_template.fleeting-asg[each.key].id
     version = aws_launch_template.fleeting-asg[each.key].latest_version
   }
 
   min_size = 0
-  max_size = var.required_license_count_per_asg
+  max_size = var.autoscaling_group_max
 
   health_check_grace_period = 600
 
@@ -74,7 +70,7 @@ resource "aws_autoscaling_group" "fleeting-asg" {
   protect_from_scale_in = var.protect_from_scale_in
 
   dynamic "tag" {
-    for_each = local.tags
+    for_each = var.labels
     content {
       key                 = tag.key
       value               = tag.value

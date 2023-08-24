@@ -8,8 +8,8 @@ resource "tls_private_key" "aws-jobs" {
 }
 
 resource "aws_key_pair" "jobs" {
-  key_name   = "${var.shard}-ssh-key"
+  key_name   = "ssh-key"
   public_key = tls_private_key.aws-jobs.public_key_openssh
 
-  tags = local.tags
+  tags = var.labels
 }

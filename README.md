@@ -6,6 +6,8 @@ The GitLab Runner Infrastructure Toolkit (GRIT) is to be the primary entry-point
 
 Experimental. GRIT is in early development and not yet consumable.
 
+Epic: https://gitlab.com/groups/gitlab-org/ci-cd/runner-tools/-/epics/1
+
 ## Intended use cases
 
 Setting up and managing...

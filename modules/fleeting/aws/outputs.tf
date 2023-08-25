@@ -23,3 +23,13 @@ output "fleeting_service_account_secret_access_key" {
   description = "The secret access key for access to the fleeting service account"
   sensitive   = true
 }
+
+#####################
+# Autoscaling Group #
+#####################
+
+output "autoscaling_group_names" {
+  value = [
+    for asg in aws_autoscaling_group.fleeting-asg : asg.name
+  ]
+}

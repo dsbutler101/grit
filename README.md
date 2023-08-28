@@ -8,6 +8,19 @@ Experimental. GRIT is in early development and not yet consumable.
 
 Follow [the epic](https://gitlab.com/groups/gitlab-org/ci-cd/runner-tools/-/epics/1) to see progress.
 
+## Working use cases
+
+### Mac Runners on AWS -- development -- fleeting-only
+
+Usage:
+
+```sh
+make dev-init
+make dev-apply
+```
+
+Get credentials from `environments/dev/terraform.tfstate` for setting up your runner manager (not automated yet).
+
 ## Intended use cases
 
 Setting up and managing...

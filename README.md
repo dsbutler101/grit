@@ -19,6 +19,8 @@ make dev-init
 make dev-apply
 ```
 
+Provide current staging AMI when prompted (e.g. `ami-0fcd5ff1c92b00231`).
+
 Get credentials from `environments/dev/terraform.tfstate` for setting up your runner manager (not automated yet).
 
 ## Intended use cases

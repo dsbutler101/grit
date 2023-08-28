@@ -32,6 +32,10 @@ resource "aws_launch_template" "fleeting-asg" {
 
   network_interfaces {
     subnet_id = aws_subnet.jobs-vpc-subnet[each.key].id
+
+    security_groups = [
+      aws_security_group.jobs-security-group.id
+    ]
   }
 
   tag_specifications {
@@ -52,7 +56,7 @@ resource "aws_autoscaling_group" "fleeting-asg" {
   for_each = var.autoscaling_groups
 
   name = each.key
-       
+
   launch_template {
     id      = aws_launch_template.fleeting-asg[each.key].id
     version = aws_launch_template.fleeting-asg[each.key].latest_version

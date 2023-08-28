@@ -44,3 +44,33 @@ resource "aws_subnet" "jobs-vpc-subnet" {
     Name = each.key
   })
 }
+
+resource "aws_security_group" "jobs-security-group" {
+  name   = "jobs-sc"
+  vpc_id = aws_vpc.jobs-vpc.id
+
+  ingress {
+    description = "SSH from outside"
+    protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "ICMP from remote"
+    protocol    = "icmp"
+    from_port   = 8
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.labels
+}

@@ -11,24 +11,24 @@ resource "google_compute_subnetwork" "subnet" {
 }
 
 data "google_container_engine_versions" "gke_version" {
-  location = var.region
+  location       = var.region
   version_prefix = "1.27."
 }
 
 resource "google_container_cluster" "primary" {
-  name     = "${var.project_id}-gke"
-  location = var.region
+  name                     = "${var.project_id}-gke"
+  location                 = var.region
   remove_default_node_pool = true
   initial_node_count       = 1
-  network    = google_compute_network.vpc.name
-  subnetwork = google_compute_subnetwork.subnet.name
+  network                  = google_compute_network.vpc.name
+  subnetwork               = google_compute_subnetwork.subnet.name
 }
 
 resource "google_container_node_pool" "primary_nodes" {
   name       = google_container_cluster.primary.name
   location   = var.region
   cluster    = google_container_cluster.primary.name
-  version = data.google_container_engine_versions.gke_version.release_channel_latest_version["STABLE"]
+  version    = data.google_container_engine_versions.gke_version.release_channel_latest_version["STABLE"]
   node_count = var.gke_num_nodes
   node_config {
     oauth_scopes = [
@@ -49,19 +49,19 @@ resource "google_container_node_pool" "primary_nodes" {
 data "google_client_config" "provider" {}
 
 resource "helm_release" "gitlab-runner" {
-  name = "gitlab-runner"
+  name       = "gitlab-runner"
   repository = "https://charts.gitlab.io"
-  chart = "gitlab-runner"
+  chart      = "gitlab-runner"
   set {
-      name = "gitlabUrl"
-      value = var.gitlab_url
+    name  = "gitlabUrl"
+    value = var.gitlab_url
   }
   set {
-      name = "rbac.create"
-      value = "true"
+    name  = "rbac.create"
+    value = "true"
   }
   set {
-      name = "runnerToken"
-      value = var.gitlab_runner_token
+    name  = "runnerToken"
+    value = var.gitlab_runner_token
   }
 }

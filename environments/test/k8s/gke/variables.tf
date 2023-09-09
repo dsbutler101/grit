@@ -4,17 +4,19 @@ variable "gitlab_runner_token" {
 
 variable "gitlab_url" {
   description = "The URL of your GitLab instance"
+  default     = "https://gitlab.com"
 }
 
 variable "project_id" {
-  description = "project id"
+  description = "The GCP project in which to create your cluster"
 }
 
 variable "region" {
-  description = "region"
+  default     = "us-central1"
+  description = "The GCP region in which to create your cluster"
 }
 
 variable "gke_num_nodes" {
+  description = "The number of GKE nodes in your cluster"
   default     = 2
-  description = "number of gke nodes"
 }

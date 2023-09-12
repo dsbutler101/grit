@@ -47,28 +47,3 @@ resource "google_container_node_pool" "primary_nodes" {
 }
 
 data "google_client_config" "provider" {}
-
-resource "helm_release" "gitlab-runner" {
-  name       = "gitlab-runner"
-  repository = "https://charts.gitlab.io"
-  chart      = "gitlab-runner"
-  set {
-    name  = "gitlabUrl"
-    value = var.gitlab_url
-  }
-  set {
-    name  = "rbac.create"
-    value = "true"
-  }
-  set {
-    name  = "runnerToken"
-    value = gitlab_user_runner.primary.token
-  }
-}
-
-resource "gitlab_user_runner" "primary" {
-  description = "GRIT test GKE"
-  runner_type = "project_type"
-  project_id  = var.gitlab_project_id
-  untagged    = true
-}

@@ -45,7 +45,7 @@ variable "autoscaling_groups" {
 
     autoscaling_groups = {
       group-1 = {
-        ami_id        = "ami-034ccb74da463ebe1"
+        ami_id        = var.ami
         instance_type = "mac2.metal"
         subnet_cidr   = "10.0.22.0/21"
       },

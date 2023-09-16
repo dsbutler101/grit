@@ -34,17 +34,17 @@ module "aks-cluster" {
 ##################
 
 module "gce-instance-group" {
-  count  = var.runner_provider = "gce" ? 1 : 0
+  count  = var.runner_provider == "gce" ? 1 : 0
   source = "../internal/fleeting/gce"
 }
 
 module "ec2-instance-group" {
-  count  = var.runner_provider = "ec2" ? 1 : 0
+  count  = var.runner_provider == "ec2" ? 1 : 0
   source = "../internal/fleeting/ec2"
 }
 
 module "azure-instance-group" {
-  count  = var.runner_provider = "azure" ? 1 : 0
+  count  = var.runner_provider == "azure" ? 1 : 0
   source = "../internal/fleeting/azure"
 }
 
@@ -53,26 +53,26 @@ module "azure-instance-group" {
 ###################
 
 module "gce-managers" {
-  count  = var.manager_provider = "gce"
+  count  = var.manager_provider == "gce"
   source = "../internal/manager/gce"
 }
 
 module "ec2-managers" {
-  count  = var.manager_provider = "ec2"
+  count  = var.manager_provider == "ec2"
   source = "../internal/manager/ec2"
 }
 
 module "azure-managers" {
-  count  = var.manager_provider = "azure"
+  count  = var.manager_provider == "azure"
   source = "../internal/manager/azure"
 }
 
 module "helm" {
-  count  = var.manager_provider = "helm"
+  count  = var.manager_provider == "helm"
   source = "../internal/manager/helm"
 }
 
 module "operator" {
-  count  = var.manager_provider = "operator"
+  count  = var.manager_provider == "operator"
   source = "../internal/manager/operator"
 }

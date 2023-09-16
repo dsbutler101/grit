@@ -61,11 +61,11 @@ variable "protect_from_scale_in" {
 }
 
 variable "labels" {
-  type = map
+  type    = map(any)
   default = {}
 }
 
 variable "autoscaling_group_max" {
-  type = number
+  type    = number
   default = 20
 }

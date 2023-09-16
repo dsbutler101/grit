@@ -1,3 +1,13 @@
+provider "gitlab" {
+  base_url = var.gitlab_url
+  token    = var.gitlab_token
+}
+
+provider "google" {
+  project = var.project_id
+  zone    = var.zone
+}
+
 provider "helm" {
   kubernetes {
     host                   = google_container_cluster.primary.endpoint

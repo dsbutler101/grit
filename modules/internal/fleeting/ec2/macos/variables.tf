@@ -62,7 +62,9 @@ variable "protect_from_scale_in" {
 
 variable "labels" {
   type    = map(any)
-  default = {}
+  default = {
+    env = "grit"
+  }
 }
 
 variable "autoscaling_group_max" {

@@ -10,7 +10,7 @@ module "instance_group" {
   }
   autoscaling_groups = {
     main = {
-      ami_id        = "ami-034ccb74da463ebe1"
+      ami_id        = "ami-0fcd5ff1c92b00231"
       instance_type = "mac2.metal"
       subnet_cidr   = "10.0.0.0/24"
     }

@@ -1,10 +1,10 @@
 resource "google_compute_network" "vpc" {
-  name                    = "${var.project_id}-vpc"
+  name                    = "grit-vpc"
   auto_create_subnetworks = "false"
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  name          = "${var.project_id}-subnet"
+  name          = "grit-subnet"
   region        = var.region
   network       = google_compute_network.vpc.name
   ip_cidr_range = "10.10.0.0/24"
@@ -16,7 +16,7 @@ data "google_container_engine_versions" "gke_version" {
 }
 
 resource "google_container_cluster" "primary" {
-  name                     = "${var.project_id}-gke"
+  name                     = "grit-gke"
   location                 = var.zone
   remove_default_node_pool = true
   initial_node_count       = 1
@@ -36,10 +36,10 @@ resource "google_container_node_pool" "primary_nodes" {
       "https://www.googleapis.com/auth/monitoring",
     ]
     labels = {
-      env = var.project_id
+      env = "grit"
     }
     machine_type = "n1-standard-1"
-    tags         = ["gke-node", "${var.project_id}-gke"]
+    tags         = ["gke-node", "grit-gke"]
     metadata = {
       disable-legacy-endpoints = "true"
     }

@@ -7,7 +7,8 @@ locals {
 #######################
 
 module "gitlab" {
-  source = "../internal/gitlab"
+  source            = "../internal/gitlab"
+  gitlab_project_id = var.gitlab_project_id
 }
 
 ######################
@@ -15,17 +16,17 @@ module "gitlab" {
 ######################
 
 module "gke-cluster" {
-  count  = var.runner_provider == "gke" || kubernetes_manager ? 1 : 0
+  count  = var.runner_provider == "gke" || local.kubernetes_manager ? 1 : 0
   source = "../internal/kubernetes/gke"
 }
 
 module "eks-cluster" {
-  count  = var.runner_provider == "eks" || kubernetes_manager ? 1 : 0
+  count  = var.runner_provider == "eks" || local.kubernetes_manager ? 1 : 0
   source = "../internal/kubernetes/eks"
 }
 
 module "aks-cluster" {
-  count  = var.runner_provider == "aks" || kubernetes_manager ? 1 : 0
+  count  = var.runner_provider == "aks" || local.kubernetes_manager ? 1 : 0
   source = "../internal/kubernetes/aks"
 }
 
@@ -53,26 +54,28 @@ module "azure-instance-group" {
 ###################
 
 module "gce-managers" {
-  count  = var.manager_provider == "gce"
+  count  = var.manager_provider == "gce" ? 1 : 0
   source = "../internal/manager/gce"
 }
 
 module "ec2-managers" {
-  count  = var.manager_provider == "ec2"
+  count  = var.manager_provider == "ec2" ? 1 : 0
   source = "../internal/manager/ec2"
 }
 
 module "azure-managers" {
-  count  = var.manager_provider == "azure"
+  count  = var.manager_provider == "azure" ? 1 : 0
   source = "../internal/manager/azure"
 }
 
 module "helm" {
-  count  = var.manager_provider == "helm"
-  source = "../internal/manager/helm"
+  count        = var.manager_provider == "helm" ? 1 : 0
+  source       = "../internal/manager/helm"
+  runner_token = module.gitlab.runner_token
+  gitlab_url   = var.gitlab_url
 }
 
 module "operator" {
-  count  = var.manager_provider == "operator"
+  count  = var.manager_provider == "operator" ? 1 : 0
   source = "../internal/manager/operator"
 }

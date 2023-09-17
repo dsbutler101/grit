@@ -4,14 +4,14 @@ provider "gitlab" {
 }
 
 provider "google" {
-  project = var.project_id
+  project = var.gcp_project_id
   zone    = var.zone
 }
 
 provider "helm" {
   kubernetes {
-    host                   = google_container_cluster.primary.endpoint
-    token                  = data.google_client_config.provider.access_token
-    cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+    host                   = module.test.gke-cluster.host
+    token                  = module.test.gke-cluster.access_token
+    cluster_ca_certificate = base64decode(module.test.gke-cluster.ca_certificate)
   }
 }

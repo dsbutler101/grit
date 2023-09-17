@@ -1,7 +1,3 @@
-variable "project_id" {
-  description = "The GCP project in which to create your cluster"
-}
-
 variable "region" {
   default     = "us-central1"
   description = "The GCP region in which your cluster will reside"

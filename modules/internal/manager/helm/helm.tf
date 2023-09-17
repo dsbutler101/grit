@@ -12,6 +12,6 @@ resource "helm_release" "gitlab-runner" {
   }
   set {
     name  = "runnerToken"
-    value = gitlab_user_runner.primary.token
+    value = var.runner_token
   }
 }

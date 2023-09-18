@@ -14,3 +14,7 @@ variable "gitlab_url" {
   description = "The URL of the GitLab instance where to register the Runner Manager"
   default     = "https://gitlab.com/"
 }
+
+variable "gitlab_runner_description" {
+  default = "GRIT"
+}

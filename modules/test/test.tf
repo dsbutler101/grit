@@ -7,8 +7,9 @@ locals {
 #######################
 
 module "gitlab" {
-  source            = "../internal/gitlab"
-  gitlab_project_id = var.gitlab_project_id
+  source                    = "../internal/gitlab"
+  gitlab_project_id         = var.gitlab_project_id
+  gitlab_runner_description = var.gitlab_runner_description
 }
 
 ######################
@@ -54,13 +55,15 @@ module "azure-instance-group" {
 ###################
 
 module "gce-managers" {
-  count  = var.manager_provider == "gce" ? 1 : 0
-  source = "../internal/manager/gce"
+  count        = var.manager_provider == "gce" ? 1 : 0
+  source       = "../internal/manager/gce"
 }
 
 module "ec2-managers" {
   count  = var.manager_provider == "ec2" ? 1 : 0
   source = "../internal/manager/ec2"
+  runner_token = module.gitlab.runner_token
+  gitlab_url   = var.gitlab_url
 }
 
 module "azure-managers" {

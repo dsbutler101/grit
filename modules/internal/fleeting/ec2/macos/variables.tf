@@ -61,7 +61,7 @@ variable "protect_from_scale_in" {
 }
 
 variable "labels" {
-  type    = map(any)
+  type = map(any)
   default = {
     env = "grit"
   }

@@ -62,7 +62,7 @@ resource "aws_instance" "web" {
   subnet_id                   = aws_subnet.subnet_public.id
   vpc_security_group_ids      = [aws_security_group.sg_22.id]
   associate_public_ip_address = true
-  user_data                   = templatefile("${path.module}/setup-runner.yaml", {
+  user_data = templatefile("${path.module}/setup-runner.yaml", {
     gitlab_url   = var.gitlab_url
     runner_token = var.runner_token
   })

@@ -1,2 +1,2 @@
-variable gitlab_url {}
-variable runner_token {}
+variable "gitlab_url" {}
+variable "runner_token" {}

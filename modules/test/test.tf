@@ -18,17 +18,17 @@ module "gitlab" {
 ######################
 
 module "gke-cluster" {
-  count  = var.runner_provider == "gke" || local.kubernetes_manager ? 1 : 0
+  count  = var.capacity_provider == "gke" || local.kubernetes_manager ? 1 : 0
   source = "../internal/kubernetes/gke"
 }
 
 module "eks-cluster" {
-  count  = var.runner_provider == "eks" || local.kubernetes_manager ? 1 : 0
+  count  = var.capacity_provider == "eks" || local.kubernetes_manager ? 1 : 0
   source = "../internal/kubernetes/eks"
 }
 
 module "aks-cluster" {
-  count  = var.runner_provider == "aks" || local.kubernetes_manager ? 1 : 0
+  count  = var.capacity_provider == "aks" || local.kubernetes_manager ? 1 : 0
   source = "../internal/kubernetes/aks"
 }
 
@@ -37,17 +37,17 @@ module "aks-cluster" {
 ##################
 
 module "gce-instance-group" {
-  count  = var.runner_provider == "gce" ? 1 : 0
+  count  = var.capacity_provider == "gce" ? 1 : 0
   source = "../internal/fleeting/gce"
 }
 
 module "ec2-instance-group" {
-  count  = var.runner_provider == "ec2" ? 1 : 0
+  count  = var.capacity_provider == "ec2" ? 1 : 0
   source = "../internal/fleeting/ec2"
 }
 
 module "azure-instance-group" {
-  count  = var.runner_provider == "azure" ? 1 : 0
+  count  = var.capacity_provider == "azure" ? 1 : 0
   source = "../internal/fleeting/azure"
 }
 
@@ -56,13 +56,13 @@ module "azure-instance-group" {
 ###################
 
 module "gce-managers" {
-  count        = var.manager_provider == "gce" ? 1 : 0
-  source       = "../internal/manager/gce"
+  count  = var.manager_provider == "gce" ? 1 : 0
+  source = "../internal/manager/gce"
 }
 
 module "ec2-managers" {
-  count  = var.manager_provider == "ec2" ? 1 : 0
-  source = "../internal/manager/ec2"
+  count        = var.manager_provider == "ec2" ? 1 : 0
+  source       = "../internal/manager/ec2"
   runner_token = module.gitlab.runner_token
   gitlab_url   = var.gitlab_url
 }

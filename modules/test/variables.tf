@@ -18,3 +18,7 @@ variable "gitlab_url" {
 variable "gitlab_runner_description" {
   default = "GRIT"
 }
+
+variable "gitlab_runner_tags" {
+  default = []
+}

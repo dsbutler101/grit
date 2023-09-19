@@ -155,6 +155,8 @@ default AMI. Same goes for `modules/test` and `modules/prod`. The
 details of each template, separate by cloud provider and then
 operating system. These should not be used outside the GRIT modules.
 
+### Outputs
+
 Because GRIT handles a widely expanding combination of configurations
 outputs are exported from each layer as a map. This avoids the need to
 repeat each output at every layer.

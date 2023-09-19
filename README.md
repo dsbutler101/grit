@@ -103,3 +103,94 @@ many personas and use-cases.
 
 - With a regular cadence of release and upgrade, best practices and bug fixes can be adopted widely.
 - Easier to discuss and diagnose configuration issues. Users can say "I'm on GRIT 16.5 and I'm seeing this ..." and support will know exactly how they are setup.
+
+## API and Guarantees
+
+The GRIT API is defined by `variables.tf` in the directories
+`modules/dev`, `modules/test` and `modules/prod`. These variables are
+the parameters for configuring each stage of GRIT.
+
+The `dev` stage should be considered volatile. It's a set of
+convenience configuration for developing and debugging runner. They
+should work but might change as needs of developers change. These
+templates do not produce a full working runner deployment.
+
+The `test` stage will be relatively stable. It's all the ways that 
+GRIT can deploy runners but with lots of convenient defaults so they
+can be setup will few required parameters. These templates register
+runner to a GitLab instance so they will produce a working runner
+deployment.
+
+The `prod` stage templates will each be associated with a maturity
+designation of `alpha`, `beta` or `stable`. The goal of all `prod`
+templates is to be `stable`.
+
+The `stable` templates are the set of battle-hardened templates that
+GRIT authors have experience running. They will be backward
+compatible, meaning they will not be refactored in a way that causes
+unnecessary resource destruction. Especially since that would likely
+cause an outage! When backward incompatable changes are necessary
+advance warning will be given in manner compatible with existing
+GitLab deprecation policies.
+
+## Contributing
+
+GRIT is currently early in the development stage so if you want to
+contribute, reach out to us through Slack or open an Issue. There's
+lots to do, but you might need a little help getting started.
+
+### General Guidance
+
+The GRIT codebase should conform to [Google's best practices for using
+Terraform](https://cloud.google.com/docs/terraform/best-practices-for-terraform).
+
+The goal of GRIT is decompose runner infrastructure sufficiently that
+there is little to no repetition. The `environments` folders are
+examples of how to use GRIT to setup a runner deployment. The
+`modules/dev` and subfolders are all the defaults that are applied to
+make `dev` templates convenient to
+use. E.g. `modules/dev/ec2/macos/macos.tf` contains a reference to a
+default AMI. Same goes for `modules/test` and `modules/prod`. The
+`modules/internal` directory structure contains the implementation
+details of each template, separate by cloud provider and then
+operating system. These should not be used outside the GRIT modules.
+
+Because GRIT handles a widely expanding combination of configurations
+outputs are exported from each layer as a map. This avoids the need to
+repeat each output at every layer.
+
+For example EC2 MacOS outputs are surfaced like this:
+
+```terraform
+output "output_map" {
+  description = "Outputs from the Fleeting Instance Group"
+  value = tomap({
+    "ssh_key_pem"                                = module.instance_group.ssh_key_pem,
+    "fleeting_service_account_access_key_id"     = module.instance_group.fleeting_service_account_access_key_id,
+    "fleeting_service_account_secret_access_key" = module.instance_group.fleeting_service_account_secret_access_key,
+  })
+}
+```
+
+And bubbled up like this:
+
+```terrform
+output "output_map" {
+  description = "Outputs from EC2 resources"
+  value = tomap({
+    "macos" = try(module.macos[0].output_map, null),
+  })
+}
+```
+
+For resources which are not created based on `counts` fields
+the `try` block will emit their output map as `null`.
+
+This allows users to access the ssh key via references like this:
+
+```terraform
+value = module.my-runner.ec2.macos.ssh_key_pem
+```
+
+And prevents outputs referencing resources not created. E.g. AKS
+clusters when deploying to GKE.

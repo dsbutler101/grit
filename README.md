@@ -25,7 +25,7 @@ uses convenient defaults and is not necessarily production grade.
 
 ```terraform
 module "single-ec2-shell-runner" {
-  source = "../../grit/modules/test"
+  source = "../grit/modules/test"
 
   manager_provider  = "ec2"
   capacity_provider = "none"
@@ -40,7 +40,7 @@ module "single-ec2-shell-runner" {
 
 ```terraform
 module "gke-kubernetes-runner" {
-  source = "../../grit/modules/test"
+  source = "../grit/modules/test"
 
   manager_provider  = "helm"
   capacity_provider = "gke"

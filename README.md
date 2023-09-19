@@ -191,7 +191,9 @@ the `try` block will emit their output map as `null`.
 This allows users to access the ssh key via references like this:
 
 ```terraform
-value = module.my-runner.ec2.macos.ssh_key_pem
+module "my-runner" {
+  value = module.my-runner.ec2.macos.ssh_key_pem
+}
 ```
 
 And prevents outputs referencing resources not created. E.g. AKS

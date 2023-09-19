@@ -30,7 +30,7 @@ module "single-ec2-shell-runner" {
   manager_provider  = "ec2"
   capacity_provider = "none"
 
-  gitlab_project_id         = "YOUR_PROJECT_ID
+  gitlab_project_id         = "YOUR_PROJECT_ID"
   gitlab_runner_description = "grit-runner"
   gitlab_runner_tags        = []
 }

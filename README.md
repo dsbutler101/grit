@@ -176,7 +176,7 @@ output "output_map" {
 
 And bubbled up like this:
 
-```terrform
+```terraform
 output "output_map" {
   description = "Outputs from EC2 resources"
   value = tomap({

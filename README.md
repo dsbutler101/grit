@@ -1,3 +1,5 @@
+Demo: https://youtu.be/sWugZ_eW5nQ
+
 # GitLab Runner Infrastructure Toolkit (GRIT)
 
 The GitLab Runner Infrastructure Toolkit (GRIT) is a library of

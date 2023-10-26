@@ -10,13 +10,21 @@ resource "aws_launch_template" "fleeting-asg" {
 
   key_name = aws_key_pair.jobs.key_name
 
-  license_specification {
-    license_configuration_arn = aws_licensemanager_license_configuration.license-config.arn
+  dynamic "license_specification" {
+    for_each = var.license_arn != "" ? [1] : []
+
+    content {
+      license_configuration_arn = var.license_arn
+    }
   }
 
-  placement {
-    tenancy                 = "host"
-    host_resource_group_arn = aws_cloudformation_stack.jobs-host-resource-group.outputs["ResourceGroupArn"]
+  dynamic "placement" {
+    for_each = length(var.jobs-host-resource-group-outputs) > 0 ? [1] : []
+
+    content {
+      tenancy                 = "host"
+      host_resource_group_arn = var.jobs-host-resource-group-outputs["ResourceGroupArn"]
+    }
   }
 
   block_device_mappings {
@@ -63,7 +71,7 @@ resource "aws_autoscaling_group" "fleeting-asg" {
   }
 
   min_size = 0
-  max_size = var.autoscaling_group_max
+  max_size = var.scale_max
 
   health_check_grace_period = 600
 

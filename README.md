@@ -30,7 +30,7 @@ module "single-ec2-shell-runner" {
   source = "../grit/modules/test"
 
   manager_provider  = "ec2"
-  capacity_provider = "none"
+  fleeting_provider = "none"
 
   gitlab_project_id         = "YOUR_PROJECT_ID"
   gitlab_runner_description = "grit-runner"
@@ -45,7 +45,7 @@ module "gke-kubernetes-runner" {
   source = "../grit/modules/test"
 
   manager_provider  = "helm"
-  capacity_provider = "gke"
+  fleeting_provider = "gke"
 
   gitlab_project_id         = "YOUR_PROJECT_ID"
   gitlab_runner_description = "grit-runner"

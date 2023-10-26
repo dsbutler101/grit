@@ -2,7 +2,7 @@ variable "manager_provider" {
   description = "The system which provides infrastructure for the Runner Managers"
 }
 
-variable "capacity_provider" {
+variable "fleeting_provider" {
   description = "The system which provides infrastructure for the Runners"
 }
 

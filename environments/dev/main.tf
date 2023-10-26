@@ -1,5 +1,5 @@
 module "dev" {
   source            = "../../modules/dev"
   fleeting_provider = "ec2"
-  os                = "macos"
+  fleeting_os       = "macos"
 }

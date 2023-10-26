@@ -2,6 +2,11 @@
 # AWS configuration #
 #####################
 
+variable "aws_zone" {
+  type    = string
+  default = "us-east-1a"
+}
+
 variable "aws_vpc_cidr" {
   type = string
 }
@@ -18,6 +23,14 @@ variable "required_license_count_per_asg" {
 variable "cores_per_license" {
   type    = number
   default = 8
+}
+
+variable "asg_storage" {
+  type = object({
+    size       = optional(number, 500)
+    type       = optional(string, "gp2")
+    throughput = optional(number)
+  })
 }
 
 variable "autoscaling_groups" {
@@ -42,9 +55,37 @@ variable "autoscaling_groups" {
   */
 }
 
+variable "protect_from_scale_in" {
+  type    = bool
+  default = true
+}
+
 variable "labels" {
   type = map(any)
   default = {
     env = "grit"
   }
+}
+
+variable "scale_min" {
+  default = 0
+}
+
+variable "scale_max" {
+  type    = number
+  default = 20
+}
+
+variable "idle_percentage" {
+  default = 10
+}
+
+variable "license_arn" {
+  type    = string
+  default = ""
+}
+
+variable "jobs-host-resource-group-outputs" {
+  type    = map(any)
+  default = {}
 }

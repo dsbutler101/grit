@@ -1,1 +1,1 @@
-variable "os" {}
+variable "fleeting_os" {}

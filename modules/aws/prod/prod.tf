@@ -2,6 +2,14 @@
 # PROD MODULE #
 ###############
 
+locals {
+  use_case = "${var.fleeting_service}-${var.manager_provider}-${var.executor}"
+  use_case_maturity = tomap({
+    "ec2-ec2-docker-autoscaler" = "alpha"
+  })
+  maturity = try(local.use_case_maturity[local.use_case], "unsupported")
+}
+
 module "prod-module" {
   source = "./internal"
 
@@ -21,4 +29,19 @@ module "prod-module" {
   gitlab_project_id         = var.gitlab_project_id
   gitlab_runner_description = var.gitlab_runner_description
   gitlab_runner_tags        = var.gitlab_runner_tags
+}
+
+check "maturity" {
+  assert {
+    condition = local.maturity == "alpha" || local.maturity == "beta" || local.maturity == "stable" || var.min_maturity != "alpha"
+    error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
+  }
+  assert {
+    condition = local.maturity == "beta" || local.maturity == "stable" || var.min_maturity != "beta"
+    error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
+  }
+  assert {
+    condition = local.maturity == "stable" || var.min_maturity != "stable"
+    error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
+  }
 }

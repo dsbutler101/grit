@@ -34,8 +34,6 @@ output "fleeting_service_account_secret_access_key" {
 # Autoscaling Group #
 #####################
 
-output "autoscaling_group_names" {
-  value = [
-    for asg in aws_autoscaling_group.fleeting-asg : asg.name
-  ]
+output "autoscaling_group_name" {
+  value = aws_autoscaling_group.fleeting-asg.name
 }

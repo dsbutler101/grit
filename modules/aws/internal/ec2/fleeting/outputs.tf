@@ -35,6 +35,6 @@ output "fleeting_service_account_secret_access_key" {
 # Autoscaling Group #
 #####################
 
-output "autoscaling_group_names" {
-  value = module.common.autoscaling_group_names
+output "autoscaling_group_name" {
+  value = module.common.autoscaling_group_name
 }

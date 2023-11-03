@@ -25,34 +25,31 @@ variable "cores_per_license" {
   default = 8
 }
 
-variable "asg_storage" {
-  type = object({
-    size       = optional(number, 500)
-    type       = optional(string, "gp2")
-    throughput = optional(number)
-  })
+variable "asg_storage_size" {
+  type    = number
+  default = 500
 }
 
-variable "autoscaling_groups" {
-  type = map(object({
-    ami_id        = string
-    instance_type = string
-    subnet_cidr   = string
-  }))
+variable "asg_storage_type" {
+  type    = string
+  default = "gp2"
+}
 
-  /*
-    Example usage:
+variable "asg_storage_throughput" {
+  type    = number
+  default = 0
+}
 
-    autoscaling_groups = {
-      group-1 = {
-        ami_id        = var.ami
-        instance_type = "mac2.metal"
-        subnet_cidr   = "10.0.22.0/21"
-      },
-      group-2 = {...},
-      (...)
-    }
-  */
+variable "asg_ami_id" {
+  type = string
+}
+
+variable "asg_instance_type" {
+  type = string
+}
+
+variable "asg_subnet_cidr" {
+  type = string
 }
 
 variable "protect_from_scale_in" {
@@ -68,6 +65,7 @@ variable "labels" {
 }
 
 variable "scale_min" {
+  type    = number
   default = 0
 }
 
@@ -77,6 +75,7 @@ variable "scale_max" {
 }
 
 variable "idle_percentage" {
+  type    = number
   default = 10
 }
 

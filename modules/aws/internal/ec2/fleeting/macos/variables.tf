@@ -20,26 +20,16 @@ variable "cores_per_license" {
   default = 8
 }
 
-variable "autoscaling_groups" {
-  type = map(object({
-    ami_id        = string
-    instance_type = string
-    subnet_cidr   = string
-  }))
+variable "asg_ami_id" {
+  type = string
+}
 
-  /*
-    Example usage:
+variable "asg_instance_type" {
+  type = string
+}
 
-    autoscaling_groups = {
-      group-1 = {
-        ami_id        = var.ami
-        instance_type = "mac2.metal"
-        subnet_cidr   = "10.0.22.0/21"
-      },
-      group-2 = {...},
-      (...)
-    }
-  */
+variable "asg_subnet_cidr" {
+  type = string
 }
 
 variable "labels" {

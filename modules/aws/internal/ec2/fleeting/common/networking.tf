@@ -31,17 +31,15 @@ resource "aws_route" "internet-access" {
 }
 
 resource "aws_subnet" "jobs-vpc-subnet" {
-  for_each = var.autoscaling_groups
-
   vpc_id     = aws_vpc.jobs-vpc.id
-  cidr_block = each.value.subnet_cidr
+  cidr_block = var.asg_subnet_cidr
 
   availability_zone = var.aws_zone
 
   map_public_ip_on_launch = true
 
   tags = merge(var.labels, {
-    Name = each.key
+    Name = "${var.aws_zone} subnet"
   })
 }
 

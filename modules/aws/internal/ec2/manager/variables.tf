@@ -10,8 +10,12 @@ variable "aws_asg_name" {
   type = string
 }
 
-variable "idle_count" {
-  type = string
+variable "capacity_per_instance" {
+  type = number
+}
+
+variable "scale_min" {
+  type = number
 }
 
 variable "scale_max" {

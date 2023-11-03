@@ -3,8 +3,8 @@
 ################################
 
 module "instance_group" {
-  source = "../../../../internal/ec2/fleeting"
-  os     = "macos"
+  source      = "../../../../internal/ec2/fleeting"
+  fleeting_os = "macos"
 
   ami           = "ami-0fcd5ff1c92b00231"
   instance_type = "mac2.metal"

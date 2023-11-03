@@ -1,2 +1,7 @@
-variable "runner_token" {}
-variable "gitlab_url" {}
+variable "runner_token" {
+  type = string
+}
+
+variable "gitlab_url" {
+  type = string
+}

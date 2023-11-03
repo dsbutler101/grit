@@ -4,10 +4,10 @@
 
 module "linux" {
   count  = var.fleeting_os == "linux" ? 1 : 0
-  source = "linux"
+  source = "./linux"
 }
 
 module "windows" {
   count  = var.fleeting_os == "windows" ? 1 : 0
-  source = "windows"
+  source = "./windows"
 }

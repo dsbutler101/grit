@@ -1,3 +1,11 @@
-variable "gitlab_project_id" {}
-variable "gitlab_runner_description" {}
-variable "gitlab_runner_tags" {}
+variable "gitlab_project_id" {
+  type = string
+}
+
+variable "gitlab_runner_description" {
+  type = string
+}
+
+variable "gitlab_runner_tags" {
+  type = list(string)
+}

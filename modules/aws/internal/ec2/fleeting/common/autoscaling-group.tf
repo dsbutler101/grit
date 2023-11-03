@@ -1,12 +1,10 @@
 resource "aws_launch_template" "fleeting-asg" {
-  for_each = var.autoscaling_groups
-
-  description = "Launch template for GitLab Runner fleeting configuration for ${each.key}"
+  description = "Launch template for GitLab Runner fleeting configuration"
 
   tags = var.labels
 
-  image_id      = each.value.ami_id
-  instance_type = each.value.instance_type
+  image_id      = var.asg_ami_id
+  instance_type = var.asg_instance_type
 
   key_name = aws_key_pair.jobs.key_name
 
@@ -32,14 +30,14 @@ resource "aws_launch_template" "fleeting-asg" {
 
     ebs {
       delete_on_termination = "true"
-      volume_size           = var.asg_storage.size
-      volume_type           = var.asg_storage.type
-      throughput            = var.asg_storage.throughput
+      volume_size           = var.asg_storage_size
+      volume_type           = var.asg_storage_type
+      throughput            = var.asg_storage_throughput
     }
   }
 
   network_interfaces {
-    subnet_id = aws_subnet.jobs-vpc-subnet[each.key].id
+    subnet_id = aws_subnet.jobs-vpc-subnet.id
 
     security_groups = [
       aws_security_group.jobs-security-group.id
@@ -61,13 +59,11 @@ resource "aws_launch_template" "fleeting-asg" {
 }
 
 resource "aws_autoscaling_group" "fleeting-asg" {
-  for_each = var.autoscaling_groups
-
-  name = each.key
+  name = "GRIT ASG"
 
   launch_template {
-    id      = aws_launch_template.fleeting-asg[each.key].id
-    version = aws_launch_template.fleeting-asg[each.key].latest_version
+    id      = aws_launch_template.fleeting-asg.id
+    version = aws_launch_template.fleeting-asg.latest_version
   }
 
   min_size = 0
@@ -76,7 +72,7 @@ resource "aws_autoscaling_group" "fleeting-asg" {
   health_check_grace_period = 600
 
   vpc_zone_identifier = [
-    aws_subnet.jobs-vpc-subnet[each.key].id
+    aws_subnet.jobs-vpc-subnet.id
   ]
 
   protect_from_scale_in = var.protect_from_scale_in

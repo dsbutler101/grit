@@ -1,1 +1,3 @@
-variable "fleeting_os" {}
+variable "fleeting_os" {
+  type = string
+}

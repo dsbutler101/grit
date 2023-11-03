@@ -36,5 +36,5 @@ output "fleeting_service_account_secret_access_key" {
 #####################
 
 output "autoscaling_group_names" {
-  value = module.ec2-instance-group[0].autoscaling_group_names
+  value = module.ec2-instance-group[0].autoscaling_group_name
 }

@@ -12,31 +12,21 @@ module "common" {
   scale_max       = var.scale_max
   idle_percentage = var.idle_percentage
 
-  asg_storage = {
-    type       = "gp3"
-    throughput = 750
-  }
-  autoscaling_groups = {
-    main = {
-      ami_id        = var.vm_img_id
-      instance_type = var.instance_type
-      subnet_cidr   = "10.0.0.0/24"
-    }
-  }
-  aws_vpc_cidr = "10.0.0.0/24"
+  asg_storage_type       = "gp3"
+  asg_storage_throughput = 750
+  asg_ami_id             = var.ami
+  asg_instance_type      = var.instance_type
+  asg_subnet_cidr        = "10.0.0.0/24"
+  aws_vpc_cidr           = "10.0.0.0/24"
 }
 
 module "macos" {
   count  = var.os == "macos" ? 1 : 0
   source = "./macos"
 
-  autoscaling_groups = {
-    main = {
-      ami_id        = var.vm_img_id
-      instance_type = var.instance_type
-      subnet_cidr   = "10.0.0.0/24"
-    }
-  }
+  asg_ami_id        = var.ami
+  asg_instance_type = var.instance_type
+  asg_subnet_cidr   = "10.0.0.0/24"
 
   aws_vpc_cidr = "10.0.0.0/24"
 }

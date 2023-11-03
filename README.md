@@ -27,10 +27,10 @@ uses convenient defaults and is not necessarily production grade.
 
 ```terraform
 module "single-ec2-shell-runner" {
-  source = "../grit/modules/test"
+  source = "modules/aws/test"
 
   manager_provider  = "ec2"
-  fleeting_provider = "none"
+  fleeting_service = "none"
 
   gitlab_project_id         = "YOUR_PROJECT_ID"
   gitlab_runner_description = "grit-runner"
@@ -42,10 +42,10 @@ module "single-ec2-shell-runner" {
 
 ```terraform
 module "gke-kubernetes-runner" {
-  source = "../grit/modules/test"
+  source = "modules/aws/test"
 
   manager_provider  = "helm"
-  fleeting_provider = "gke"
+  fleeting_service = "gke"
 
   gitlab_project_id         = "YOUR_PROJECT_ID"
   gitlab_runner_description = "grit-runner"
@@ -64,9 +64,9 @@ the credential necessary to access the raw resources.
 
 ```terraform
 module "my-experimental-mac-machines" {
-  source = "../grit/modules/dev"
+  source = "modules/aws/dev"
 
-  fleeting_provider = "ec2"
+  fleeting_service = "ec2"
   os                = "macos"
 }
 ```

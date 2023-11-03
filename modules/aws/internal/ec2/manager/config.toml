@@ -1,0 +1,45 @@
+concurrent = ${scale_max}
+
+[[runners]]
+    name = "grit-test-instance"
+    url = "${gitlab_url}"
+    token = "${runner_token}"
+
+%{ if fleeting_service != "ec2" }
+    executor = "shell"
+%{ endif }
+%{ if fleeting_service == "ec2" }
+    executor = "docker-autoscaler"
+    shell = "sh" # use powershell or pwsh for Windows AMIs
+
+    # uncomment for Windows AMIs when the Runner manager is hosted on Linux
+    # environment = ["FF_USE_POWERSHELL_PATH_RESOLVER=1"]
+
+    # Docker Executor config
+    [runners.docker]
+        image = "busybox:latest"
+
+    # Autoscaler config
+    [runners.autoscaler]
+        plugin = "/etc/gitlab-runner/fleeting-plugin-aws"
+
+        capacity_per_instance = 1
+        max_use_count = 10
+        max_instances = ${scale_max}
+
+        [runners.autoscaler.plugin_config]
+            name             = "${aws_asg_name}"          # AWS Autoscaling Group name
+            profile          = "default"                  # optional, default is 'default'
+            config_file      = "/root/.aws/config"        # optional, default is '~/.aws/config'
+            credentials_file = "/root/.aws/credentials"   # optional, default is '~/.aws/credentials'
+            region           = "us-east-1"                # required
+
+        [runners.autoscaler.connector_config]
+            username          = "ubuntu"
+            use_external_addr = true
+            key_path          = "/etc/gitlab-runner/keypair.pem"
+
+        [[runners.autoscaler.policy]]
+            idle_count = ${idle_count}
+            idle_time = "20m0s"
+%{ endif }

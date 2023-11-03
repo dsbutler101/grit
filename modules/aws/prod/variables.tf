@@ -64,7 +64,7 @@ variable "executor" {
 variable "min_maturity" {
   type = string
   validation {
-    condition = var.min_maturity == "alpha" || var.min_maturity == "beta" || var.min_maturity == "stable"
+    condition     = var.min_maturity == "alpha" || var.min_maturity == "beta" || var.min_maturity == "stable"
     error_message = "min_maturity must be alpha, beta or stable"
   }
 }

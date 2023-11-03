@@ -33,15 +33,15 @@ module "prod-module" {
 
 check "maturity" {
   assert {
-    condition = local.maturity == "alpha" || local.maturity == "beta" || local.maturity == "stable" || var.min_maturity != "alpha"
+    condition     = local.maturity == "alpha" || local.maturity == "beta" || local.maturity == "stable" || var.min_maturity != "alpha"
     error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
   }
   assert {
-    condition = local.maturity == "beta" || local.maturity == "stable" || var.min_maturity != "beta"
+    condition     = local.maturity == "beta" || local.maturity == "stable" || var.min_maturity != "beta"
     error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
   }
   assert {
-    condition = local.maturity == "stable" || var.min_maturity != "stable"
+    condition     = local.maturity == "stable" || var.min_maturity != "stable"
     error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
   }
 }

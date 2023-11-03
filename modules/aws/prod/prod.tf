@@ -32,16 +32,22 @@ module "prod-module" {
 }
 
 check "maturity" {
+
+  // min_maturity alpha can be satisfied by alpha, beta or stable
   assert {
-    condition     = local.maturity == "alpha" || local.maturity == "beta" || local.maturity == "stable" || var.min_maturity != "alpha"
+    condition     = var.min_maturity != "alpha" || local.maturity == "alpha" || local.maturity == "beta" || local.maturity == "stable"
     error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
   }
+
+  // min_maturity beta can be satisfied by beta or stable
   assert {
-    condition     = local.maturity == "beta" || local.maturity == "stable" || var.min_maturity != "beta"
+    condition     = var.min_maturity != "beta" || local.maturity == "beta" || local.maturity == "stable"
     error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
   }
+
+  // min_maturity beta can be satisfied by only stable
   assert {
-    condition     = local.maturity == "stable" || var.min_maturity != "stable"
+    condition     = var.min_maturity != "stable" || local.maturity == "stable"
     error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
   }
 }

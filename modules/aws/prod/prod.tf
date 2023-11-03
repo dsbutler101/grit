@@ -45,7 +45,7 @@ check "maturity" {
     error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"
   }
 
-  // min_maturity beta can be satisfied by only stable
+  // min_maturity stable can be satisfied by only stable
   assert {
     condition     = var.min_maturity != "stable" || local.maturity == "stable"
     error_message = "Maturity is ${local.maturity} but min_maturity is ${var.min_maturity}"

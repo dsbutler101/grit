@@ -26,9 +26,9 @@ locals {
           gitlab_url       = var.gitlab_url
           runner_token     = var.runner_token
           aws_asg_name     = var.aws_asg_name
-          scale_max        = var.scale_max
-          idle_count       = var.idle_count
           fleeting_service = var.fleeting_service
+          idle_count       = var.scale_min * var.capacity_per_instance
+          scale_max        = var.scale_max
         })
       }
     ]

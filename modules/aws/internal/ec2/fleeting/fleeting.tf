@@ -21,7 +21,7 @@ module "common" {
 }
 
 module "macos" {
-  count  = var.os == "macos" ? 1 : 0
+  count  = var.fleeting_os == "macos" ? 1 : 0
   source = "./macos"
 
   asg_ami_id        = var.ami

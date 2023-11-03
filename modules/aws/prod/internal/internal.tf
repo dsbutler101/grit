@@ -25,11 +25,11 @@ module "ec2-instance-group" {
   count  = var.fleeting_service == "ec2" ? 1 : 0
   source = "../../internal/ec2/fleeting"
 
-  os            = "linux"
-  ami           = "ami-0a1cc31585e72ab51"
-  instance_type = "t2.large"
-  aws_vpc_cidr  = "10.0.0.0/24"
-  scale_max     = 100
+  fleeting_os   = var.fleeting_os
+  ami           = var.ami
+  instance_type = var.instance_type
+  aws_vpc_cidr  = var.aws_vpc_cidr
+  scale_max     = var.scale_max
 }
 
 ###################
@@ -40,14 +40,16 @@ module "ec2-managers" {
   count                                      = var.manager_provider == "ec2" ? 1 : 0
   source                                     = "../../internal/ec2/manager"
   runner_token                               = module.gitlab.runner_token
-  executor                                   = "docker-autoscaler"
+  executor                                   = var.executor
   gitlab_url                                 = var.gitlab_url
   fleeting_service_account_access_key_id     = local.access_key_id
   fleeting_service_account_secret_access_key = local.secret_access_key
   ssh_key_pem                                = local.ssh_key_pem
   ssh_key_pem_name                           = local.ssh_key_pem_name
   aws_asg_name                               = local.aws_asg_name
-  idle_count                                 = 10
-  scale_max                                  = 100
   fleeting_service                           = var.fleeting_service
+
+  capacity_per_instance = var.capacity_per_instance
+  scale_min             = var.scale_min
+  scale_max             = var.scale_max
 }

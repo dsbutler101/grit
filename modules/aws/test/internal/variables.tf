@@ -1,0 +1,24 @@
+variable "manager_provider" {
+  description = "The system which provides infrastructure for the Runner Managers"
+}
+
+variable "fleeting_service" {
+  description = "The system which provides infrastructure for the Runners"
+}
+
+variable "gitlab_project_id" {
+  description = "The project ID in which to register the runner"
+}
+
+variable "gitlab_url" {
+  description = "The URL of the GitLab instance where to register the Runner Manager"
+  default     = "https://gitlab.com/"
+}
+
+variable "gitlab_runner_description" {
+  default = "GRIT"
+}
+
+variable "gitlab_runner_tags" {
+  default = []
+}

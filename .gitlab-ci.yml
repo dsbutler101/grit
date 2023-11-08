@@ -1,7 +1,0 @@
-stages:
-- e2e
-
-e2e-hello-world:
-  stage: e2e
-  tags: [TestEndToEnd]
-  script: echo hello e2e

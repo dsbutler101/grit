@@ -11,6 +11,7 @@ locals {
 #######################
 
 module "gitlab" {
+  count                     = var.runner_token == "" ? 1 : 0
   source                    = "../../../gitlab/internal"
   gitlab_project_id         = var.gitlab_project_id
   gitlab_runner_description = var.gitlab_runner_description
@@ -37,9 +38,9 @@ module "ec2-instance-group" {
 ###################
 
 module "ec2-managers" {
-  count                                      = var.manager_provider == "ec2" ? 1 : 0
+  count                                      = var.manager_service == "ec2" ? 1 : 0
   source                                     = "../../internal/ec2/manager"
-  runner_token                               = module.gitlab.runner_token
+  runner_token                               = var.runner_token != "" ? var.runner_token : module.gitlab[0].runner_token
   executor                                   = var.executor
   gitlab_url                                 = var.gitlab_url
   fleeting_service_account_access_key_id     = local.access_key_id

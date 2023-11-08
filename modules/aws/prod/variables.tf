@@ -1,4 +1,4 @@
-variable "manager_provider" {
+variable "manager_service" {
   type        = string
   description = "The system which provides infrastructure for the Runner Managers"
 }
@@ -11,6 +11,7 @@ variable "fleeting_service" {
 variable "gitlab_project_id" {
   type        = string
   description = "The project ID in which to register the runner"
+  default     = ""
 }
 
 variable "gitlab_url" {
@@ -25,7 +26,8 @@ variable "gitlab_runner_description" {
 }
 
 variable "gitlab_runner_tags" {
-  type = list(string)
+  type    = list(string)
+  default = []
 }
 
 variable "fleeting_os" {
@@ -67,4 +69,9 @@ variable "min_maturity" {
     condition     = var.min_maturity == "alpha" || var.min_maturity == "beta" || var.min_maturity == "stable"
     error_message = "min_maturity must be alpha, beta or stable"
   }
+}
+
+variable "runner_token" {
+  type    = string
+  default = ""
 }

@@ -1,5 +1,5 @@
 locals {
-  kubernetes_manager = var.manager_provider == "helm" || var.manager_provider == "operator"
+  kubernetes_manager = var.manager_service == "helm" || var.manager_service == "operator"
 }
 
 #######################
@@ -7,6 +7,7 @@ locals {
 #######################
 
 module "gitlab" {
+  count                     = var.runner_token == "" ? 1 : 0
   source                    = "../../../gitlab/internal"
   gitlab_project_id         = var.gitlab_project_id
   gitlab_runner_description = var.gitlab_runner_description
@@ -46,18 +47,18 @@ module "gce-instance-group" {
 ###################
 
 module "gce-managers" {
-  count  = var.manager_provider == "gce" ? 1 : 0
+  count  = var.manager_service == "gce" ? 1 : 0
   source = "../../internal/gce/manager"
 }
 
 module "helm" {
-  count        = var.manager_provider == "helm" ? 1 : 0
+  count        = var.manager_service == "helm" ? 1 : 0
   source       = "../../../helm"
-  runner_token = module.gitlab.runner_token
+  runner_token = var.runner_token != "" ? var.runner_token : module.gitlab[0].runner_token
   gitlab_url   = var.gitlab_url
 }
 
 module "operator" {
-  count  = var.manager_provider == "operator" ? 1 : 0
+  count  = var.manager_service == "operator" ? 1 : 0
   source = "../../../operator"
 }

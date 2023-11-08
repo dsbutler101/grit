@@ -3,7 +3,7 @@
 ###############
 
 locals {
-  use_case = "${var.fleeting_service}-${var.manager_provider}-${var.executor}"
+  use_case = "${var.fleeting_service}-${var.manager_service}-${var.executor}"
   use_case_maturity = tomap({
     "ec2-ec2-docker-autoscaler" = "alpha"
   })
@@ -24,8 +24,9 @@ module "prod-module" {
   scale_min             = var.scale_min
   scale_max             = var.scale_max
 
-  manager_provider = var.manager_provider
+  manager_service = var.manager_service
 
+  runner_token              = var.runner_token
   gitlab_project_id         = var.gitlab_project_id
   gitlab_runner_description = var.gitlab_runner_description
   gitlab_runner_tags        = var.gitlab_runner_tags

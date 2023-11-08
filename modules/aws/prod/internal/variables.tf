@@ -1,4 +1,4 @@
-variable "manager_provider" {
+variable "manager_service" {
   type        = string
   description = "The system which provides infrastructure for the Runner Managers"
 }
@@ -27,6 +27,10 @@ variable "gitlab_runner_description" {
 variable "gitlab_runner_tags" {
   type    = list(string)
   default = []
+}
+
+variable "runner_token" {
+  type = string
 }
 
 variable "fleeting_os" {

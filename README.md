@@ -29,7 +29,7 @@ uses convenient defaults and is not necessarily production grade.
 module "single-ec2-shell-runner" {
   source = "modules/aws/test"
 
-  manager_provider  = "ec2"
+  manager_service  = "ec2"
   fleeting_service = "none"
 
   gitlab_project_id         = "YOUR_PROJECT_ID"
@@ -44,7 +44,7 @@ module "single-ec2-shell-runner" {
 module "gke-kubernetes-runner" {
   source = "modules/aws/test"
 
-  manager_provider  = "helm"
+  manager_service  = "helm"
   fleeting_service = "gke"
 
   gitlab_project_id         = "YOUR_PROJECT_ID"

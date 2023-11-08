@@ -30,6 +30,7 @@ variable "ssh_key_pem" {
   type    = string
   default = ""
 }
+
 variable "ssh_key_pem_name" {
   type    = string
   default = ""

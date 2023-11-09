@@ -43,7 +43,7 @@ func TestEndToEnd(t *testing.T) {
 		TerraformBinary: "terraform",
 		TerraformDir:    ".",
 		Vars: map[string]interface{}{
-			"manager_provider":      "ec2",
+			"manager_service":       "ec2",
 			"fleeting_service":      "ec2",
 			"gitlab_project_id":     gritEndToEndTestProjectID,
 			"gitlab_runner_tags":    []string{t.Name()},

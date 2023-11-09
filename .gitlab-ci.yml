@@ -1,0 +1,8 @@
+stages:
+- e2e
+
+prod-aws-e2e:
+  stage: e2e
+  script:
+    - cd modules/aws/prod
+    - go test . -tags e2e

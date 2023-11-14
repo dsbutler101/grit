@@ -1,0 +1,15 @@
+stages:
+- e2e
+
+prod-aws-e2e:
+  stage: e2e
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  before_script:
+    - apk add --update --no-cache curl tar bash
+    - curl -OL https://golang.org/dl/go1.21.4.linux-amd64.tar.gz
+    - tar -C /usr/local -xzf go1.21.4.linux-amd64.tar.gz
+    - export PATH=$PATH:/usr/local/go/bin
+    - go version
+  script:
+    - cd modules/aws/prod
+    - go test . -tags e2e -timeout 30m

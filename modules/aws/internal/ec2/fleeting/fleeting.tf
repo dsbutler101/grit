@@ -18,6 +18,7 @@ module "common" {
   asg_instance_type      = var.instance_type
   asg_subnet_cidr        = "10.0.0.0/24"
   aws_vpc_cidr           = "10.0.0.0/24"
+  name                   = var.name
 }
 
 module "macos" {
@@ -29,4 +30,5 @@ module "macos" {
   asg_subnet_cidr   = "10.0.0.0/24"
 
   aws_vpc_cidr = "10.0.0.0/24"
+  name         = var.name
 }

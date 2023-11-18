@@ -48,3 +48,7 @@ variable "idle_percentage" {
   type    = number
   default = 10
 }
+
+variable "name" {
+  type = string
+}

@@ -3,10 +3,15 @@
 #########################################
 
 resource "aws_iam_user" "fleeting-service-account" {
-  name = "fleeting-service-account"
+  name = "${var.name}_fleeting-service-account"
+
+  tags = merge(var.labels, {
+    Name = "${var.name}_fleeting-service-account"
+  })
 }
 
-data "aws_iam_policy_document" "fleeting-service-account-policy" {
+# both `name` and `tags` are unsupported arguments
+data "aws_iam_policy_document" "fleeting-service-account-policy-document" {
   statement {
     effect    = "Allow"
     resources = ["*"]
@@ -42,14 +47,20 @@ data "aws_iam_policy_document" "fleeting-service-account-policy" {
 resource "aws_iam_policy" "fleeting-service-account-policy" {
   name        = "fleeting-service-account-policy"
   description = "A policy for accessing autoscaling groups"
-  policy      = data.aws_iam_policy_document.fleeting-service-account-policy.json
+  policy      = data.aws_iam_policy_document.fleeting-service-account-policy-document.json
+
+  tags = merge(var.labels, {
+    Name = "${var.name}_fleeting-service-account-policy"
+  })
 }
 
+# both `name` and `tags` are unsupported arguments
 resource "aws_iam_user_policy_attachment" "fleeting-service-account-attach" {
   user       = aws_iam_user.fleeting-service-account.name
   policy_arn = aws_iam_policy.fleeting-service-account-policy.arn
 }
 
+# both `name` and `tags` are unsupported arguments
 resource "aws_iam_access_key" "fleeting-service-account-key" {
   user = aws_iam_user.fleeting-service-account.name
 }

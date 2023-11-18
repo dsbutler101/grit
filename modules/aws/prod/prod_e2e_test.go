@@ -20,6 +20,7 @@ import (
 )
 
 const (
+	jobIdVar                  = "CI_JOB_ID"
 	asgOutputKey              = "autoscaling_group_names"
 	gitlabTokenVar            = "GITLAB_TOKEN"
 	gritEndToEndTestProjectID = 52010278
@@ -30,6 +31,8 @@ const (
 
 func TestEndToEnd(t *testing.T) {
 
+	jobId := os.Getenv(jobIdVar)
+	require.NotEmpty(t, jobId)
 	gitlabToken := os.Getenv(gitlabTokenVar)
 	require.NotEmpty(t, gitlabToken)
 	client, err := gitlab.NewClient(gitlabToken)
@@ -57,6 +60,7 @@ func TestEndToEnd(t *testing.T) {
 			"executor":              "docker-autoscaler",
 			"min_maturity":          "alpha",
 			"runner_token":          runnerToken,
+			"name":                  "e2e-" + jobId,
 		},
 	}
 	_, err = terraform.InitAndApplyE(t, options)

@@ -5,3 +5,7 @@ variable "runner_token" {
 variable "gitlab_url" {
   type = string
 }
+
+variable "name" {
+  type = string
+}

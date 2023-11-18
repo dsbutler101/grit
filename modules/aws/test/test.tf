@@ -11,4 +11,5 @@ module "test-module" {
   runner_token       = var.runner_token
   gitlab_project_id  = var.gitlab_project_id
   gitlab_runner_tags = var.gitlab_runner_tags
+  name               = var.name
 }

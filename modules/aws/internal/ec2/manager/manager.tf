@@ -86,17 +86,30 @@ resource "aws_vpc" "vpc" {
   cidr_block           = "10.1.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
+
+  tags = merge(var.labels, {
+    Name = "${var.name}_vpc"
+  })
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
+
+  tags = merge(var.labels, {
+    Name = "${var.name}_igw"
+  })
 }
 
 resource "aws_subnet" "subnet_public" {
   vpc_id     = aws_vpc.vpc.id
   cidr_block = "10.1.0.0/24"
+
+  tags = merge(var.labels, {
+    Name = "${var.name}_subnet_public"
+  })
 }
 
+# adding tags to aws_route_table causes an error: query returned no results
 resource "aws_route_table" "rtb_public" {
   vpc_id = aws_vpc.vpc.id
   route {
@@ -111,7 +124,7 @@ resource "aws_route_table_association" "rta_subnet_public" {
 }
 
 resource "aws_security_group" "sg_22" {
-  name   = "sg_22"
+  name   = "${var.name}_sg_22"
   vpc_id = aws_vpc.vpc.id
   ingress {
     from_port   = 22
@@ -125,6 +138,10 @@ resource "aws_security_group" "sg_22" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = merge(var.labels, {
+    Name = "${var.name}_sg_22"
+  })
 }
 
 resource "aws_instance" "runner-manager" {
@@ -134,9 +151,11 @@ resource "aws_instance" "runner-manager" {
   vpc_security_group_ids      = [aws_security_group.sg_22.id]
   associate_public_ip_address = true
   user_data                   = data.cloudinit_config.config.rendered
-  tags = {
-    Name = "GRIT Runner Manager"
-  }
+
+  tags = merge(var.labels, {
+    Name = "${var.name}_runner-manager"
+  })
+
   key_name = var.ssh_key_pem_name
 }
 

@@ -38,3 +38,7 @@ variable "labels" {
     env = "grit"
   }
 }
+
+variable "name" {
+  type = string
+}

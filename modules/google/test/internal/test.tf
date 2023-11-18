@@ -12,6 +12,7 @@ module "gitlab" {
   gitlab_project_id         = var.gitlab_project_id
   gitlab_runner_description = var.gitlab_runner_description
   gitlab_runner_tags        = var.gitlab_runner_tags
+  name                      = var.name
 }
 
 ######################
@@ -53,9 +54,10 @@ module "gce-managers" {
 
 module "helm" {
   count        = var.manager_service == "helm" ? 1 : 0
-  source       = "../../../helm"
+  source       = "../../../helm/internal"
   runner_token = var.runner_token != "" ? var.runner_token : module.gitlab[0].runner_token
   gitlab_url   = var.gitlab_url
+  name         = var.name
 }
 
 module "operator" {

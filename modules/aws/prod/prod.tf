@@ -30,6 +30,7 @@ module "prod-module" {
   gitlab_project_id         = var.gitlab_project_id
   gitlab_runner_description = var.gitlab_runner_description
   gitlab_runner_tags        = var.gitlab_runner_tags
+  name                      = var.name
 }
 
 check "maturity" {

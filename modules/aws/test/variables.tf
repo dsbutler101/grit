@@ -33,3 +33,8 @@ variable "runner_token" {
   type    = string
   default = ""
 }
+
+variable "name" {
+  type    = string
+  default = "test_env"
+}

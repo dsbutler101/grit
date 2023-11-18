@@ -9,3 +9,7 @@ variable "gitlab_runner_description" {
 variable "gitlab_runner_tags" {
   type = list(string)
 }
+
+variable "name" {
+  type = string
+}

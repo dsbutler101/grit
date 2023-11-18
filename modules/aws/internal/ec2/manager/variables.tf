@@ -50,3 +50,14 @@ variable "fleeting_service" {
   type        = string
   description = "The system which provides infrastructure for the Runners"
 }
+
+variable "labels" {
+  type = map(any)
+  default = {
+    env = "grit"
+  }
+}
+
+variable "name" {
+  type = string
+}

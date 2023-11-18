@@ -17,6 +17,7 @@ module "gitlab" {
   gitlab_project_id         = var.gitlab_project_id
   gitlab_runner_description = var.gitlab_runner_description
   gitlab_runner_tags        = var.gitlab_runner_tags
+  name                      = var.name
 }
 
 ##################
@@ -32,6 +33,7 @@ module "ec2-instance-group" {
   instance_type = "t2.large"
   aws_vpc_cidr  = "10.0.0.0/24"
   scale_max     = local.scale_max
+  name          = var.name
 }
 
 ###################
@@ -58,4 +60,5 @@ module "ec2-managers" {
   capacity_per_instance = 1
   scale_min             = 0
   scale_max             = local.scale_max
+  name                  = var.name
 }

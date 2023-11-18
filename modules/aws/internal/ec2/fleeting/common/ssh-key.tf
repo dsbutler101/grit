@@ -2,14 +2,17 @@
 # Autoscaling group credentials #
 #################################
 
-resource "tls_private_key" "aws-jobs" {
+# both `name` and `tags` are unsupported arguments
+resource "tls_private_key" "aws-jobs-private-key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-resource "aws_key_pair" "jobs" {
-  key_name   = "ssh-key"
-  public_key = tls_private_key.aws-jobs.public_key_openssh
+resource "aws_key_pair" "jobs-key-pair" {
+  key_name   = "${var.name}_ssh-key"
+  public_key = tls_private_key.aws-jobs-private-key.public_key_openssh
 
-  tags = var.labels
+  tags = merge(var.labels, {
+    Name = "${var.name}_jobs-key-pair"
+  })
 }

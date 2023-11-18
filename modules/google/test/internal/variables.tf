@@ -32,3 +32,7 @@ variable "gitlab_runner_tags" {
 variable "runner_token" {
   type = string
 }
+
+variable "name" {
+  type = string
+}

@@ -65,3 +65,7 @@ variable "executor" {
   type    = string
   default = "docker-autoscaler"
 }
+
+variable "name" {
+  type = string
+}

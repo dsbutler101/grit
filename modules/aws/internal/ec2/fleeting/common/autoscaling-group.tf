@@ -1,12 +1,13 @@
-resource "aws_launch_template" "fleeting-asg" {
-  description = "Launch template for GitLab Runner fleeting configuration"
+resource "aws_launch_template" "fleeting-asg-template" {
+  # Name must be alphanumeric, no spaces
+  name = "${var.name}_fleeting-asg-template"
 
-  tags = var.labels
+  description = "Launch template for GitLab Runner fleeting configuration"
 
   image_id      = var.asg_ami_id
   instance_type = var.asg_instance_type
 
-  key_name = aws_key_pair.jobs.key_name
+  key_name = aws_key_pair.jobs-key-pair.key_name
 
   dynamic "license_specification" {
     for_each = var.license_arn != "" ? [1] : []
@@ -47,7 +48,9 @@ resource "aws_launch_template" "fleeting-asg" {
   tag_specifications {
     resource_type = "instance"
 
-    tags = var.labels
+    tags = merge(var.labels, {
+      Name = "${var.name}_fleeting-asg-template instance"
+    })
   }
 
   lifecycle {
@@ -56,14 +59,19 @@ resource "aws_launch_template" "fleeting-asg" {
       tag_specifications,
     ]
   }
+
+  tags = merge(var.labels, {
+    Name = "${var.name}_fleeting-asg-template"
+  })
 }
 
+# tags are a deprecated property on this resource type
 resource "aws_autoscaling_group" "fleeting-asg" {
-  name = "GRIT ASG"
+  name = "${var.name}_fleeting-asg"
 
   launch_template {
-    id      = aws_launch_template.fleeting-asg.id
-    version = aws_launch_template.fleeting-asg.latest_version
+    id      = aws_launch_template.fleeting-asg-template.id
+    version = aws_launch_template.fleeting-asg-template.latest_version
   }
 
   min_size = 0

@@ -88,3 +88,7 @@ variable "jobs-host-resource-group-outputs" {
   type    = map(any)
   default = {}
 }
+
+variable "name" {
+  type = string
+}

@@ -9,10 +9,10 @@ resource "tls_private_key" "aws-jobs-private-key" {
 }
 
 resource "aws_key_pair" "jobs-key-pair" {
-  key_name   = "${var.name}_ssh-key"
+  key_name   = "${var.name}"
   public_key = tls_private_key.aws-jobs-private-key.public_key_openssh
 
   tags = merge(var.labels, {
-    Name = "${var.name}_jobs-key-pair"
+    Name = "${var.name}"
   })
 }

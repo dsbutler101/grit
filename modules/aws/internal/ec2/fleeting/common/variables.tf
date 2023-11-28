@@ -37,7 +37,7 @@ variable "asg_storage_type" {
 
 variable "asg_storage_throughput" {
   type    = number
-  default = 0
+  default = 125 #must be in range of (125 - 1000)
 }
 
 variable "asg_ami_id" {

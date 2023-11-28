@@ -38,7 +38,7 @@ locals {
 
   basic_cmd = [
     "curl -L \"https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh\" | sudo bash",
-    "sudo apt-get install gitlab-runner"
+    "sudo apt-get install gitlab-runner",
   ]
 
   ec2_fleet_cmd = [
@@ -88,7 +88,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
 
   tags = merge(var.labels, {
-    Name = "${var.name}_vpc"
+    Name = "${var.name}"
   })
 }
 
@@ -96,7 +96,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(var.labels, {
-    Name = "${var.name}_igw"
+    Name = "${var.name}"
   })
 }
 
@@ -105,7 +105,7 @@ resource "aws_subnet" "subnet_public" {
   cidr_block = "10.1.0.0/24"
 
   tags = merge(var.labels, {
-    Name = "${var.name}_subnet_public"
+    Name = "${var.name}"
   })
 }
 
@@ -124,7 +124,7 @@ resource "aws_route_table_association" "rta_subnet_public" {
 }
 
 resource "aws_security_group" "sg_22" {
-  name   = "${var.name}_sg_22"
+  name   = "${var.name}"
   vpc_id = aws_vpc.vpc.id
   ingress {
     from_port   = 22
@@ -140,7 +140,7 @@ resource "aws_security_group" "sg_22" {
   }
 
   tags = merge(var.labels, {
-    Name = "${var.name}_sg_22"
+    Name = "${var.name}"
   })
 }
 
@@ -153,7 +153,7 @@ resource "aws_instance" "runner-manager" {
   user_data                   = data.cloudinit_config.config.rendered
 
   tags = merge(var.labels, {
-    Name = "${var.name}_runner-manager"
+    Name = "${var.name}"
   })
 
   key_name = var.ssh_key_pem_name

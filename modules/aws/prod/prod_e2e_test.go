@@ -1,6 +1,6 @@
 //go:build e2e
 
-package prod
+package aws_prod
 
 import (
 	"fmt"
@@ -17,28 +17,24 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 	"github.com/xanzy/go-gitlab"
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
 const (
-	jobIdVar                  = "CI_JOB_ID"
-	asgOutputKey              = "autoscaling_group_names"
-	gitlabTokenVar            = "GITLAB_TOKEN"
-	gritEndToEndTestProjectID = 52010278
-	region                    = "us-east-1"
-	runnerTokenVar            = "RUNNER_TOKEN"
-	testKey                   = "AWS_PROD_TESTENDTOEND"
+	asgOutputKey = "autoscaling_group_names"
+	testKey      = "AWS_PROD_TESTENDTOEND"
 )
 
 func TestEndToEnd(t *testing.T) {
 
-	jobId := os.Getenv(jobIdVar)
+	jobId := os.Getenv(test_tools.JobIdVar)
 	require.NotEmpty(t, jobId)
-	gitlabToken := os.Getenv(gitlabTokenVar)
+	gitlabToken := os.Getenv(test_tools.GitlabTokenVar)
 	require.NotEmpty(t, gitlabToken)
 	client, err := gitlab.NewClient(gitlabToken)
 	require.NoError(t, err)
 
-	runnerToken := os.Getenv(runnerTokenVar)
+	runnerToken := os.Getenv(test_tools.RunnerTokenVar)
 	require.NotEmpty(t, runnerToken)
 
 	// Create runner stack
@@ -48,7 +44,7 @@ func TestEndToEnd(t *testing.T) {
 		Vars: map[string]interface{}{
 			"manager_service":       "ec2",
 			"fleeting_service":      "ec2",
-			"gitlab_project_id":     gritEndToEndTestProjectID,
+			"gitlab_project_id":     test_tools.GritEndToEndTestProjectID,
 			"gitlab_runner_tags":    []string{t.Name()},
 			"fleeting_os":           "linux",
 			"ami":                   "ami-0735db9b38fcbdb39",
@@ -76,7 +72,7 @@ func TestEndToEnd(t *testing.T) {
 	main := "main"
 	key := testKey
 	uniqueValue := strconv.Itoa(int(rand.Uint32()))
-	pipeline, _, err := client.Pipelines.CreatePipeline(gritEndToEndTestProjectID, &gitlab.CreatePipelineOptions{
+	pipeline, _, err := client.Pipelines.CreatePipeline(test_tools.GritEndToEndTestProjectID, &gitlab.CreatePipelineOptions{
 		Ref: &main,
 		Variables: &[]*gitlab.PipelineVariableOptions{{
 			Key:   &key,
@@ -88,11 +84,11 @@ func TestEndToEnd(t *testing.T) {
 
 	// TODO: poll for job completion
 	time.Sleep(time.Minute)
-	jobs, _, err := client.Jobs.ListPipelineJobs(gritEndToEndTestProjectID, pipelineID, &gitlab.ListJobsOptions{})
+	jobs, _, err := client.Jobs.ListPipelineJobs(test_tools.GritEndToEndTestProjectID, pipelineID, &gitlab.ListJobsOptions{})
 	require.Len(t, jobs, 1)
 	job := jobs[0]
 	require.Equal(t, "success", job.Status)
-	logReader, _, err := client.Jobs.GetTraceFile(gritEndToEndTestProjectID, job.ID)
+	logReader, _, err := client.Jobs.GetTraceFile(test_tools.GritEndToEndTestProjectID, job.ID)
 	require.NoError(t, err)
 	logBytes, err := io.ReadAll(logReader)
 	require.NoError(t, err)
@@ -104,7 +100,7 @@ func TestEndToEnd(t *testing.T) {
 	// Assert the job ran on our stack
 	asg, err := terraform.OutputE(t, options, asgOutputKey)
 	require.NoError(t, err)
-	autoscalingClient, err := aws.NewAsgClientE(t, region)
+	autoscalingClient, err := aws.NewAsgClientE(t, test_tools.Region)
 	require.NoError(t, err)
 	groups, err := autoscalingClient.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
 		AutoScalingGroupNames: []*string{&asg},

@@ -1,5 +1,5 @@
 resource "helm_release" "gitlab-runner" {
-  name       = "${var.name}_gitlab-runner"
+  name       = "${var.name}"
   repository = "https://charts.gitlab.io"
   chart      = "gitlab-runner"
   set {

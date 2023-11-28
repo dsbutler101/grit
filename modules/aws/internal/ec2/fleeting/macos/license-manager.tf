@@ -1,23 +1,23 @@
 resource "aws_licensemanager_license_configuration" "license-config" {
-  name                     = "${var.name}_required-license"
+  name                     = "${var.name}"
   license_count            = var.required_license_count_per_asg * var.cores_per_license
   license_count_hard_limit = false
   license_counting_type    = "Core"
 
   tags = merge(var.labels, {
-    Name = "${var.name}_license-config"
+    Name = "${var.name}"
   })
 }
 
 locals {
-  jobs_host_resource_group = "${var.name}_host-resource-group"
+  jobs_host_resource_group = "${var.name}"
 }
 
 resource "aws_cloudformation_stack" "jobs-cloudformation-stack" {
   name = local.jobs_host_resource_group
 
   tags = merge(var.labels, {
-    Name = "${var.name}_jobs-cloudformation-stack"
+    Name = "${var.name}"
   })
 
   template_body = <<EOS

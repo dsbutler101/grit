@@ -1,15 +1,65 @@
 stages:
+- unit
 - e2e
 
-prod-aws-e2e:
-  stage: e2e
-  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+.go-install:
   before_script:
     - apk add --update --no-cache curl tar bash
     - curl -OL https://golang.org/dl/go1.21.4.linux-amd64.tar.gz
     - tar -C /usr/local -xzf go1.21.4.linux-amd64.tar.gz
     - export PATH=$PATH:/usr/local/go/bin
     - go version
+
+aws-internal-unit-tests:
+  stage: unit
+  extends:
+    - .go-install
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  script:
+    - cd modules/aws/internal
+    - go test ./... -v
+
+aws-prod-unit-tests:
+  stage: unit
+  extends:
+    - .go-install
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
   script:
     - cd modules/aws/prod
-    - go test . -tags e2e -timeout 30m
+    - go test ./... -v
+
+aws-dev-unit-tests:
+  stage: unit
+  extends:
+    - .go-install
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  script:
+    - cd modules/aws/dev
+    - go test ./... -v
+
+aws-test-unit-tests:
+  stage: unit
+  extends:
+    - .go-install
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  script:
+    - cd modules/aws/test
+    - go test ./... -v
+
+gitlab-provider-unit-tests:
+  stage: unit
+  extends:
+    - .go-install
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  script:
+    - cd modules/gitlab/internal
+    - go test ./... -v
+
+prod-aws-e2e:
+  stage: e2e
+  extends:
+    - .go-install
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  script:
+    - cd modules/aws/prod
+    - go test ./prod_e2e_test.go -tags e2e -timeout 30m

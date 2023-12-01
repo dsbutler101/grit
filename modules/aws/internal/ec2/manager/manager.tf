@@ -153,7 +153,7 @@ resource "aws_instance" "runner-manager" {
   user_data                   = data.cloudinit_config.config.rendered
 
   tags = merge(var.labels, {
-    Name = "${var.name}"
+    Name = "${var.name}_runner-manager"
   })
 
   key_name = var.ssh_key_pem_name

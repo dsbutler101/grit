@@ -12,8 +12,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/gruntwork-io/terratest/modules/aws"
+	"github.com/aws/aws-sdk-go/service/ec2"
+	terratest_aws "github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 	"github.com/xanzy/go-gitlab"
@@ -66,7 +69,8 @@ func TestEndToEnd(t *testing.T) {
 	require.NoError(t, err)
 
 	// TODO: implement check for runner stack health
-	time.Sleep(5 * time.Minute)
+	instanceName := "e2e-" + jobId + "_runner-manager"
+	requireRunnerManagerRunning(t, instanceName)
 
 	// Run a job
 	main := "main"
@@ -82,11 +86,25 @@ func TestEndToEnd(t *testing.T) {
 	require.NoError(t, err)
 	pipelineID := pipeline.ID
 
-	// TODO: poll for job completion
-	time.Sleep(time.Minute)
+	var job *gitlab.Job
 	jobs, _, err := client.Jobs.ListPipelineJobs(test_tools.GritEndToEndTestProjectID, pipelineID, &gitlab.ListJobsOptions{})
+	require.NoError(t, err)
 	require.Len(t, jobs, 1)
-	job := jobs[0]
+	jobID := jobs[0].ID
+
+	// poll every second for 15 minutes for job completion
+	for i := 0; i < 60*15; i++ {
+		job, _, err = client.Jobs.GetJob(test_tools.GritEndToEndTestProjectID, jobID)
+		require.NoError(t, err)
+
+		if job.Status != "created" && job.Status != "pending" && job.Status != "running" {
+			break
+		}
+
+		fmt.Println("Waiting for job. Current status:", job.Status)
+		time.Sleep(time.Second)
+	}
+
 	require.Equal(t, "success", job.Status)
 	logReader, _, err := client.Jobs.GetTraceFile(test_tools.GritEndToEndTestProjectID, job.ID)
 	require.NoError(t, err)
@@ -100,7 +118,7 @@ func TestEndToEnd(t *testing.T) {
 	// Assert the job ran on our stack
 	asg, err := terraform.OutputE(t, options, asgOutputKey)
 	require.NoError(t, err)
-	autoscalingClient, err := aws.NewAsgClientE(t, test_tools.Region)
+	autoscalingClient, err := terratest_aws.NewAsgClientE(t, test_tools.Region)
 	require.NoError(t, err)
 	groups, err := autoscalingClient.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
 		AutoScalingGroupNames: []*string{&asg},
@@ -119,4 +137,32 @@ func TestEndToEnd(t *testing.T) {
 		}
 	}
 	require.True(t, jobRanOnAsg)
+}
+
+func requireRunnerManagerRunning(t *testing.T, instanceName string) {
+	sess, _ := session.NewSession(&aws.Config{
+		Region: aws.String("us-east-1")},
+	)
+
+	svc := ec2.New(sess)
+
+	input := &ec2.DescribeInstancesInput{
+		Filters: []*ec2.Filter{
+			{
+				Name:   aws.String("tag:Name"),
+				Values: []*string{aws.String(instanceName)},
+			},
+		},
+	}
+
+	result, err := svc.DescribeInstances(input)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+
+	require.NotNil(t, result)
+	require.Len(t, result.Reservations, 1)
+	require.Len(t, result.Reservations[0].Instances, 1)
+	require.Equal(t, "running", *result.Reservations[0].Instances[0].State.Name)
 }

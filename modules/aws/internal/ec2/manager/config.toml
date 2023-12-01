@@ -17,7 +17,7 @@ concurrent = ${scale_max}
 
     # Docker Executor config
     [runners.docker]
-        image = "busybox:latest"
+        image = "ubuntu:latest"
 
     # Autoscaler config
     [runners.autoscaler]

@@ -8,3 +8,4 @@ module "ec2" {
   fleeting_os = var.fleeting_os
   name        = var.name
 }
+

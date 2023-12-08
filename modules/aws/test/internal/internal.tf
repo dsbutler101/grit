@@ -62,3 +62,4 @@ module "ec2-managers" {
   scale_max             = local.scale_max
   name                  = var.name
 }
+

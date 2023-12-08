@@ -9,3 +9,4 @@ variable "gitlab_url" {
 variable "name" {
   type = string
 }
+

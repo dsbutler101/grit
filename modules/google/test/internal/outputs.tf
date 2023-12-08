@@ -13,3 +13,4 @@ output "gke_cluster_access_token" {
 output "gke_cluster_ca_certificate" {
   value = module.gke-cluster[0].ca_certificate
 }
+

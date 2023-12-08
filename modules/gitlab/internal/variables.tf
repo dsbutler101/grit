@@ -13,3 +13,4 @@ variable "gitlab_runner_tags" {
 variable "name" {
   type = string
 }
+

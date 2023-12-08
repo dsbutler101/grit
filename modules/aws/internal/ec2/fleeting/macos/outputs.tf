@@ -7,3 +7,4 @@ output "license-config-arn" {
   description = "The ARN for licenses used to deploy MacOS instances"
   value       = aws_licensemanager_license_configuration.license-config.arn
 }
+

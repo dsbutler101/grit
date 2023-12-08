@@ -7,3 +7,4 @@ module "gce" {
   source      = "./internal/gce"
   fleeting_os = var.fleeting_os
 }
+

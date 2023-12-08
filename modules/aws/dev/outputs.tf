@@ -9,3 +9,4 @@ output "fleeting_service_account_access_key_id" {
 output "fleeting_service_account_secret_access_key" {
   value = module.ec2[0].fleeting_service_account_secret_access_key
 }
+

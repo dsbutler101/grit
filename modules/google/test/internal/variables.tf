@@ -36,3 +36,4 @@ variable "runner_token" {
 variable "name" {
   type = string
 }
+

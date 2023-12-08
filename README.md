@@ -117,7 +117,7 @@ convenience configuration for developing and debugging runner. They
 should work but might change as needs of developers change. These
 templates do not produce a full working runner deployment.
 
-The `test` stage will be relatively stable. It's all the ways that 
+The `test` stage will be relatively stable. It's all the ways that
 GRIT can deploy runners but with lots of convenient defaults so they
 can be setup will few required parameters. These templates register
 runner to a GitLab instance so they will produce a working runner

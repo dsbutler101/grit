@@ -52,3 +52,4 @@ variable "idle_percentage" {
 variable "name" {
   type = string
 }
+

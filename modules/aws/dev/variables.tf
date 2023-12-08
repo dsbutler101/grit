@@ -12,3 +12,4 @@ variable "name" {
   type    = string
   default = "dev_env"
 }
+

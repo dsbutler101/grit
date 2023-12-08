@@ -92,3 +92,4 @@ variable "jobs-host-resource-group-outputs" {
 variable "name" {
   type = string
 }
+

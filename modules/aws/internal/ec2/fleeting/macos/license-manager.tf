@@ -95,3 +95,4 @@ resource "aws_cloudformation_stack" "jobs-cloudformation-stack" {
     }
 EOS
 }
+

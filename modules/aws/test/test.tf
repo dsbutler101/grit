@@ -13,3 +13,4 @@ module "test-module" {
   gitlab_runner_tags = var.gitlab_runner_tags
   name               = var.name
 }
+

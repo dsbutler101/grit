@@ -3,10 +3,10 @@
 #########################################
 
 resource "aws_iam_user" "fleeting-service-account" {
-  name = "${var.name}"
+  name = var.name
 
   tags = merge(var.labels, {
-    Name = "${var.name}"
+    Name = var.name
   })
 }
 
@@ -45,12 +45,12 @@ data "aws_iam_policy_document" "fleeting-service-account-policy-document" {
 }
 
 resource "aws_iam_policy" "fleeting-service-account-policy" {
-  name        = "${var.name}"
+  name        = var.name
   description = "A policy for accessing autoscaling groups"
   policy      = data.aws_iam_policy_document.fleeting-service-account-policy-document.json
 
   tags = merge(var.labels, {
-    Name = "${var.name}"
+    Name = var.name
   })
 }
 

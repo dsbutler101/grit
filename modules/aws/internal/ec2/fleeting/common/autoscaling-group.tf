@@ -1,6 +1,6 @@
 resource "aws_launch_template" "fleeting-asg-template" {
   # Name must be alphanumeric, no spaces
-  name = "${var.name}"
+  name = var.name
 
   description = "Launch template for GitLab Runner fleeting configuration"
 
@@ -49,7 +49,7 @@ resource "aws_launch_template" "fleeting-asg-template" {
     resource_type = "instance"
 
     tags = merge(var.labels, {
-      Name = "${var.name}"
+      Name = var.name
     })
   }
 
@@ -61,13 +61,13 @@ resource "aws_launch_template" "fleeting-asg-template" {
   }
 
   tags = merge(var.labels, {
-    Name = "${var.name}"
+    Name = var.name
   })
 }
 
 # tags are a deprecated property on this resource type
 resource "aws_autoscaling_group" "fleeting-asg" {
-  name = "${var.name}"
+  name = var.name
 
   launch_template {
     id      = aws_launch_template.fleeting-asg-template.id

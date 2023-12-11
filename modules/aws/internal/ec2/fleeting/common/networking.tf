@@ -6,7 +6,7 @@ resource "aws_vpc" "jobs-vpc" {
   cidr_block = var.aws_vpc_cidr
 
   tags = merge(var.labels, {
-    Name = "${var.name}"
+    Name = var.name
   })
 }
 
@@ -23,7 +23,7 @@ resource "aws_internet_gateway" "internet-access" {
   vpc_id = aws_vpc.jobs-vpc.id
 
   tags = merge(var.labels, {
-    Name = "${var.name}"
+    Name = var.name
   })
 }
 
@@ -43,12 +43,12 @@ resource "aws_subnet" "jobs-vpc-subnet" {
   map_public_ip_on_launch = true
 
   tags = merge(var.labels, {
-    Name = "${var.name}"
+    Name = var.name
   })
 }
 
 resource "aws_security_group" "jobs-security-group" {
-  name   = "${var.name}"
+  name   = var.name
   vpc_id = aws_vpc.jobs-vpc.id
 
   ingress {
@@ -75,6 +75,6 @@ resource "aws_security_group" "jobs-security-group" {
   }
 
   tags = merge(var.labels, {
-    Name = "${var.name}"
+    Name = var.name
   })
 }

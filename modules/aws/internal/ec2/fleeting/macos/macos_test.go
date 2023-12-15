@@ -18,26 +18,12 @@ func TestAWSInternalEC2FleetingMacos(t *testing.T) {
 		moduleVars      map[string]interface{}
 		expectedModules []string
 	}{
-		"do not override defaults": {
-			moduleVars: map[string]interface{}{
-				"aws_vpc_cidr":      "10.0.0.0/24",
-				"asg_ami_id":        "ami-0fcd5ff1c92b00231",
-				"asg_instance_type": "mac2.metal",
-				"asg_subnet_cidr":   "10.0.0.0/24",
-				"name":              name,
-			},
-			expectedModules: expectedModules,
-		},
 		"override defaults": {
 			moduleVars: map[string]interface{}{
-				"aws_vpc_cidr":                   "10.0.0.0/24",
-				"asg_ami_id":                     "ami-0fcd5ff1c92b00231",
-				"asg_instance_type":              "mac2.metal",
-				"asg_subnet_cidr":                "10.0.0.0/24",
-				"name":                           name,
 				"required_license_count_per_asg": 10,
 				"cores_per_license":              4,
 				"labels":                         map[string]string{"env": "another place"},
+				"name":                           name,
 			},
 			expectedModules: expectedModules,
 		},

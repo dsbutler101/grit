@@ -38,7 +38,7 @@ resource "aws_launch_template" "fleeting-asg-template" {
   }
 
   network_interfaces {
-    subnet_id = aws_subnet.jobs-vpc-subnet.id
+    subnet_id = var.subnet_id
 
     security_groups = [
       aws_security_group.jobs-security-group.id
@@ -80,7 +80,7 @@ resource "aws_autoscaling_group" "fleeting-asg" {
   health_check_grace_period = 600
 
   vpc_zone_identifier = [
-    aws_subnet.jobs-vpc-subnet.id
+    var.subnet_id
   ]
 
   protect_from_scale_in = var.protect_from_scale_in

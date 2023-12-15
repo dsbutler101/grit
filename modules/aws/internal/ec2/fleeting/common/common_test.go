@@ -15,14 +15,9 @@ func TestAWSInternalEC2FleetingCommon(t *testing.T) {
 		"aws_iam_policy.fleeting-service-account-policy",
 		"aws_iam_user.fleeting-service-account",
 		"aws_iam_user_policy_attachment.fleeting-service-account-attach",
-		"aws_internet_gateway.internet-access",
 		"aws_key_pair.jobs-key-pair",
 		"aws_launch_template.fleeting-asg-template",
-		"aws_route.internet-route",
 		"aws_security_group.jobs-security-group",
-		"aws_subnet.jobs-vpc-subnet",
-		"aws_vpc.jobs-vpc",
-		"data.aws_route_table.jobs-route-table",
 		"tls_private_key.aws-jobs-private-key",
 	}
 
@@ -30,26 +25,22 @@ func TestAWSInternalEC2FleetingCommon(t *testing.T) {
 		moduleVars      map[string]interface{}
 		expectedModules []string
 	}{
-		"do not override defaults": {
+		"common fleet": {
 			moduleVars: map[string]interface{}{
-				"aws_vpc_cidr":      "10.0.0.0/24",
-				"asg_ami_id":        "ami-0fcd5ff1c92b00231",
-				"asg_instance_type": "mac2.metal",
-				"asg_subnet_cidr":   "10.0.0.0/24",
-				"name":              name + "-common-default",
-			},
-			expectedModules: expectedModules,
-		},
-		"override defaults": {
-			moduleVars: map[string]interface{}{
-				"aws_vpc_cidr":                   "10.0.0.0/24",
-				"asg_ami_id":                     "ami-0fcd5ff1c92b00231",
-				"asg_instance_type":              "mac2.metal",
-				"asg_subnet_cidr":                "10.0.0.0/24",
-				"name":                           name + "-macos",
-				"required_license_count_per_asg": 10,
-				"cores_per_license":              4,
-				"labels":                         map[string]string{"env": "another place"},
+				"license_arn":                      "",
+				"jobs-host-resource-group-outputs": map[string]string{},
+				"scale_min":                        0,
+				"scale_max":                        10,
+				"idle_percentage":                  10,
+				"asg_storage_size":                 500,
+				"asg_storage_type":                 "gp3",
+				"asg_storage_throughput":           125,
+				"asg_ami_id":                       "ami-0fcd5ff1c92b00231",
+				"asg_instance_type":                "mac2.metal",
+				"labels":                           map[string]string{"env": "another place"},
+				"vpc_id":                           "1234",
+				"subnet_id":                        "12345",
+				"name":                             name + "-macos",
 			},
 			expectedModules: expectedModules,
 		},

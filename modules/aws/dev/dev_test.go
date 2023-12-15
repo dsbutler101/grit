@@ -9,24 +9,37 @@ import (
 func TestAWSDev(t *testing.T) {
 	name := test_tools.JobName(t)
 
-	macExpectedModules := []string{
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_autoscaling_group.fleeting-asg",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_iam_access_key.fleeting-service-account-key",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_iam_policy.fleeting-service-account-policy",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_iam_user.fleeting-service-account",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_iam_user_policy_attachment.fleeting-service-account-attach",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_internet_gateway.internet-access",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_key_pair.jobs-key-pair",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_launch_template.fleeting-asg-template",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_route.internet-route",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_security_group.jobs-security-group",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_subnet.jobs-vpc-subnet",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.aws_vpc.jobs-vpc",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.data.aws_route_table.jobs-route-table",
-		"module.ec2[0].module.macos[0].module.instance_group.module.common.tls_private_key.aws-jobs-private-key",
-		"module.ec2[0].module.macos[0].module.instance_group.module.macos[0].aws_cloudformation_stack.jobs-cloudformation-stack",
-		"module.ec2[0].module.macos[0].module.instance_group.module.macos[0].aws_licensemanager_license_configuration.license-config",
+	baseExpectedModules := []string{
+		"module.dev-module.module.ec2-instance-group[0].module.common.aws_autoscaling_group.fleeting-asg",
+		"module.dev-module.module.ec2-instance-group[0].module.common.aws_iam_access_key.fleeting-service-account-key",
+		"module.dev-module.module.ec2-instance-group[0].module.common.aws_iam_policy.fleeting-service-account-policy",
+		"module.dev-module.module.ec2-instance-group[0].module.common.aws_iam_user.fleeting-service-account",
+		"module.dev-module.module.ec2-instance-group[0].module.common.aws_iam_user_policy_attachment.fleeting-service-account-attach",
+		"module.dev-module.module.ec2-instance-group[0].module.common.aws_key_pair.jobs-key-pair",
+		"module.dev-module.module.ec2-instance-group[0].module.common.aws_launch_template.fleeting-asg-template",
+		"module.dev-module.module.ec2-instance-group[0].module.common.aws_security_group.jobs-security-group",
+		"module.dev-module.module.ec2-instance-group[0].module.common.tls_private_key.aws-jobs-private-key",
+		"module.dev-module.module.vpc[0].aws_internet_gateway.igw",
+		"module.dev-module.module.vpc[0].aws_route.internet-route",
+		"module.dev-module.module.vpc[0].aws_route_table.rtb_public",
+		"module.dev-module.module.vpc[0].aws_route_table_association.rta_subnet_public",
+		"module.dev-module.module.vpc[0].aws_subnet.jobs-vpc-subnet",
+		"module.dev-module.module.vpc[0].aws_vpc.vpc",
 	}
+
+	vpcExpectedModules := []string{
+		"module.dev-module.module.vpc[0].aws_internet_gateway.igw",
+		"module.dev-module.module.vpc[0].aws_route.internet-route",
+		"module.dev-module.module.vpc[0].aws_route_table.rtb_public",
+		"module.dev-module.module.vpc[0].aws_route_table_association.rta_subnet_public",
+		"module.dev-module.module.vpc[0].aws_subnet.jobs-vpc-subnet",
+		"module.dev-module.module.vpc[0].aws_vpc.vpc",
+	}
+
+	macExpectedModules := append(baseExpectedModules, []string{
+		"module.dev-module.module.ec2-instance-group[0].module.macos[0].aws_cloudformation_stack.jobs-cloudformation-stack",
+		"module.dev-module.module.ec2-instance-group[0].module.macos[0].aws_licensemanager_license_configuration.license-config",
+	}...)
 
 	testCases := map[string]struct {
 		moduleVars      map[string]interface{}
@@ -36,24 +49,30 @@ func TestAWSDev(t *testing.T) {
 			moduleVars: map[string]interface{}{
 				"fleeting_service": "ec2",
 				"fleeting_os":      "linux",
+				"ami":              "ami-05012401516a40259",
+				"instance_type":    "t2.medium",
 				"name":             name,
 			},
 			// linux currently not implemented in dev, should return empty expectedModules
-			expectedModules: []string{},
+			expectedModules: baseExpectedModules,
 		},
 		"ec2 windows fleet": {
 			moduleVars: map[string]interface{}{
 				"fleeting_service": "ec2",
-				"fleeting_os":      "linux",
+				"fleeting_os":      "windows",
+				"ami":              "none",
+				"instance_type":    "none",
 				"name":             name,
 			},
-			// windows currently not implemented in dev, should return empty expectedModules
-			expectedModules: []string{},
+			// windows currently not implemented, only vpc will get created
+			expectedModules: vpcExpectedModules,
 		},
 		"ec2 macos fleet": {
 			moduleVars: map[string]interface{}{
 				"fleeting_service": "ec2",
 				"fleeting_os":      "macos",
+				"ami":              "ami-0fcd5ff1c92b00231",
+				"instance_type":    "mac2.metal",
 				"name":             name,
 			},
 			expectedModules: macExpectedModules,

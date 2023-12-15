@@ -82,50 +82,9 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_vpc" "vpc" {
-  cidr_block           = "10.1.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-
-  tags = merge(var.labels, {
-    Name = var.name
-  })
-}
-
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.vpc.id
-
-  tags = merge(var.labels, {
-    Name = var.name
-  })
-}
-
-resource "aws_subnet" "subnet_public" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = "10.1.0.0/24"
-
-  tags = merge(var.labels, {
-    Name = var.name
-  })
-}
-
-# adding tags to aws_route_table causes an error: query returned no results
-resource "aws_route_table" "rtb_public" {
-  vpc_id = aws_vpc.vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
-  }
-}
-
-resource "aws_route_table_association" "rta_subnet_public" {
-  subnet_id      = aws_subnet.subnet_public.id
-  route_table_id = aws_route_table.rtb_public.id
-}
-
-resource "aws_security_group" "sg_22" {
-  name   = var.name
-  vpc_id = aws_vpc.vpc.id
+resource "aws_security_group" "manager_sg" {
+  name   = "${var.name} manager"
+  vpc_id = var.vpc_id
 
   ingress {
     from_port   = 22
@@ -142,15 +101,15 @@ resource "aws_security_group" "sg_22" {
   }
 
   tags = merge(var.labels, {
-    Name = var.name
+    Name = "${var.name} manager"
   })
 }
 
 resource "aws_instance" "runner-manager" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
-  subnet_id                   = aws_subnet.subnet_public.id
-  vpc_security_group_ids      = [aws_security_group.sg_22.id]
+  subnet_id                   = var.subnet_id
+  vpc_security_group_ids      = [aws_security_group.manager_sg.id]
   associate_public_ip_address = true
   user_data                   = data.cloudinit_config.config.rendered
 

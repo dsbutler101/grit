@@ -1,12 +1,15 @@
 output "ssh_key_pem" {
-  value = module.ec2[0].ssh_key_pem
+  value     = try(module.dev-module.ssh_key_pem, "")
+  sensitive = true
 }
 
 output "fleeting_service_account_access_key_id" {
-  value = module.ec2[0].fleeting_service_account_access_key_id
+  value     = try(module.dev-module.fleeting_service_account_access_key_id, "")
+  sensitive = true
 }
 
 output "fleeting_service_account_secret_access_key" {
-  value = module.ec2[0].fleeting_service_account_secret_access_key
+  value     = try(module.dev-module.fleeting_service_account_secret_access_key, "")
+  sensitive = true
 }
 

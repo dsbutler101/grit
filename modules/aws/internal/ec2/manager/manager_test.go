@@ -11,12 +11,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 
 	expectedModules := []string{
 		"aws_instance.runner-manager",
-		"aws_internet_gateway.igw",
-		"aws_route_table.rtb_public",
-		"aws_route_table_association.rta_subnet_public",
-		"aws_security_group.sg_22",
-		"aws_subnet.subnet_public",
-		"aws_vpc.vpc",
+		"aws_security_group.manager_sg",
 	}
 
 	testCases := map[string]struct {
@@ -28,29 +23,17 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"runner_token":                           "runnerToken",
 				"executor":                               "docker-autoscaler",
 				"gitlab_url":                             "https://gitlab.com",
+				"fleeting_service":                       "ec2",
 				"fleeting_service_account_access_key_id": "access_key_id",
 				"fleeting_service_account_secret_access_key": "secret_access_key",
 				"ssh_key_pem":           "ssh_key_pem",
 				"ssh_key_pem_name":      "ssh_key_pem_name",
 				"aws_asg_name":          "aws_asg_name",
-				"fleeting_service":      "ec2",
 				"capacity_per_instance": 1,
 				"scale_min":             1,
 				"scale_max":             1,
-				"name":                  name,
-			},
-			expectedModules: expectedModules,
-		},
-		"default manager": {
-			moduleVars: map[string]interface{}{
-				"runner_token":          "runnerToken",
-				"executor":              "docker-autoscaler",
-				"gitlab_url":            "https://gitlab.com",
-				"aws_asg_name":          "aws_asg_name",
-				"fleeting_service":      "ec2",
-				"capacity_per_instance": 1,
-				"scale_min":             1,
-				"scale_max":             1,
+				"vpc_id":                "1234",
+				"subnet_id":             "1234",
 				"name":                  name,
 			},
 			expectedModules: expectedModules,

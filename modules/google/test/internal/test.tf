@@ -7,7 +7,7 @@ locals {
 #######################
 
 module "gitlab" {
-  count                     = var.runner_token == "" ? 1 : 0
+  count                     = var.runner_token == "" && var.gitlab_project_id != "" ? 1 : 0
   source                    = "../../../gitlab/internal"
   gitlab_project_id         = var.gitlab_project_id
   gitlab_runner_description = var.gitlab_runner_description

@@ -13,43 +13,51 @@ variable "instance_type" {
   description = ""
 }
 
-variable "aws_vpc_cidr" {
-  type    = string
-  default = "10.0.0.0/24"
-}
-
-variable "gitlab_url" {
-  type        = string
-  description = "The URL of the GitLab instance where to register the Runner Manager"
-  default     = "https://gitlab.com/"
-}
-
-variable "gitlab_runner_description" {
-  type    = string
-  default = "GRIT"
-}
-
-variable "gitlab_runner_tags" {
-  type    = list(string)
-  default = []
-}
-
 variable "scale_min" {
-  type    = number
-  default = 0
+  type = number
 }
 
 variable "scale_max" {
-  type    = number
-  default = 1
+  type = number
 }
 
 variable "idle_percentage" {
-  type    = number
-  default = 10
+  type = number
 }
 
 variable "name" {
   type = string
+}
+
+variable "labels" {
+  type = map(any)
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "subnet_id" {
+  type = string
+}
+
+variable "asg_storage_type" {
+  type = string
+}
+
+variable "asg_storage_size" {
+  type = number
+}
+
+variable "asg_storage_throughput" {
+  type = number
+}
+
+variable "macos_required_license_count_per_asg" {
+  type = number
+}
+
+variable "macos_cores_per_license" {
+  type = number
 }
 

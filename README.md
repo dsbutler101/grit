@@ -35,6 +35,7 @@ module "single-ec2-shell-runner" {
   gitlab_project_id         = "YOUR_PROJECT_ID"
   gitlab_runner_description = "grit-runner"
   gitlab_runner_tags        = []
+  name                      = "test-name"
 }
 ```
 
@@ -50,13 +51,14 @@ module "gke-kubernetes-runner" {
   gitlab_project_id         = "YOUR_PROJECT_ID"
   gitlab_runner_description = "grit-runner"
   gitlab_runner_tags        = []
+  name                      = "test-name"
 }
 ```
 
 ### Dev
 
 Dev use cases setup a piece of the runner infrastructure which is
-convienient for development and debugging. For example setting up an
+convenient for development and debugging. For example setting up an
 Instance Group for Fleeting on the system of choice, outputting just
 the credential necessary to access the raw resources.
 
@@ -67,7 +69,9 @@ module "my-experimental-mac-machines" {
   source = "modules/aws/dev"
 
   fleeting_service = "ec2"
-  os                = "macos"
+  fleeting_os      = "macos"
+  ami              = "ami-12345"
+  instance_type    = "mac2.metal"
 }
 ```
 
@@ -80,13 +84,13 @@ many personas and use-cases.
 
 ### Testing
 
-- Easier to setup a demo with non-trivial runner infrastructure.
+- Easier to set up a demo with non-trivial runner infrastructure.
 - A single entry-point for discovering and learning about runner configuration.
 - A common test library for verifying changes to runner don't break user infrastructure.
 
 ### Development
 
-- Quickly setup the parts of the stack that a developer *isn't* working on, so they can focus on the part they *are*.
+- Quickly set up the parts of the stack that a developer *isn't* working on, so they can focus on the part they *are*.
 - Easily reproduce production issues by setting up an identical stack.
 
 ### Production

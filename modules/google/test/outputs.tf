@@ -7,7 +7,8 @@ output "gke_cluster_host" {
 }
 
 output "gke_cluster_access_token" {
-  value = module.test-module.gke_cluster_access_token
+  value     = module.test-module.gke_cluster_access_token
+  sensitive = true
 }
 
 output "gke_cluster_ca_certificate" {

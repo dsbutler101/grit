@@ -15,10 +15,11 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 	}{
 		"gitlab project runner": {
 			moduleVars: map[string]interface{}{
-				"name":                      name + "-new-runner",
-				"gitlab_runner_description": "my new GRIT runner",
-				"gitlab_project_id":         test_tools.GritEndToEndTestProjectID,
-				"gitlab_runner_tags":        []string{"job-tag"},
+				"url":                "https://gitlab.com",
+				"name":               name + "-new-runner",
+				"runner_description": "my new GRIT runner",
+				"project_id":         test_tools.GritEndToEndTestProjectID,
+				"runner_tags":        []string{"job-tag"},
 			},
 			expectedModules: []string{"gitlab_user_runner.primary"},
 		},

@@ -1,16 +1,19 @@
-variable "gitlab_project_id" {
+variable "url" {
   type = string
 }
 
-variable "gitlab_runner_description" {
+variable "project_id" {
   type = string
 }
 
-variable "gitlab_runner_tags" {
+variable "runner_description" {
+  type = string
+}
+
+variable "runner_tags" {
   type = list(string)
 }
 
 variable "name" {
   type = string
 }
-

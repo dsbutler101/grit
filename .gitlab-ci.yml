@@ -1,5 +1,5 @@
 stages:
-  - prepare
+  - lint
   - unit
   - e2e
 
@@ -13,55 +13,21 @@ image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
     - export PATH=$PATH:/usr/local/go/bin
     - go version
 
-# Terraform formatting
+# Linting
 
 terraform-formatting:
-  stage: prepare
+  stage: lint
   script:
     - terraform fmt -check -recursive
 
-# AWS unit tests
+# Unit tests
 
-aws-internal-unit-tests:
+unit-tests:
   stage: unit
   extends:
     - .go-install
   script:
-    - cd modules/aws/internal
-    - go test ./... -v
-
-aws-prod-unit-tests:
-  stage: unit
-  extends:
-    - .go-install
-  script:
-    - cd modules/aws/prod
-    - go test ./... -v
-
-aws-dev-unit-tests:
-  stage: unit
-  extends:
-    - .go-install
-  script:
-    - cd modules/aws/dev
-    - go test ./... -v
-
-aws-test-unit-tests:
-  stage: unit
-  extends:
-    - .go-install
-  script:
-    - cd modules/aws/test
-    - go test ./... -v
-
-# Gitlab module tests
-
-gitlab-provider-unit-tests:
-  stage: unit
-  extends:
-    - .go-install
-  script:
-    - cd modules/gitlab/internal
+    - cd modules
     - go test ./... -v
 
 # E2E tests
@@ -71,5 +37,5 @@ aws-prod-e2e:
   extends:
     - .go-install
   script:
-    - cd modules/aws/prod
-    - go test ./prod_e2e_test.go -tags e2e -timeout 30m
+    - cd e2e/aws
+    - go test . -tags e2e -timeout 30m

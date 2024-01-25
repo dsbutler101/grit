@@ -1,8 +1,5 @@
-output "autoscaling_group_name" {
-  value = module.fleeting.autoscaling_group_name
-}
-
 locals {
+  # Metadata is common input to all modules.
   metadata = {
     name = "my-autoscaling-runner"
     labels = tomap({
@@ -12,11 +9,15 @@ locals {
   }
 }
 
+# The IAM module creates a service account for runner to access
+# ephemeral VMs.
 module "iam" {
   source   = "../../modules/aws/iam/prod"
   metadata = local.metadata
 }
 
+# The VPC module creates an independent VPC to isolate this runner
+# installation from others.
 module "vpc" {
   source   = "../../modules/aws/vpc/prod"
   metadata = local.metadata
@@ -26,10 +27,18 @@ module "vpc" {
   subnet_cidr = "10.0.0.0/24"
 }
 
+# The fleeting module creates an instance group and SSH key to access
+# it. This is used as job running capacity for the autoscaling runner.
 module "fleeting" {
   source   = "../../modules/aws/fleeting/prod"
   metadata = local.metadata
-  vpc      = local.vpc
+
+  # The outputs of the VPC module are passed into fleeting so it knows
+  # where to put the VMs.
+  vpc = {
+    id        = module.vpc.id
+    subnet_id = module.vpc.subnet_id
+  }
 
   service       = "ec2"
   os            = "linux"
@@ -39,6 +48,8 @@ module "fleeting" {
   scale_max     = 10
 }
 
+# The gitlab modules will register the created runner to GitLab as a
+# project runner.
 module "gitlab" {
   source   = "../../modules/gitlab/prod"
   metadata = local.metadata
@@ -52,10 +63,26 @@ module "gitlab" {
 module "runner" {
   source   = "../../modules/aws/runner/prod"
   metadata = local.metadata
-  vpc      = local.vpc
-  iam      = local.iam
-  fleeting = local.fleeting
-  gitlab   = local.gitlab
+
+  # All the module outputs are ultimately fed into the runner module
+  # to create and configure the runner manager.
+  vpc = {
+    id        = module.vpc.id
+    subnet_id = module.vpc.subnet_id
+  }
+  iam = {
+    fleeting_access_key_id     = module.iam.fleeting_access_key_id
+    fleeting_secret_access_key = module.iam.fleeting_secret_access_key
+  }
+  fleeting = {
+    ssh_key_pem_name       = module.fleeting.ssh_key_pem_name
+    ssh_key_pem            = module.fleeting.ssh_key_pem
+    autoscaling_group_name = module.fleeting.autoscaling_group_name
+  }
+  gitlab = {
+    runner_token = module.gitlab.runner_token
+    url          = module.gitlab.url
+  }
 
   service               = "ec2"
   executor              = "docker-autoscaler"
@@ -63,27 +90,4 @@ module "runner" {
   scale_max             = 10
   idle_percentage       = 10
   capacity_per_instance = 1
-}
-
-locals {
-  iam = {
-    fleeting_access_key_id     = module.iam.fleeting_access_key_id
-    fleeting_secret_access_key = module.iam.fleeting_secret_access_key
-  }
-
-  vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnet_id
-  }
-
-  fleeting = {
-    ssh_key_pem_name       = module.fleeting.ssh_key_pem_name
-    ssh_key_pem            = module.fleeting.ssh_key_pem
-    autoscaling_group_name = module.fleeting.autoscaling_group_name
-  }
-
-  gitlab = {
-    runner_token = module.gitlab.runner_token
-    url          = module.gitlab.url
-  }
 }

@@ -3,79 +3,78 @@ Demo: https://youtu.be/sWugZ_eW5nQ
 # GitLab Runner Infrastructure Toolkit (GRIT)
 
 The GitLab Runner Infrastructure Toolkit (GRIT) is a library of
-Terraform templates for deploying GitLab Runner and managing its
+Terraform modules for deploying GitLab Runner and managing its
 lifecycle. It covers everything from a single runner deployment to
 complex autoscaling configurations. It embodies the best-practices
 for configuration and operation of runner.
 
-## Current state
+## Current State
 
-Alpha. There are a few things that work. But they are likely to change
-quite a bit.
+Experimental. There are a few consumers and the first production use
+case will be in beta soon.
 
 Follow [the epic](https://gitlab.com/groups/gitlab-org/ci-cd/runner-tools/-/epics/1) to see progress.
 
-## Working use cases
+## Usage
 
-### Test
+Download the [latest
+release](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/releases)
+and reference the test or prod modules in your Terraform configuration.
 
-Test use cases setup a working runner stack and register it to a
-GitLab instance. The result is a working system, but one which
-uses convenient defaults and is not necessarily production grade.
+### Test and Prod Modules
 
-#### Single EC2 Shell Runner
+GRIT provides two types of modules, test and prod. Test modules
+provide lots of defaults and have no support promises or
+restrictions. They are useful for local development and automated
+testing.
 
-```terraform
-module "single-ec2-shell-runner" {
-  source = "modules/aws/test"
+Prod modules have associated support levels and promises around
+backward compatability. Support levels follow [GitLab's
+definition](https://about.gitlab.com/support/statement-of-support/#alpha-beta-features)
+of experimental, beta and GA. See APIs and Guarantees below for more
+information.
 
-  manager_service  = "ec2"
-  fleeting_service = "none"
+Consumable modules are organized as follows:
 
-  gitlab_project_id         = "YOUR_PROJECT_ID"
-  gitlab_runner_description = "grit-runner"
-  gitlab_runner_tags        = []
-  name                      = "test-name"
+1. `modules` directory
+2. provider (e.g. `aws`, `google`, `azure`)
+3. module (e.g. `vpc`, `iam`, `fleeting`, `runner`)
+4. type (e.g. `prod` or `test`)
+
+Example module source path:
+
+```
+module "my-runner" {
+  source = "grit/modules/aws/runner/prod"
+  ...
 }
 ```
 
-#### GKE Kubernetes Runner
+All consumable module paths end in either "test" or "prod". Do not
+directly reference any modules within "internal" folders.
 
-```terraform
-module "gke-kubernetes-runner" {
-  source = "modules/aws/test"
+### Composable Modules
 
-  manager_service  = "helm"
-  fleeting_service = "gke"
+The primary module is `runner` which can be used by itself ([example
+main.tf](examples/test-shell-runner-only-ec2/main.tf)). Required and
+optional inputs are documented in the `variables.tf` file ([example
+prod variables.tf](modules/aws/runner/prod/variables.tf)). Outputs are
+documented in the `outputs.tf` file ([example prod
+outputs.tf](modules/aws/runner/prod/outputs.tf)).
 
-  gitlab_project_id         = "YOUR_PROJECT_ID"
-  gitlab_runner_description = "grit-runner"
-  gitlab_runner_tags        = []
-  name                      = "test-name"
-}
-```
+Optional modules are available to setup additional configuration for
+runner which can be fed into the `runner` module. For example, the
+`gitlab`, `vpc`, `iam`, `fleeting` and `runner` modules can create a
+fully autoscaling runner on its own VPC and automatically register it
+to a GitLab project ([example
+main.tf](examples/prod-docker-autoscaler-ec2/main.tf)) The outputs of
+each optional module are exactly what is required as input to the
+`runner` module, so they should fit together easily.
 
-### Dev
+### Examples
 
-Dev use cases setup a piece of the runner infrastructure which is
-convenient for development and debugging. For example setting up an
-Instance Group for Fleeting on the system of choice, outputting just
-the credential necessary to access the raw resources.
-
-#### Mac Runners on AWS -- Fleeting Instance Group
-
-```terraform
-module "my-experimental-mac-machines" {
-  source = "modules/aws/dev"
-
-  fleeting_service = "ec2"
-  fleeting_os      = "macos"
-  ami              = "ami-12345"
-  instance_type    = "mac2.metal"
-}
-```
-
-Get credentials from `environments/dev/terraform.tfstate` for setting up your runner manager (not automated yet).
+- [Test shell runner on EC2](examples/test-shell-runner-only-ec2/main.tf)
+- [Production docker-autoscaler configuration on EC2](examples/prod-docker-autoscaler-ec2/main.tf)
 
 ## Value of GRIT
 
@@ -112,37 +111,34 @@ many personas and use-cases.
 
 ## API and Guarantees
 
-The GRIT API is defined by `variables.tf` in the directories
-`modules/dev`, `modules/test` and `modules/prod`. These variables are
-the parameters for configuring each stage of GRIT.
+The GRIT API is defined by `variables.tf` and `output.tf` in the
+`test` and `prod` directories.
 
-The `dev` stage should be considered volatile. It's a set of
-convenience configuration for developing and debugging runner. They
-should work but might change as needs of developers change. These
-templates do not produce a full working runner deployment.
+The `test` type modules provide all the ways that GRIT can deploy
+runners with lots of convenient defaults so they can be setup will few
+required parameters.
 
-The `test` stage will be relatively stable. It's all the ways that
-GRIT can deploy runners but with lots of convenient defaults so they
-can be setup will few required parameters. These templates register
-runner to a GitLab instance so they will produce a working runner
-deployment.
+The `prod` type modules will each be associated with a support
+designation of `experimental`, `beta` or `ga`. The end-goal is to have
+all `prod` modules be `ga`. In general, experimental modules are new
+or just used in tests and development. Beta modules are at least
+dogfooded by GitLab internally. And GA modules are used by GitLab
+customers. Some modules like `runner` provide support levels on a
+per use case basis.
 
-The `prod` stage templates will each be associated with a maturity
-designation of `alpha`, `beta` or `stable`. The goal of all `prod`
-templates is to be `stable`.
-
-The `stable` templates are the set of battle-hardened templates that
-GRIT authors have experience running. They will be backward
-compatible, meaning they will not be refactored in a way that causes
-unnecessary resource destruction. Especially since that would likely
-cause an outage! When backward incompatable changes are necessary
-advance warning will be given in manner compatible with existing
-GitLab deprecation policies.
+The `ga` modules are the set of battle-hardened modules that GRIT
+authors have experience running. They will be backward compatible,
+meaning they will not be refactored in a way that causes unnecessary
+resource destruction. Especially since that would likely cause an
+outage! When backward incompatable changes are necessary advance
+warning will be given in manner compatible with existing GitLab
+deprecation policies.
 
 ## Contributing
 
 GRIT is currently early in the development stage so if you want to
-contribute, reach out to us through Slack or open an Issue. There's
+contribute, reach out to us through Slack or open an
+[Issue](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/issues). There's
 lots to do, but you might need a little help getting started.
 
 ### General Guidance
@@ -151,56 +147,18 @@ The GRIT codebase should conform to [Google's best practices for using
 Terraform](https://cloud.google.com/docs/terraform/best-practices-for-terraform).
 
 The goal of GRIT is decompose runner infrastructure sufficiently that
-there is little to no repetition. The `environments` folders are
-examples of how to use GRIT to setup a runner deployment. The
-`modules/dev` and subfolders are all the defaults that are applied to
-make `dev` templates convenient to
-use. E.g. `modules/dev/ec2/macos/macos.tf` contains a reference to a
-default AMI. Same goes for `modules/test` and `modules/prod`. The
-`modules/internal` directory structure contains the implementation
-details of each template, separate by cloud provider and then
-operating system. These should not be used outside the GRIT modules.
+there is little repetition. It uses composable modules to reduce the
+complexity of each module. See [The Zen of
+Fabric](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/blob/master/CONTRIBUTING.md#the-zen-of-fabric).
 
-### Outputs
+The structure should be very consistent and predicatable so the
+codebase is easy to navigate. All consumable modules must be in the
+`modules` directory. The next directory layer must be the provider.
+We separate modules by provider so consumers are not forced to configure
+any providers they are not using.
 
-Because GRIT handles a widely expanding combination of configurations
-outputs are exported from each layer as a map. This avoids the need to
-repeat each output at every layer.
-
-For example EC2 MacOS outputs are surfaced like this:
-
-```terraform
-output "output_map" {
-  description = "Outputs from the Fleeting Instance Group"
-  value = tomap({
-    "ssh_key_pem"                                = module.instance_group.ssh_key_pem,
-    "fleeting_service_account_access_key_id"     = module.instance_group.fleeting_service_account_access_key_id,
-    "fleeting_service_account_secret_access_key" = module.instance_group.fleeting_service_account_secret_access_key,
-  })
-}
-```
-
-And bubbled up like this:
-
-```terraform
-output "output_map" {
-  description = "Outputs from EC2 resources"
-  value = tomap({
-    "macos" = try(module.macos[0].output_map, null),
-  })
-}
-```
-
-For resources which are not created based on `counts` fields
-the `try` block will emit their output map as `null`.
-
-This allows users to access the ssh key via references like this:
-
-```terraform
-output "my-runner-ssh-key" {
-  value = module.my-runner.ec2.macos.ssh_key_pem
-}
-```
-
-And prevents outputs referencing resources not created. E.g. AKS
-clusters when deploying to GKE.
+The next layer must be a series of logical modules. The primary module
+must be `runner`. The rest can be a decomposition of runner setups on
+that provider platform.  E.g. `aws` container `iam`, `vpc`, `fleeting`
+and `runner` modules. Consider creating a separate module for aspects
+with low coupling, where consumers might want to "bring their own".

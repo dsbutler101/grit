@@ -31,9 +31,9 @@ module "ec2" {
   ami                                  = var.ami
   instance_type                        = var.instance_type
   labels                               = var.metadata.labels
-  asg_storage_type                     = var.asg_storage_type
-  asg_storage_size                     = var.asg_storage_size
-  asg_storage_throughput               = var.asg_storage_throughput
+  storage_type                         = var.storage_type
+  storage_size                         = var.storage_size
+  storage_throughput                   = var.storage_throughput
   macos_required_license_count_per_asg = var.macos_required_license_count_per_asg
   macos_cores_per_license              = var.macos_cores_per_license
   scale_min                            = var.scale_min

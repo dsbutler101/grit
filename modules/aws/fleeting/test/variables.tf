@@ -18,53 +18,68 @@ variable "metadata" {
 ###################
 
 variable "service" {
-  type        = string
   description = "The AWS service on which to run jobs"
+  type        = string
+  default     = "ec2"
 }
 
-variable "fleeting_os" {
-  description = "TODO"
+variable "os" {
+  description = "The operating system to use"
   type        = string
-}
-
-variable "ami" {
-  description = "TODO"
-  type        = string
+  default     = "linux"
 }
 
 variable "instance_type" {
-  description = "TODO"
+  description = "The instance type to use in the autoscaling group"
+  type        = string
+  default     = "t2.micro"
+}
+
+variable "ami" {
+  description = "The machine image to use on the instances"
   type        = string
 }
 
-variable "asg_storage_type" {
-  description = "TODO"
+variable "storage_type" {
+  description = "The type of the storage"
   type        = string
   default     = "gp3"
 }
 
-variable "asg_storage_size" {
-  description = "TODO"
+variable "storage_size" {
+  description = "The size of the storage in GB"
   type        = number
   default     = 500
 }
 
-variable "asg_storage_throughput" {
-  description = "TODO"
+variable "storage_throughput" {
+  description = "The throughput of the storage"
   type        = number
   default     = 750 #must be in range of (125 - 1000)
 }
 
 variable "macos_required_license_count_per_asg" {
-  description = "TODO"
+  description = "Required license count per ASG (MacOS only)"
   type        = number
   default     = 20
 }
 
 variable "macos_cores_per_license" {
-  description = "TODO"
+  description = "Cores per license (MacOS only)"
   type        = number
   default     = 8
+}
+
+variable "scale_min" {
+  description = "Autoscaling group minimum number of instances"
+  type        = number
+  default     = 0
+}
+
+variable "scale_max" {
+  description = "Autoscaling group maximum number of instances"
+  type        = number
+  default     = 10
 }
 
 #######

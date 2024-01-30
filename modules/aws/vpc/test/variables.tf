@@ -18,17 +18,19 @@ variable "metadata" {
 ##############
 
 variable "zone" {
+  description = "The AWS zone in which to create the subnet."
   type        = string
-  description = "TODO"
   default     = "us-east-1"
 }
 
 variable "cidr" {
+  description = "The VPC CIDR."
   type        = string
-  description = "TODO"
+  default     = "10.0.0.0/16"
 }
 
 variable "subnet_cidr" {
+  description = "The subnet CIDR."
   type        = string
-  description = "TODO"
+  default     = "10.0.0.0/24"
 }

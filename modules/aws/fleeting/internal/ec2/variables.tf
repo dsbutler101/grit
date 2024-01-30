@@ -33,15 +33,15 @@ variable "labels" {
   type = map(any)
 }
 
-variable "asg_storage_type" {
+variable "storage_type" {
   type = string
 }
 
-variable "asg_storage_size" {
+variable "storage_size" {
   type = number
 }
 
-variable "asg_storage_throughput" {
+variable "storage_throughput" {
   type = number
 }
 

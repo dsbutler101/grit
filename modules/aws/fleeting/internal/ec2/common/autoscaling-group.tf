@@ -4,8 +4,8 @@ resource "aws_launch_template" "fleeting-asg-template" {
 
   description = "Launch template for GitLab Runner fleeting configuration"
 
-  image_id      = var.asg_ami_id
-  instance_type = var.asg_instance_type
+  image_id      = var.ami_id
+  instance_type = var.instance_type
 
   key_name = aws_key_pair.jobs-key-pair.key_name
 
@@ -31,9 +31,9 @@ resource "aws_launch_template" "fleeting-asg-template" {
 
     ebs {
       delete_on_termination = "true"
-      volume_size           = var.asg_storage_size
-      volume_type           = var.asg_storage_type
-      throughput            = var.asg_storage_throughput
+      volume_size           = var.storage_size
+      volume_type           = var.storage_type
+      throughput            = var.storage_throughput
     }
   }
 

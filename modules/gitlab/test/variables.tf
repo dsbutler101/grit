@@ -18,24 +18,24 @@ variable "metadata" {
 ######################
 
 variable "url" {
-  description = "TODO"
+  description = "The GitLab instance URL on which to register the runner."
   type        = string
-  default     = "gitlab.com"
+  default     = "https://gitlab.com"
 }
 
 variable "project_id" {
-  description = "TODO"
+  description = "The numeric project ID to which to register the runner."
   type        = string
 }
 
 variable "runner_description" {
-  description = "TODO"
+  description = "The runner description shown in the UI."
   type        = string
-  default     = "GRIT"
+  default     = "GRIT Runner"
 }
 
 variable "runner_tags" {
-  description = "TODO"
+  description = "The list of runner tags for selecting jobs. An empty list will run untagged jobs."
   type        = list(string)
   default     = []
 }

@@ -2,23 +2,23 @@
 # AWS Autoscaling Group configuration #
 #######################################
 
-variable "asg_storage_size" {
+variable "storage_size" {
   type = number
 }
 
-variable "asg_storage_type" {
+variable "storage_type" {
   type = string
 }
 
-variable "asg_storage_throughput" {
+variable "storage_throughput" {
   type = number
 }
 
-variable "asg_ami_id" {
+variable "ami_id" {
   type = string
 }
 
-variable "asg_instance_type" {
+variable "instance_type" {
   type = string
 }
 

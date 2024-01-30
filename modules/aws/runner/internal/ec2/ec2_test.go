@@ -41,6 +41,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"capacity_per_instance": 1,
 				"scale_min":             1,
 				"scale_max":             1,
+				"labels":                map[string]string{},
 				"name":                  name,
 			},
 			expectedModules: expectedModules,

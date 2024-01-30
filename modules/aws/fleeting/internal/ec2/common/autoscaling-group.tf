@@ -83,7 +83,7 @@ resource "aws_autoscaling_group" "fleeting-asg" {
     var.subnet_id
   ]
 
-  protect_from_scale_in = var.protect_from_scale_in
+  protect_from_scale_in = true
 
   dynamic "tag" {
     for_each = var.labels

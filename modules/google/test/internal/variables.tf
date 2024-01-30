@@ -16,17 +16,14 @@ variable "gitlab_project_id" {
 variable "gitlab_url" {
   type        = string
   description = "The URL of the GitLab instance where to register the Runner Manager"
-  default     = "https://gitlab.com/"
 }
 
 variable "gitlab_runner_description" {
-  type    = string
-  default = "GRIT"
+  type = string
 }
 
 variable "gitlab_runner_tags" {
-  type    = list(string)
-  default = []
+  type = list(string)
 }
 
 variable "runner_token" {

@@ -46,9 +46,6 @@ variable "executor" {
 
 variable "labels" {
   type = map(any)
-  default = {
-    env = "grit"
-  }
 }
 
 variable "name" {

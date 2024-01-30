@@ -20,6 +20,15 @@ terraform-formatting:
   script:
     - terraform fmt -check -recursive
 
+# Terraform variables
+
+terraform-variables:
+  stage: lint
+  extends:
+    - .go-install
+  script:
+    - go test -tags lint .
+
 # Unit tests
 
 unit-tests:

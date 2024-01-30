@@ -22,11 +22,6 @@ variable "asg_instance_type" {
   type = string
 }
 
-variable "protect_from_scale_in" {
-  type    = bool
-  default = true
-}
-
 variable "labels" {
   type = map(any)
 }

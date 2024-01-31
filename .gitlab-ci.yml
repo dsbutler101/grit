@@ -5,6 +5,10 @@ stages:
 
 image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
 
+default:
+  tags:
+    - gitlab-org
+
 .go-install:
   before_script:
     - apk add --update --no-cache curl tar bash

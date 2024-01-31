@@ -1,17 +1,54 @@
 [[runners]]
   request_concurency = ${request_concurrency}
+  executor = "${executor}"
 
 %{ if runners_global_section != "" }
   ${runners_global_section}
 %{ endif }
 
-  executor = "docker"
+%{ if use_autoscaling }
+  [runners.autoscaler]
+    plugin = "fleeting-plugin-googlecompute"
 
+    capacity_per_instance = ${capacity_per_instance}
+    max_use_count = ${max_use_count}
+    max_instances = ${max_instances}
+
+    [runners.autoscaler.plugin_config]
+      name = "${fleeting_instance_group_name}"
+      project = "${fleeting_google_project}"
+      zone = "${fleeting_google_zone}"
+
+    [runners.autoscaler.connector_config]
+      username = "cos"
+      key_path = "/etc/gitlab-runner/ssh-key.priv"
+      use_external_addr = false
+
+%{ for policy in autoscaling_policies }
+    [[runners.autoscaler.policy]]
+      periods = [${policy.periods}]
+%{ if policy.timezone != "" }
+      timezone = ${policy.timezone}
+%{ endif }
+
+      idle_count = ${policy.idle_count}
+      idle_time = "${policy.idle_time}"
+
+%{ if policy.scale_factor > 0}
+      scale_factor = ${policy.scale_factor}
+      scale_factor_limit = ${policy.scale_factor_limit}
+%{ endif }
+
+%{ endfor }
+%{ endif }
+
+%{ if use_docker }
   [runners.docker]
     image = "alpine:latest"
 
 %{ if runners_docker_section != "" }
     ${runners_docker_section}
+%{ endif }
 %{ endif }
 
 %{ if cache_gcs_bucket != "" }

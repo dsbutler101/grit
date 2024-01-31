@@ -24,16 +24,6 @@ module "gke-cluster" {
   source = "../../internal/kubernetes/fleeting/gke"
 }
 
-module "eks-cluster" {
-  count  = var.fleeting_service == "eks" || local.kubernetes_manager ? 1 : 0
-  source = "../../internal/kubernetes/fleeting/eks"
-}
-
-module "aks-cluster" {
-  count  = var.fleeting_service == "aks" || local.kubernetes_manager ? 1 : 0
-  source = "../../internal/kubernetes/fleeting/aks"
-}
-
 ##################
 # INSTANCE GROUP #
 ##################

@@ -7,7 +7,8 @@ output "host" {
 }
 
 output "access_token" {
-  value = data.google_client_config.provider.access_token
+  value     = data.google_client_config.provider.access_token
+  sensitive = true
 }
 
 output "ca_certificate" {

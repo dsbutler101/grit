@@ -1,0 +1,24 @@
+[[runners]]
+  request_concurency = ${request_concurrency}
+
+%{ if runners_global_section != "" }
+  ${runners_global_section}
+%{ endif }
+
+  executor = "docker"
+
+  [runners.docker]
+    image = "alpine:latest"
+
+%{ if runners_docker_section != "" }
+    ${runners_docker_section}
+%{ endif }
+
+%{ if cache_gcs_bucket != "" }
+  [runners.cache]
+    Type = "gcs"
+    Shared = true
+
+    [runners.cache.gcs]
+      BucketName = "${cache_gcs_bucket}"
+%{ endif }

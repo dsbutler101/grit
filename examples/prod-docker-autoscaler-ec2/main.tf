@@ -1,3 +1,13 @@
+# export GITLAB_TOKEN=<YOUR_GITLAB_TOKEN>
+
+terraform {
+  required_providers {
+    gitlab = {
+      source = "gitlabhq/gitlab"
+    }
+  }
+}
+
 locals {
   # Metadata is common input to all modules.
   metadata = {

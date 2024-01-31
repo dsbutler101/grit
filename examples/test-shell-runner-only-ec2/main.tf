@@ -1,4 +1,6 @@
-variable "runner_token" {}
+variable "runner_token" {
+  default = "MY_RUNNER_TOKEN"
+}
 
 module "runner" {
   source = "../../modules/aws/runner/test"

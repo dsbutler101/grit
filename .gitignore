@@ -9,7 +9,7 @@
 *.tfcache
 
 # Terraform lock files inside modules which are created by tests
-modules/**/.terraform.lock.hcl
+**/.terraform.lock.hcl
 
 # Crash log files
 crash.log

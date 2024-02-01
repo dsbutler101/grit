@@ -31,7 +31,7 @@ variable "machine_type" {
   type        = string
   description = "Machine type for runner manager instance"
 
-  default = "n2d-standard-4"
+  default = ""
 }
 
 variable "disk_type" {

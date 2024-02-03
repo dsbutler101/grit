@@ -28,7 +28,7 @@ module "macos" {
   source = "./macos"
 
   license_count_per_asg = var.macos_license_count_per_asg
-  cores_per_license              = var.macos_cores_per_license
+  cores_per_license     = var.macos_cores_per_license
 
   labels = var.labels
   name   = var.name

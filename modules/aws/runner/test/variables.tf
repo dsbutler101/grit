@@ -23,31 +23,31 @@ variable "service" {
 }
 
 variable "executor" {
-  description = "TODO"
+  description = "The runner's executor type"
   type        = string
   default     = "shell"
 }
 
 variable "scale_min" {
-  description = "TODO"
+  description = "The minimum number of instances to maintain"
   type        = number
   default     = 0
 }
 
 variable "scale_max" {
-  description = "TODO"
+  description = "The maximum number of instances to maintain"
   type        = number
   default     = 10
 }
 
 variable "idle_percentage" {
-  description = "TODO"
+  description = "The number of idle instances to maintain as a percentage of the current number of busy instances"
   type        = number
   default     = 10
 }
 
 variable "capacity_per_instance" {
-  description = "TODO"
+  description = "The number of concurrent job each instances can run"
   type        = number
   default     = 1
 }

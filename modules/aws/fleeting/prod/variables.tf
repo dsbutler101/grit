@@ -26,57 +26,57 @@ variable "service" {
 }
 
 variable "os" {
-  description = "TODO"
-  type        = string
-}
-
-variable "ami" {
-  description = "TODO"
+  description = "The operating system to use"
   type        = string
 }
 
 variable "instance_type" {
-  description = "TODO"
+  description = "The instance type to use in the autoscaling group"
   type        = string
 }
 
-variable "asg_storage_type" {
-  description = "TODO"
+variable "ami" {
+  description = "The machine image to use on the instances"
+  type        = string
+}
+
+variable "storage_type" {
+  description = "The type of the storage"
   type        = string
   default     = "gp3"
 }
 
-variable "asg_storage_size" {
-  description = "TODO"
+variable "storage_size" {
+  description = "The size of the storage in GB"
   type        = number
   default     = 500
 }
 
-variable "asg_storage_throughput" {
-  description = "TODO"
+variable "storage_throughput" {
+  description = "The throughput of the storage"
   type        = number
-  default     = 750 #must be in range of (125 - 1000)
+  default     = 750
 }
 
-variable "macos_required_license_count_per_asg" {
-  description = "TODO"
+variable "macos_license_count_per_asg" {
+  description = "License count per ASG (MacOS only)"
   type        = number
   default     = 20
 }
 
 variable "macos_cores_per_license" {
-  description = "TODO"
+  description = "Cores per license (MacOS only)"
   type        = number
   default     = 8
 }
 
 variable "scale_min" {
-  description = "TODO"
+  description = "Autoscaling group minimum number of instances"
   type        = number
 }
 
 variable "scale_max" {
-  description = "TODO"
+  description = "Autoscaling group maximum number of instances"
   type        = number
 }
 

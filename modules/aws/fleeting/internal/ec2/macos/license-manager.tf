@@ -1,6 +1,6 @@
 resource "aws_licensemanager_license_configuration" "license-config" {
   name                     = var.name
-  license_count            = var.required_license_count_per_asg * var.cores_per_license
+  license_count            = var.license_count_per_asg * var.cores_per_license
   license_count_hard_limit = false
   license_counting_type    = "Core"
 

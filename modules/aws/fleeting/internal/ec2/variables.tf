@@ -45,7 +45,7 @@ variable "storage_throughput" {
   type = number
 }
 
-variable "macos_required_license_count_per_asg" {
+variable "macos_license_count_per_asg" {
   type = number
 }
 

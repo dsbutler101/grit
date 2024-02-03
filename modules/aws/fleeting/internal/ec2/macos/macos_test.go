@@ -20,10 +20,10 @@ func TestAWSInternalEC2FleetingMacos(t *testing.T) {
 	}{
 		"override defaults": {
 			moduleVars: map[string]interface{}{
-				"required_license_count_per_asg": 10,
-				"cores_per_license":              4,
-				"labels":                         map[string]string{"env": "another place"},
-				"name":                           name,
+				"license_count_per_asg": 10,
+				"cores_per_license":     4,
+				"labels":                map[string]string{"env": "another place"},
+				"name":                  name,
 			},
 			expectedModules: expectedModules,
 		},

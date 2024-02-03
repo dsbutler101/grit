@@ -26,7 +26,7 @@ variable "service" {
 }
 
 variable "executor" {
-  description = "The runner's executor type"
+  description = "The runner's executor type. See https://docs.gitlab.com/runner/executors/"
   type        = string
 }
 

@@ -55,11 +55,11 @@ variable "storage_size" {
 variable "storage_throughput" {
   description = "The throughput of the storage"
   type        = number
-  default     = 750 #must be in range of (125 - 1000)
+  default     = 750
 }
 
-variable "macos_required_license_count_per_asg" {
-  description = "Required license count per ASG (MacOS only)"
+variable "macos_license_count_per_asg" {
+  description = "License count per ASG (MacOS only)"
   type        = number
   default     = 20
 }

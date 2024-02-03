@@ -34,5 +34,6 @@ module "ec2" {
   scale_min             = var.scale_min
   scale_max             = var.scale_max
 
-  name = var.metadata.name
+  name   = var.metadata.name
+  labels = var.metadata.labels
 }

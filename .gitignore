@@ -5,6 +5,9 @@
 *.tfstate
 *.tfstate.*
 
+# .tfcache files (used - by convenience - for local plan storage)
+*.tfcache
+
 # Terraform lock files inside modules which are created by tests
 modules/**/.terraform.lock.hcl
 

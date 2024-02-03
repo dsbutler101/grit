@@ -7,5 +7,5 @@ output "runner_token" {
 
 output "url" {
   description = "The URL where the runner was registered."
-  value       = module.gitlab.url     
+  value       = module.gitlab.url
 }

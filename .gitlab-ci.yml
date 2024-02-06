@@ -10,10 +10,12 @@ default:
     - gitlab-org
 
 .go-install:
+  variables:
+    GO_VERSION: "go1.21.4"
   before_script:
     - apk add --update --no-cache curl tar bash
-    - curl -OL https://golang.org/dl/go1.21.4.linux-amd64.tar.gz
-    - tar -C /usr/local -xzf go1.21.4.linux-amd64.tar.gz
+    - curl -OL https://golang.org/dl/${GO_VERSION}.linux-amd64.tar.gz
+    - tar -C /usr/local -xzf ${GO_VERSION}.linux-amd64.tar.gz
     - export PATH=$PATH:/usr/local/go/bin
     - go version
 
@@ -39,7 +41,10 @@ unit-tests:
   stage: unit
   extends:
     - .go-install
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   script:
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
     - cd modules
     - go test ./... -v
 

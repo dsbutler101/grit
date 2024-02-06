@@ -1,0 +1,26 @@
+[Unit]
+Description=Start GitLab Runner container
+After=docker.service docker.socket
+Wants=docker.service docker.socket
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+Environment="HOME=/home/cloudservice"
+
+ExecStart=/usr/bin/docker run \
+            --rm \
+            --name=gitlab-runner \
+            -v /etc/gitlab-runner:/etc/gitlab-runner/ \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            --entrypoint /etc/gitlab-runner/entrypoint.sh \
+            ${gitlab_runner_image} \
+            run \
+            --user=gitlab-runner \
+            --working-directory=/home/gitlab-runner
+
+ExecStop=/usr/bin/docker stop gitlab-runner
+ExecStopPost=/usr/bin/docker rm gitlab-runner
+
+TimeoutStopSec=7200

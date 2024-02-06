@@ -20,6 +20,15 @@ module "validate-support" {
 # RUNNER PROD MODULE #
 ######################
 
+module "validate-scale-parameters" {
+  source                = "../../../internal/validation/scale_parameters"
+  executor              = var.executor
+  capacity_per_instance = var.capacity_per_instance
+  scale_min             = var.scale_min
+  scale_max             = var.scale_max
+  idle_percentage       = var.idle_percentage
+}
+
 module "ec2" {
   count  = var.service == "ec2" ? 1 : 0
   source = "../internal/ec2"

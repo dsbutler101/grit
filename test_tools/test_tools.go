@@ -2,10 +2,11 @@ package test_tools
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
@@ -25,7 +26,7 @@ func JobName(t *testing.T) string {
 	return "unit-" + jobId
 }
 
-func PlanAndAssert(t *testing.T, moduleVars map[string]interface{}, expectedModules []string) {
+func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []string) {
 	tempDir := t.TempDir()
 	tempFilePath := filepath.Join(tempDir, "plan.json")
 
@@ -48,5 +49,24 @@ func PlanAndAssert(t *testing.T, moduleVars map[string]interface{}, expectedModu
 	fmt.Println(t.Name(), "ResourceChangesMap keys:")
 	for k, _ := range plan.ResourceChangesMap {
 		fmt.Printf("\"%v\",\n", k)
+	}
+}
+
+func PlanAndAssertError(t *testing.T, moduleVars map[string]any, wantErr bool) {
+	tempDir := t.TempDir()
+	tempFilePath := filepath.Join(tempDir, "plan.json")
+
+	options := &terraform.Options{
+		TerraformBinary: "terraform",
+		TerraformDir:    ".",
+		PlanFilePath:    tempFilePath,
+		Vars:            moduleVars,
+	}
+
+	_, err := terraform.InitAndPlanE(t, options)
+	if wantErr {
+		require.Error(t, err)
+	} else {
+		require.NoError(t, err)
 	}
 }

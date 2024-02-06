@@ -1,0 +1,42 @@
+variable "executor" {
+  type = string
+}
+variable "scale_min" {
+  type = number
+}
+variable "scale_max" {
+  type = number
+}
+variable "idle_percentage" {
+  type = number
+}
+variable "capacity_per_instance" {
+  type = number
+}
+
+locals {
+  check_scale_min_fail_message             = "scale_min is required for the autoscaling instance and docker-autoscaler executors"
+  check_scale_max_fail_message             = "scale_max is required for the autoscaling instance and docker-autoscaler executors"
+  check_idle_percentage_fail_message       = "idle_percentage is required for the autoscaling instance and docker-autoscaler executors"
+  check_capacity_per_instance_fail_message = "capacity_per_instance is required for the autoscaling instance and docker-autoscaler executors"
+}
+
+module "check-scale-min" {
+  source  = "../fail_validation"
+  message = var.scale_min == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler") ? local.check_scale_min_fail_message : ""
+}
+
+module "check-scale-max" {
+  source  = "../fail_validation"
+  message = var.scale_max == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler") ? local.check_scale_max_fail_message : ""
+}
+
+module "check-idle-percentage" {
+  source  = "../fail_validation"
+  message = var.idle_percentage == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler") ? local.check_idle_percentage_fail_message : ""
+}
+
+module "check-capacity-per-instance" {
+  source  = "../fail_validation"
+  message = var.capacity_per_instance == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler") ? local.check_capacity_per_instance_fail_message : ""
+}

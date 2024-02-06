@@ -1,5 +1,6 @@
 variable "runner_token" {}
 variable "name" {}
+variable "job_id" {}
 
 output "autoscaling_group_name" {
   value = module.fleeting.autoscaling_group_name
@@ -9,7 +10,8 @@ locals {
   metadata = {
     name = var.name
     labels = tomap({
-      env = "grit-e2e"
+      job_id = var.job_id
+      env    = "grit-e2e"
     })
     min_support = "experimental"
   }

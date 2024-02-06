@@ -1,10 +1,12 @@
 package test_tools
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -14,16 +16,21 @@ import (
 
 const (
 	JobIdVar                  = "CI_JOB_ID"
+	CommitSHAVar              = "CI_COMMIT_SHA"
 	GitlabTokenVar            = "GITLAB_TOKEN"
 	GritEndToEndTestProjectID = 52010278
 	Region                    = "us-east-1"
 	RunnerTokenVar            = "RUNNER_TOKEN"
 )
 
-func JobName(t *testing.T) string {
+func JobName(_ *testing.T) string {
 	jobId := os.Getenv(JobIdVar)
-	require.NotEmpty(t, jobId)
-	return "unit-" + jobId
+	sha := os.Getenv(CommitSHAVar)
+
+	id := fmt.Sprintf("%s:%s:%d", jobId, sha, time.Now().Unix())
+	hash := sha1.Sum([]byte(id))
+
+	return fmt.Sprintf("u-%x", hash[:5])
 }
 
 func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []string) {

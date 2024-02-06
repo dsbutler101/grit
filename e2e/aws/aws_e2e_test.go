@@ -20,6 +20,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 	"github.com/xanzy/go-gitlab"
+
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
@@ -29,6 +30,7 @@ const (
 )
 
 func TestEndToEnd(t *testing.T) {
+	name := test_tools.JobName(t)
 
 	jobId := os.Getenv(test_tools.JobIdVar)
 	require.NotEmpty(t, jobId)
@@ -46,7 +48,8 @@ func TestEndToEnd(t *testing.T) {
 		TerraformDir:    ".",
 		Vars: map[string]interface{}{
 			"runner_token": runnerToken,
-			"name":         "e2e-" + jobId,
+			"name":         name,
+			"job_id":       jobId,
 		},
 	}
 	_, err = terraform.InitAndApplyE(t, options)
@@ -56,7 +59,7 @@ func TestEndToEnd(t *testing.T) {
 	require.NoError(t, err)
 
 	// TODO: implement check for runner stack health
-	instanceName := "e2e-" + jobId + "_runner-manager"
+	instanceName := name + "_runner-manager"
 	requireRunnerManagerRunning(t, instanceName)
 
 	// Run a job

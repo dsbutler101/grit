@@ -56,19 +56,19 @@ variable "capacity_per_instance" {
 
 check "scale_parameters" {
   assert {
-    condition     = var.scale_min == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler")
+    condition     = !(var.scale_min == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler"))
     error_message = "scale_min is required for the autoscaling instance and docker-autoscaler executors"
   }
   assert {
-    condition     = var.scale_max == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler")
+    condition     = !(var.scale_max == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler"))
     error_message = "scale_max is required for the autoscaling instance and docker-autoscaler executors"
   }
   assert {
-    condition     = var.idle_percentage == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler")
+    condition     = !(var.idle_percentage == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler"))
     error_message = "idle_percentage is required for the autoscaling instance and docker-autoscaler executors"
   }
   assert {
-    condition     = var.capacity_per_instance == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler")
+    condition     = !(var.capacity_per_instance == -1 && (var.executor == "instance" || var.executor == "docker-autoscaler"))
     error_message = "capacity_per_instance is required for the autoscaling instance and docker-autoscaler executors"
   }
 }

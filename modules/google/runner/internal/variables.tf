@@ -14,6 +14,10 @@ variable "google_project" {
   type = string
 }
 
+variable "google_zone" {
+  type = string
+}
+
 variable "runner_version" {
   type = string
 }
@@ -70,6 +74,10 @@ variable "request_concurrency" {
   type = string
 }
 
+variable "executor" {
+  type = string
+}
+
 variable "cache_gcs_bucket" {
   type = string
 }
@@ -80,6 +88,41 @@ variable "runners_global_section" {
 
 variable "runners_docker_section" {
   type = string
+}
+
+#
+# Autoscaling configuration
+#
+
+variable "fleeting_googlecompute_plugin_version" {
+  type = string
+}
+
+variable "fleeting_instance_group_name" {
+  type = string
+}
+
+variable "capacity_per_instance" {
+  type = number
+}
+
+variable "max_instances" {
+  type = number
+}
+
+variable "max_use_count" {
+  type = number
+}
+
+variable "autoscaling_policies" {
+  type = list(object({
+    periods            = list(string)
+    timezone           = string
+    scale_min          = number
+    idle_time          = string
+    scale_factor       = number
+    scale_factor_limit = number
+  }))
 }
 
 #

@@ -1,5 +1,19 @@
 locals {
   runner_manager_tag = "gitlab-runner-manager"
+
+  use_autoscaling = var.executor == "docker-autoscaler" || var.executor == "instance"
+  use_docker      = var.executor == "docker-autoscaler" || var.executor == "docker"
+
+  autoscaling_policies = [
+    for p in var.autoscaling_policies : {
+      periods            = join(", ", formatlist("%q", p.periods))
+      timezone           = p.timezone
+      idle_count         = p.scale_min * var.capacity_per_instance
+      idle_time          = p.idle_time
+      scale_factor       = p.scale_factor
+      scale_factor_limit = p.scale_factor_limit
+    }
+  ]
 }
 
 data "cloudinit_config" "config" {
@@ -24,6 +38,9 @@ data "cloudinit_config" "config" {
 
             runner_token   = google_kms_secret_ciphertext.runner-token.ciphertext
             runner_ssh_key = google_kms_secret_ciphertext.runner-ssh-key.ciphertext
+
+            use_autoscaling                       = local.use_autoscaling
+            fleeting_googlecompute_plugin_version = var.fleeting_googlecompute_plugin_version
           })
         },
         {
@@ -47,8 +64,23 @@ data "cloudinit_config" "config" {
 
             cache_gcs_bucket = var.cache_gcs_bucket
 
+            use_autoscaling = local.use_autoscaling
+            use_docker      = local.use_docker
+
+            executor = var.executor
+
             runners_global_section = var.runners_global_section
             runners_docker_section = var.runners_docker_section
+
+            fleeting_google_project      = var.google_project
+            fleeting_google_zone         = var.google_zone
+            fleeting_instance_group_name = var.fleeting_instance_group_name
+
+            capacity_per_instance = var.capacity_per_instance
+            max_use_count         = var.max_use_count
+            max_instances         = var.max_instances
+
+            autoscaling_policies = local.autoscaling_policies
           })
         },
         {
@@ -108,6 +140,9 @@ resource "google_compute_instance" "runner-manager" {
 
       # Needed for signing GCS URLs for cache
       "https://www.googleapis.com/auth/iam",
+
+      # Needed for managing instances through the Instance Group Manager
+      "https://www.googleapis.com/auth/compute",
 
       # The default scopes present if not defined explicitly as above
       "https://www.googleapis.com/auth/logging.write",

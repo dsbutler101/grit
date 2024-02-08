@@ -21,6 +21,16 @@ which gitlab-runner
 gitlab-runner --version
 
 #
+# Install fleeting plugin
+#
+
+%{ if use_autoscaling }
+curl -Lo /usr/local/bin/fleeting-plugin-googlecompute \
+    "https://gitlab.com/gitlab-org/fleeting/fleeting-plugin-googlecompute/-/releases/${fleeting_googlecompute_plugin_version}/downloads/fleeting-plugin-googlecompute-linux-amd64"
+chmod +x /usr/local/bin/fleeting-plugin-googlecompute
+%{ endif }
+
+#
 # Retrieve runner token from the encrypted secret
 #
 apk add -U jq

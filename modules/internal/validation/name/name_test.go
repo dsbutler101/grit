@@ -18,13 +18,13 @@ func TestName(t *testing.T) {
 		},
 		"long name gives an error": {
 			vars: map[string]any{
-				"name": "0123456789012", // 13 characters
+				"name": "012345678901234567890", // 21 characters
 			},
 			wantErr: true,
 		},
 		"exactly the limit is okay": {
 			vars: map[string]any{
-				"name": "012345678901", // 12 characters
+				"name": "01234567890123456789", // 12 characters
 			},
 		},
 	}

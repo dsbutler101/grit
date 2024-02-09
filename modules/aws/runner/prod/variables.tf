@@ -54,6 +54,44 @@ variable "capacity_per_instance" {
   default     = -1
 }
 
+variable "security_group_ids" {
+  description = "Security groups to apply to the runner manager VMs"
+  type        = list(string)
+}
+
+variable "privileged" {
+  description = "When using docker - whether to run docker in privileged mode"
+  type        = bool
+  default     = false
+}
+
+variable "region" {
+  description = "Region to deploy the runner manager to"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "instance_role_profile_name" {
+  description = "Instance role profile to attach to the runner manager instances"
+  type        = string
+  default     = null
+}
+
+variable "install_cloudwatch_agent" {
+  type        = bool
+  description = "Install cloudwatch agent"
+  default     = false
+}
+
+variable "cloudwatch_agent_json" {
+  type        = string
+  description = <<EOF
+    Configs of the cloudwatch agent, json formatted and base64 decoded
+    ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html#Saving-Agent-Configuration-File
+   EOF
+  default     = "ewogICJhZ2VudCI6IHsKICAgICJtZXRyaWNzX2NvbGxlY3Rpb25faW50ZXJ2YWwiOiA2MCwKICAgICJsb2dmaWxlIjogIi9vcHQvYXdzL2FtYXpvbi1jbG91ZHdhdGNoLWFnZW50L2xvZ3MvYW1hem9uLWNsb3Vkd2F0Y2gtYWdlbnQubG9nIiwKICAgICJkZWJ1ZyI6IGZhbHNlLAogICAgInJ1bl9hc191c2VyIjogImN3YWdlbnQiCiAgfSwKICAibG9ncyI6IHsKICAgICJsb2dzX2NvbGxlY3RlZCI6IHsKICAgICAgImZpbGVzIjogewogICAgICAgICJjb2xsZWN0X2xpc3QiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJmaWxlX3BhdGgiOiAiL3Zhci9sb2cvc3lzbG9nIiwKICAgICAgICAgICAgImxvZ19ncm91cF9uYW1lIjogIlJ1bm5lci1NYW5hZ2VyLUxvZ3MiLAogICAgICAgICAgICAibG9nX3N0cmVhbV9uYW1lIjogIlJ1bm5lck1hbmFnZXItU3lzbG9nLVN0cmVhbSIsCiAgICAgICAgICAgICJ0aW1lc3RhbXBfZm9ybWF0IjogIiVIOiAlTTogJVMleSViJS1kIgogICAgICAgICAgfSwKCSAgewogICAgICAgICAgICAiZmlsZV9wYXRoIjogIi92YXIvbG9nL2Nsb3VkLWluaXQtb3V0cHV0LmxvZyIsCiAgICAgICAgICAgICJsb2dfZ3JvdXBfbmFtZSI6ICJSdW5uZXItTWFuYWdlci1Mb2dzIiwKICAgICAgICAgICAgImxvZ19zdHJlYW1fbmFtZSI6ICJSdW5uZXJNYW5hZ2VyLUNsb3VkaW5pdC1TdHJlYW0iLAogICAgICAgICAgICAidGltZXN0YW1wX2Zvcm1hdCI6ICIlSDogJU06ICVTJXklYiUtZCIKICAgICAgICAgIH0KCV0KICAgICAgfQogICAgfQogIH0KfQo="
+}
+
 ##########
 # GITLAB #
 ##########

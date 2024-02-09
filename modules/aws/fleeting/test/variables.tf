@@ -29,6 +29,11 @@ variable "os" {
   default     = "linux"
 }
 
+variable "ami" {
+  description = "TODO"
+  type        = string
+}
+
 variable "instance_type" {
   description = "The instance type to use in the autoscaling group"
   type        = string
@@ -58,7 +63,7 @@ variable "storage_throughput" {
   default     = 750 #must be in range of (125 - 1000)
 }
 
-variable "macos_required_license_count_per_asg" {
+variable "macos_license_count_per_asg" {
   description = "Required license count per ASG (MacOS only)"
   type        = number
   default     = 20
@@ -70,6 +75,31 @@ variable "macos_cores_per_license" {
   default     = 8
 }
 
+variable "security_group_ids" {
+  description = "Security groups to apply to the fleeting VMs"
+  type        = list(string)
+}
+
+variable "instance_role_profile_name" {
+  description = "Instance role profile to attach to the runner manager instances"
+  type        = string
+  default     = null
+}
+
+variable "install_cloudwatch_agent" {
+  type        = bool
+  description = "Install cloudwatch agent"
+  default     = false
+}
+
+variable "cloudwatch_agent_json" {
+  type        = string
+  description = <<EOF
+    Configs of the cloudwatch agent, json formatted and base64 decoded
+    ref: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html#Saving-Agent-Configuration-File
+   EOF
+  default     = "ewogICJhZ2VudCI6IHsKICAgICJtZXRyaWNzX2NvbGxlY3Rpb25faW50ZXJ2YWwiOiA2MCwKICAgICJsb2dmaWxlIjogIi9vcHQvYXdzL2FtYXpvbi1jbG91ZHdhdGNoLWFnZW50L2xvZ3MvYW1hem9uLWNsb3Vkd2F0Y2gtYWdlbnQubG9nIiwKICAgICJkZWJ1ZyI6IGZhbHNlLAogICAgInJ1bl9hc191c2VyIjogImN3YWdlbnQiCiAgfSwKICAibG9ncyI6IHsKICAgICJsb2dzX2NvbGxlY3RlZCI6IHsKICAgICAgImZpbGVzIjogewogICAgICAgICJjb2xsZWN0X2xpc3QiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJmaWxlX3BhdGgiOiAiL3Zhci9sb2cvc3lzbG9nIiwKICAgICAgICAgICAgImxvZ19ncm91cF9uYW1lIjogIkZsZWV0aW5nLUxvZ3MiLAogICAgICAgICAgICAibG9nX3N0cmVhbV9uYW1lIjogIkZsZWV0aW5nLVN5c2xvZy1TdHJlYW0iLAogICAgICAgICAgICAidGltZXN0YW1wX2Zvcm1hdCI6ICIlSDogJU06ICVTJXklYiUtZCIKICAgICAgICAgIH0sCgkgIHsKICAgICAgICAgICAgImZpbGVfcGF0aCI6ICIvdmFyL2xvZy9jbG91ZC1pbml0LW91dHB1dC5sb2ciLAogICAgICAgICAgICAibG9nX2dyb3VwX25hbWUiOiAiRmxlZXRpbmctTG9ncyIsCiAgICAgICAgICAgICJsb2dfc3RyZWFtX25hbWUiOiAiRmxlZXRpbmctQ2xvdWRpbml0LVN0cmVhbSIsCiAgICAgICAgICAgICJ0aW1lc3RhbXBfZm9ybWF0IjogIiVIOiAlTTogJVMleSViJS1kIgogICAgICAgICAgfQoJXQogICAgICB9CiAgICB9CiAgfQp9Cg=="
+}
 variable "scale_min" {
   description = "Autoscaling group minimum number of instances"
   type        = number

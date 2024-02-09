@@ -11,7 +11,7 @@ locals {
 
     packages = ["git", "git-lfs"]
 
-    write_files = [
+    write_files = setunion([
       {
         path        = "/etc/gitlab-runner/keypair.pem"
         owner       = "root:root"
@@ -29,12 +29,36 @@ locals {
           executor     = var.executor
           idle_count   = var.scale_min * var.capacity_per_instance
           scale_max    = var.scale_max
+          privileged   = var.privileged
+          region       = var.region
         })
       }
-    ]
+      ],
+      var.install_cloudwatch_agent ? [local.cloudwatch_config_file] : []
+    )
 
-    runcmd = concat(local.install_runner_cmd, var.executor == "docker-autoscaler" || var.executor == "instance" ? local.install_fleeting_plugin_cmd : [])
+
+    runcmd = concat(
+      var.install_cloudwatch_agent ? local.install_cloudwatch_agent_cmd : [],
+      local.install_runner_cmd,
+      var.executor == "docker-autoscaler" || var.executor == "instance" ? local.install_fleeting_plugin_cmd : [],
+    )
   }
+
+  cloudwatch_config_file = {
+    path        = "/tmp/amazon-cloudwatch-agent.json"
+    owner       = "root:root"
+    permissions = "0644"
+    content     = base64decode(var.cloudwatch_agent_json)
+  }
+
+  install_cloudwatch_agent_cmd = [
+    "sudo curl -O https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb",
+    "sudo apt-get -o DPkg::Lock::Timeout=300 install ./amazon-cloudwatch-agent.deb -y",
+    "sudo usermod -aG adm cwagent",
+    "sudo amazon-cloudwatch-agent-ctl -a start",
+    "sudo amazon-cloudwatch-agent-ctl -a fetch-config -c file:/tmp/amazon-cloudwatch-agent.json -s"
+  ]
 
   install_runner_cmd = [
     "curl -L \"https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh\" | sudo bash",
@@ -48,7 +72,7 @@ locals {
     "sudo ./aws/install",
     "aws --profile default configure set aws_access_key_id \"${var.iam.fleeting_access_key_id}\"",
     "aws --profile default configure set aws_secret_access_key \"${var.iam.fleeting_secret_access_key}\"",
-    "aws --profile default configure set region \"us-east-1\"",
+    "aws --profile default configure set region \"${var.region}\"",
     "curl -Lo /etc/gitlab-runner/fleeting-plugin-aws \"https://gitlab.com/gitlab-org/fleeting/fleeting-plugin-aws/-/releases/permalink/latest/downloads/fleeting-plugin-aws-linux-amd64\"",
     "chmod +x /etc/gitlab-runner/fleeting-plugin-aws && chown gitlab-runner /etc/gitlab-runner/fleeting-plugin-aws",
     "chown gitlab-runner /etc/gitlab-runner/keypair.pem"
@@ -82,36 +106,15 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_security_group" "manager_sg" {
-  name   = "${var.name} manager"
-  vpc_id = var.vpc.id
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge(var.labels, {
-    Name = "${var.name} manager"
-  })
-}
-
 resource "aws_instance" "runner-manager" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
   subnet_id                   = var.vpc.subnet_id
-  vpc_security_group_ids      = [aws_security_group.manager_sg.id]
+  vpc_security_group_ids      = var.security_group_ids
   associate_public_ip_address = true
   user_data                   = data.cloudinit_config.config.rendered
+  iam_instance_profile        = var.instance_role_profile_name
+  user_data_replace_on_change = true
 
   tags = merge(var.labels, {
     Name = "${var.name}_runner-manager"

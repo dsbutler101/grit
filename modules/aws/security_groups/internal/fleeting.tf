@@ -1,8 +1,4 @@
-##############
-# Networking #
-##############
-
-resource "aws_security_group" "jobs-security-group" {
+resource "aws_security_group" "jobs_security_group" {
   name   = "${var.name} fleet"
   vpc_id = var.vpc_id
 
@@ -33,4 +29,3 @@ resource "aws_security_group" "jobs-security-group" {
     Name = "${var.name} fleet"
   })
 }
-

@@ -8,12 +8,13 @@ module "validate-name" {
 }
 
 ###################
-# IAM TEST MODULE #
+# SECURITY GROUPS TEST MODULE #
 ###################
 
-module "iam" {
+module "security_groups" {
   source = "../internal"
 
   name   = var.metadata.name
   labels = var.metadata.labels
+  vpc_id = var.vpc_id
 }

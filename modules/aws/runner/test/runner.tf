@@ -20,10 +20,16 @@ module "ec2" {
   iam      = var.iam
   vpc      = var.vpc
 
-  executor              = var.executor
-  capacity_per_instance = var.capacity_per_instance
-  scale_min             = var.scale_min
-  scale_max             = var.scale_max
+  executor                   = var.executor
+  capacity_per_instance      = var.capacity_per_instance
+  scale_min                  = var.scale_min
+  scale_max                  = var.scale_max
+  security_group_ids         = var.security_group_ids
+  privileged                 = var.privileged
+  region                     = var.region
+  instance_role_profile_name = var.instance_role_profile_name
+  install_cloudwatch_agent   = var.install_cloudwatch_agent
+  cloudwatch_agent_json      = var.cloudwatch_agent_json
 
   name   = var.metadata.name
   labels = var.metadata.labels

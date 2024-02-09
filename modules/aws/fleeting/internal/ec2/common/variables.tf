@@ -54,3 +54,18 @@ variable "subnet_id" {
   type = string
 }
 
+variable "instance_role_profile_name" {
+  type = string
+}
+
+variable "security_group_ids" {
+  type = list(string)
+}
+
+variable "install_cloudwatch_agent" {
+  type = bool
+}
+
+variable "cloudwatch_agent_json" {
+  type = string
+}

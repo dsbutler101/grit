@@ -31,6 +31,13 @@ module "vpc" {
   subnet_cidr = "10.0.0.0/24"
 }
 
+module "security_groups" {
+  source   = "../../modules/aws/security_groups/prod"
+  metadata = local.metadata
+
+  vpc_id = module.vpc.id
+}
+
 module "fleeting" {
   source   = "../../modules/aws/fleeting/prod"
   metadata = local.metadata
@@ -42,6 +49,10 @@ module "fleeting" {
   instance_type = "t2.medium"
   scale_min     = 1
   scale_max     = 10
+
+  security_group_ids = [
+    module.security_groups.fleeting.id,
+  ]
 }
 
 module "runner" {
@@ -58,6 +69,10 @@ module "runner" {
   scale_max             = 10
   idle_percentage       = 10
   capacity_per_instance = 1
+
+  security_group_ids = [
+    module.security_groups.runner_manager.id,
+  ]
 }
 
 locals {

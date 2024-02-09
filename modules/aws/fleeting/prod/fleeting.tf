@@ -38,4 +38,8 @@ module "ec2" {
   macos_cores_per_license     = var.macos_cores_per_license
   scale_min                   = var.scale_min
   scale_max                   = var.scale_max
+  security_group_ids          = var.security_group_ids
+  install_cloudwatch_agent    = var.install_cloudwatch_agent
+  cloudwatch_agent_json       = var.cloudwatch_agent_json
+  instance_role_profile_name  = var.instance_role_profile_name
 }

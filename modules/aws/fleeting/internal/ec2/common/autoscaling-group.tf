@@ -9,6 +9,8 @@ resource "aws_launch_template" "fleeting-asg-template" {
 
   key_name = aws_key_pair.jobs-key-pair.key_name
 
+  user_data = var.install_cloudwatch_agent ? data.cloudinit_config.fleeting_config.rendered : null
+
   dynamic "license_specification" {
     for_each = var.license_arn != "" ? [1] : []
 
@@ -26,6 +28,14 @@ resource "aws_launch_template" "fleeting-asg-template" {
     }
   }
 
+  dynamic "iam_instance_profile" {
+    for_each = [var.instance_role_profile_name]
+
+    content {
+      name = iam_instance_profile.value
+    }
+  }
+
   block_device_mappings {
     device_name = "/dev/sda1"
 
@@ -40,9 +50,7 @@ resource "aws_launch_template" "fleeting-asg-template" {
   network_interfaces {
     subnet_id = var.subnet_id
 
-    security_groups = [
-      aws_security_group.jobs-security-group.id
-    ]
+    security_groups = var.security_group_ids
   }
 
   tag_specifications {

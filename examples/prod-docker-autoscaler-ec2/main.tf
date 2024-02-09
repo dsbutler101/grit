@@ -11,7 +11,7 @@ terraform {
 locals {
   # Metadata is common input to all modules.
   metadata = {
-    name = "my-autoscaling-runner"
+    name = "autoscaling"
     labels = tomap({
       env = "grit-e2e"
     })
@@ -56,6 +56,8 @@ module "fleeting" {
   instance_type = "t2.medium"
   scale_min     = 1
   scale_max     = 10
+
+  security_group_ids = [module.security_groups.fleeting.id]
 }
 
 # The gitlab modules will register the created runner to GitLab as a
@@ -100,4 +102,15 @@ module "runner" {
   scale_max             = 10
   idle_percentage       = 10
   capacity_per_instance = 1
+
+  security_group_ids = [module.security_groups.runner_manager.id]
+}
+
+module "security_groups" {
+  source = "../../modules/aws/security_groups/prod"
+
+  metadata = local.metadata
+
+  vpc_id = module.vpc.id
+
 }

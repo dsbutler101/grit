@@ -43,10 +43,10 @@ func TestRunner(t *testing.T) {
 				"scale_max":             10,
 				"idle_percentage":       10,
 				"capacity_per_instance": 1,
+				"security_group_ids":    []string{"123456"},
 			},
 			expectedModules: []string{
 				"module.ec2[0].aws_instance.runner-manager",
-				"module.ec2[0].aws_security_group.manager_sg",
 			},
 		},
 	}

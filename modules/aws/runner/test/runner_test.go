@@ -36,11 +36,11 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 					"fleeting_access_key_id":     "12345",
 					"fleeting_secret_access_key": "abcde",
 				},
-				"service": "ec2",
+				"service":            "ec2",
+				"security_group_ids": []string{"123456"},
 			},
 			expectedModules: []string{
 				"module.ec2[0].aws_instance.runner-manager",
-				"module.ec2[0].aws_security_group.manager_sg",
 			},
 		},
 	}

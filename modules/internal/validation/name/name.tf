@@ -8,7 +8,7 @@ variable "name" {
   }
 
   validation {
-    condition     = length(var.name) <= 12
-    error_message = "The name value must be 12 characters or less in length."
+    condition     = length(var.name) <= 20
+    error_message = "The name value must be 20 characters or less in length."
   }
 }

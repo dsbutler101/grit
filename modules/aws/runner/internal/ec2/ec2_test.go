@@ -31,6 +31,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 					"autoscaling_group_name": "abcde",
 					"ssh_key_pem_name":       "abcde",
 					"ssh_key_pem":            "abcde",
+					"username":               "abcde",
 				},
 				"iam": map[string]interface{}{
 					"fleeting_access_key_id":     "12345",

@@ -124,7 +124,9 @@ variable "fleeting" {
     autoscaling_group_name = optional(string, "")
     ssh_key_pem_name       = optional(string, "")
     ssh_key_pem            = optional(string, "")
+    username               = optional(string, "ubuntu")
   })
+
   default = {}
 }
 

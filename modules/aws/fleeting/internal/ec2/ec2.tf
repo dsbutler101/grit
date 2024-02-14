@@ -5,8 +5,8 @@
 module "common" {
   source = "./common"
 
-  license_arn                      = try(module.macos.license-config-arn, "")
-  jobs-host-resource-group-outputs = try(module.macos.jobs-host-resource-group-outputs, {})
+  license_arn                      = try(module.macos[0].license-config-arn, "")
+  jobs-host-resource-group-outputs = try(module.macos[0].jobs-host-resource-group-outputs, {})
 
   scale_min = var.scale_min
   scale_max = var.scale_max

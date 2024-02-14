@@ -10,6 +10,7 @@ variable "fleeting" {
     autoscaling_group_name = string
     ssh_key_pem_name       = string
     ssh_key_pem            = string
+    username               = string
   })
 }
 

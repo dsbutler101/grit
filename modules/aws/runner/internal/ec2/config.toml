@@ -6,7 +6,7 @@ concurrent = ${scale_max}
     token = "${runner_token}"
     executor = "${executor}"
 
-%{ if executor == "docker-autoscaler" }
+%{ if executor == "docker-autoscaler" || executor == "instance" }
     shell = "sh" # use powershell or pwsh for Windows AMIs
 
     # uncomment for Windows AMIs when the Runner manager is hosted on Linux
@@ -38,7 +38,7 @@ concurrent = ${scale_max}
             region           = "${region}"                # required
 
         [runners.autoscaler.connector_config]
-            username          = "ubuntu"
+            username          = "${username}"
             use_external_addr = true
             key_path          = "/etc/gitlab-runner/keypair.pem"
 

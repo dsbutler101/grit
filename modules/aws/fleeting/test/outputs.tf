@@ -13,3 +13,8 @@ output "autoscaling_group_name" {
   description = "The name of the autoscaling group created"
   value       = try(module.ec2[0].autoscaling_group_name, "")
 }
+
+output "username" {
+  description = "The username to use when accessing the instance with SSH"
+  value       = var.os == "linux" ? "ubuntu" : "ec2-user"
+}

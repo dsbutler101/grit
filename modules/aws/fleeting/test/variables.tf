@@ -29,11 +29,6 @@ variable "os" {
   default     = "linux"
 }
 
-variable "ami" {
-  description = "TODO"
-  type        = string
-}
-
 variable "instance_type" {
   description = "The instance type to use in the autoscaling group"
   type        = string

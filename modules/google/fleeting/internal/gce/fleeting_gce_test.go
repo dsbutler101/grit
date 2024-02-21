@@ -15,6 +15,7 @@ func TestFleetingGCE(t *testing.T) {
 		"google_compute_instance_template.ephemeral-runner",
 		"google_compute_instance_group_manager.ephemeral-runners",
 		"google_compute_firewall.ephemeral-runners-ssh-access",
+		"google_compute_firewall.ephemeral-runners-cross-vm-deny",
 	}
 
 	testCases := map[string]struct {

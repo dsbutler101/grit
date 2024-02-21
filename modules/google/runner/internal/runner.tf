@@ -119,8 +119,9 @@ resource "google_compute_instance" "runner-manager" {
   machine_type = var.machine_type != "" ? var.machine_type : local.runner_manager_machine_type
 
   metadata = {
-    user-data      = data.cloudinit_config.config.rendered
-    enable-oslogin = true
+    user-data           = data.cloudinit_config.config.rendered
+    enable-oslogin      = true
+    cos-update-strategy = "update_disabled"
   }
 
   labels = var.labels

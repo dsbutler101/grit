@@ -14,6 +14,19 @@ locals {
       scale_factor_limit = p.scale_factor_limit
     }
   ]
+
+  runner_manager_machine_types_map = {
+    0   = "c2-standard-4",
+    300 = "c2-standard-8"
+    600 = "c2-standard-16"
+    900 = "c2-standard-30"
+  }
+
+  runner_manager_machine_type = var.concurrent < 300 ? local.runner_manager_machine_types_map.0 : (
+    var.concurrent < 600 ? local.runner_manager_machine_types_map.300 : (
+      var.concurrent < 900 ? local.runner_manager_machine_types_map.600 : local.runner_manager_machine_types_map.900
+    )
+  )
 }
 
 data "cloudinit_config" "config" {
@@ -103,7 +116,7 @@ data "cloudinit_config" "config" {
 
 resource "google_compute_instance" "runner-manager" {
   name         = "${var.name}-runner-manager"
-  machine_type = var.machine_type
+  machine_type = var.machine_type != "" ? var.machine_type : local.runner_manager_machine_type
 
   metadata = {
     user-data      = data.cloudinit_config.config.rendered

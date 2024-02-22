@@ -28,12 +28,6 @@ variable "runner_token" {
   type = string
 }
 
-variable "runner_tags" {
-  type = list(string)
-
-  default = []
-}
-
 variable "runner_machine_type" {
   type = string
 

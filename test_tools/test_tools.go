@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/stretchr/testify/require"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -37,14 +38,32 @@ func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []st
 	tempDir := t.TempDir()
 	tempFilePath := filepath.Join(tempDir, "plan.json")
 
-	options := &terraform.Options{
+	options := terraform.Options{
 		TerraformBinary: "terraform",
 		TerraformDir:    ".",
 		PlanFilePath:    tempFilePath,
 		Vars:            moduleVars,
 	}
 
-	plan := terraform.InitAndPlanAndShowWithStruct(t, options)
+	optionsDiscardLogger := options
+	optionsDiscardLogger.Logger = logger.Discard
+
+	// We separate InitAndPlan from ShowWithStruct to use different options.
+	//
+	// In InitAndPlan we want to have a logger that will print terraform output
+	// to the test output. That is very useful when debugging.
+	_ = terraform.InitAndPlan(t, &options)
+
+	// In ShowWithStruct we use the options set that explicitly disable logger
+	// by using logger.Discard. This is due the fact that to parse the plan output
+	// for further analysis, ShowWithStruct needs to call `terraform show -json ...`
+	// which will print the JSON representation of the plan file to the output. And
+	// that may include sensitive values like tokens, passwords etc.
+	// As many of these may be created dynamically, CI/CD variables masking will not
+	// help in case of GitLab CI/CD execution.
+	//
+	// Therefore - we need to disable logging in this specific case.
+	plan := terraform.ShowWithStruct(t, &optionsDiscardLogger)
 
 	assert.Len(t, plan.ResourcePlannedValuesMap, len(expectedModules))
 

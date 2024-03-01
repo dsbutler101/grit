@@ -4,7 +4,7 @@ locals {
 
 resource "google_project_iam_custom_role" "instance-group-manager" {
   role_id = "${local.name_underscore}_instanceGroupManager"
-  title   = "Role for ${var.name} instance gorup management"
+  title   = "Role for ${var.name} instance group management"
 
   permissions = [
     "compute.instances.get",

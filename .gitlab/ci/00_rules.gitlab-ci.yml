@@ -10,6 +10,13 @@
   - "**/*.lock.hcl"
   - "**/*.go"
   - "go.*"
+  - "{scripts}/**/*"
+
+.docs-patterns: &docs-patterns
+  - ".vale.ini"
+  - ".markdownlint-cli2.yaml"
+  - "docs/**/*"
+  - "scripts/lint-docs"
 
 ##############
 # Conditions #

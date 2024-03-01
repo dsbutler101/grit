@@ -3,57 +3,9 @@ stages:
   - unit
   - e2e
 
-image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
-
-default:
-  tags:
-    - gitlab-org
-
-.go-install:
-  variables:
-    GO_VERSION: "go1.21.4"
-  before_script:
-    - apk add --update --no-cache curl tar bash
-    - curl -OL https://golang.org/dl/${GO_VERSION}.linux-amd64.tar.gz
-    - tar -C /usr/local -xzf ${GO_VERSION}.linux-amd64.tar.gz
-    - export PATH=$PATH:/usr/local/go/bin
-    - go version
-
-# Linting
-
-terraform-formatting:
-  stage: lint
-  script:
-    - terraform fmt -check -recursive
-
-# Terraform variables
-
-terraform-variables:
-  stage: lint
-  extends:
-    - .go-install
-  script:
-    - go test -tags lint .
-
-# Unit tests
-
-unit-tests:
-  stage: unit
-  extends:
-    - .go-install
-  variables:
-    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
-  script:
-    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
-    - cd modules
-    - go test ./... -v
-
-# E2E tests
-
-aws-prod-e2e:
-  stage: e2e
-  extends:
-    - .go-install
-  script:
-    - cd e2e/aws
-    - go test . -tags e2e -timeout 30m
+include:
+  - local: .gitlab/ci/00_common.gitlab-ci.yml
+  - local: .gitlab/ci/00_rules.gitlab-ci.yml
+  - local: .gitlab/ci/10_lint.gitlab-ci.yml
+  - local: .gitlab/ci/20_unit.gitlab-ci.yml
+  - local: .gitlab/ci/30_e2e.gitlab-ci.yml

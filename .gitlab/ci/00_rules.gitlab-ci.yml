@@ -1,0 +1,38 @@
+####################
+# Changes patterns #
+####################
+
+.code-backstage-patterns: &code-backstage-patterns
+  - ".gitlab-ci.yml"
+  - ".gitlab/ci/**/*"
+  - ".gitattributes"
+  - "**/*.tf"
+  - "**/*.lock.hcl"
+  - "**/*.go"
+  - "go.*"
+
+##############
+# Conditions #
+##############
+
+.if-default-branch: &if-default-branch
+  if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+.if-merge-request-pipeline: &if-merge-request-pipeline
+  if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+#########
+# Rules #
+#########
+
+.rules:merge_request_pipelines:
+  rules:
+    - <<: *if-merge-request-pipeline
+    - <<: *if-default-branch
+
+.rules:merge_request_pipelines:no_docs:
+  rules:
+    - <<: *if-merge-request-pipeline
+      changes: *code-backstage-patterns
+    - <<: *if-default-branch
+      changes: *code-backstage-patterns

@@ -1,0 +1,14 @@
+terraform formatting:
+  stage: lint
+  extends:
+    - .rules:merge_request_pipelines:no_docs
+  script:
+    - terraform fmt -check -recursive
+
+terraform variables:
+  stage: lint
+  extends:
+    - .rules:merge_request_pipelines:no_docs
+    - .go-install
+  script:
+    - go test -tags lint .

@@ -1,0 +1,10 @@
+# When adding a group as a code owner, make sure to invite the group to the
+# project here: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/project_members
+# As described in https://docs.gitlab.com/ee/user/project/code_owners.html
+
+* @gitlab-com/runner-group/saas
+
+[Documentation]
+.markdownlint-cli2.yaml @gitlab-com/runner-docs-maintainers
+.vale.ini @gitlab-com/runner-docs-maintainers
+/docs/ @gitlab-com/runner-docs-maintainers

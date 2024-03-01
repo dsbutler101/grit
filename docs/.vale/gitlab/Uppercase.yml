@@ -102,6 +102,7 @@ exceptions:
   - GPS
   - GPT
   - GPU
+  - GRIT
   - GUI
   - HAML
   - HDD

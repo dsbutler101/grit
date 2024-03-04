@@ -1,0 +1,11 @@
+variables:
+  CI_IMAGE: "${CI_REGISTRY_IMAGE}/ci:20240304-01"
+
+build CI image:
+  stage: prepare
+  extends:
+    - .rules:merge_request_pipelines:build-ci-image
+    - .docker_in_docker
+  script:
+    - apk add --no-cache make
+    - make build-ci-image

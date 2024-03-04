@@ -2,7 +2,7 @@ unit tests:
   stage: unit
   extends:
     - .rules:merge_request_pipelines:no_docs
-    - .go-install
+    - .go-cache
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   script:

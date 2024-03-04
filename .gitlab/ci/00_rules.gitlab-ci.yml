@@ -18,6 +18,11 @@
   - "docs/**/*"
   - "scripts/lint-docs"
 
+.ci-image-patterns: &ci-image-patterns
+  - dockerfiles/ci/**
+  - Makefile.image-ci.mk
+  - .gitlab/ci/11_build_ci_image.gitlab-ci.yml
+
 ##############
 # Conditions #
 ##############
@@ -43,3 +48,8 @@
       changes: *code-backstage-patterns
     - <<: *if-default-branch
       changes: *code-backstage-patterns
+
+.rules:merge_request_pipelines:build-ci-image:
+  rules:
+    - <<: *if-merge-request-pipeline
+      changes: *ci-image-patterns

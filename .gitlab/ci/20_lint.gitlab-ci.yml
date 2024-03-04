@@ -9,7 +9,7 @@ terraform variables:
   stage: lint
   extends:
     - .rules:merge_request_pipelines:no_docs
-    - .go-install
+    - .go-cache
   script:
     - go test -tags lint .
 

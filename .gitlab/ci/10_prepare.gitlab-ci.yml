@@ -1,0 +1,2 @@
+include:
+  - local: .gitlab/ci/11_build_ci_image.gitlab-ci.yml

@@ -1,10 +1,11 @@
 default:
-  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  image: ${CI_IMAGE}
   tags:
     - gitlab-org
 
 variables:
   GO_VERSION: "go1.21.7"
+  DOCKER_VERSION: "24.0.9"
 
 .no_cache:
   cache: {}
@@ -17,17 +18,23 @@ variables:
     - .no_cache
     - .no_dependencies
 
-.go-install:
+.go-cache:
   variables:
     GOCACHE: $CI_PROJECT_DIR/.gocache-$CI_COMMIT_REF_PROTECTED
   before_script:
-    - apk add --update --no-cache curl tar bash
-    - curl -OL https://golang.org/dl/${GO_VERSION}.linux-amd64.tar.gz
-    - tar -C /usr/local -xzf ${GO_VERSION}.linux-amd64.tar.gz
-    - export PATH=$PATH:/usr/local/go/bin
-    - go version
     - mkdir -p "$GOCACHE"
   cache:
     paths:
       - $CI_PROJECT_DIR/.gocache-false/
     key: "${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}"
+
+.docker_in_docker:
+  image: docker:${DOCKER_VERSION}-git
+  services:
+    - docker:${DOCKER_VERSION}-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+  tags:
+    - gitlab-org-docker

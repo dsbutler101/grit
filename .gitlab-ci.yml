@@ -1,4 +1,5 @@
 stages:
+  - prepare
   - lint
   - unit
   - e2e
@@ -6,6 +7,7 @@ stages:
 include:
   - local: .gitlab/ci/00_common.gitlab-ci.yml
   - local: .gitlab/ci/00_rules.gitlab-ci.yml
-  - local: .gitlab/ci/10_lint.gitlab-ci.yml
-  - local: .gitlab/ci/20_unit.gitlab-ci.yml
-  - local: .gitlab/ci/30_e2e.gitlab-ci.yml
+  - local: .gitlab/ci/10_prepare.gitlab-ci.yml
+  - local: .gitlab/ci/20_lint.gitlab-ci.yml
+  - local: .gitlab/ci/30_unit.gitlab-ci.yml
+  - local: .gitlab/ci/40_e2e.gitlab-ci.yml

@@ -1,0 +1,9 @@
+e2e:prod:aws:
+  stage: e2e
+  extends:
+    - .rules:merge_request_pipelines:no_docs
+    - .go-install
+  resource_group: e2e-prod-aws
+  script:
+    - cd e2e/aws
+    - go test . -tags e2e -timeout 30m

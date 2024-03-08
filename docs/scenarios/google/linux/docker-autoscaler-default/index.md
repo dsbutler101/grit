@@ -32,19 +32,18 @@ The following API services must be enabled in the Google Cloud project:
 - `iamcredentials.googleapis.com`
 - `oslogin.googleapis.com`
 
-Assuming you have sufficient permissions and your `gcloud` command is
-authenticated with Google Cloud, you can enable them by executing
-the following command in the terminal:
+Ask someone with `owner` access to your Google Cloud project to run the following
+command:
 
- ```shell
- gcloud services enable \
-     cloudkms.googleapis.com \
-     compute.googleapis.com \
-     iam.googleapis.com \
-     cloudresourcemanager.googleapis.com \
-     iamcredentials.googleapis.com \
-     oslogin.googleapis.com
- ```
+```shell
+gcloud services enable \
+    cloudkms.googleapis.com \
+    compute.googleapis.com \
+    iam.googleapis.com \
+    cloudresourcemanager.googleapis.com \
+    iamcredentials.googleapis.com \
+    oslogin.googleapis.com
+```
 
 ### Google Cloud permissions for Terraform execution
 
@@ -117,6 +116,86 @@ following [permissions](https://cloud.google.com/kms/docs/reference/permissions-
 You can also create a [custom role](https://cloud.google.com/iam/docs/creating-custom-roles)
 with these permissions. You can then assign this role to the user or service account
 responsible for provisioning the GRIT Terraform configuration.
+
+Ask someone with `owner` access to your Google Cloud project to run the following
+commands:
+
+<details>
+
+```shell
+cat > grit-provisioner-role.json <<EOF
+{
+  "title": "GRITProvisioner",
+  "description": "A role with minimum list of permissions required for GRIT provisioning",
+  "includedPermissions": [
+    "cloudkms.cryptoKeyVersions.destroy",
+    "cloudkms.cryptoKeyVersions.list",
+    "cloudkms.cryptoKeyVersions.useToEncrypt",
+    "cloudkms.cryptoKeys.create",
+    "cloudkms.cryptoKeys.get",
+    "cloudkms.cryptoKeys.update",
+    "cloudkms.keyRings.create",
+    "cloudkms.keyRings.get",
+    "compute.disks.create",
+    "compute.firewalls.create",
+    "compute.firewalls.delete",
+    "compute.firewalls.get",
+    "compute.instanceGroupManagers.create",
+    "compute.instanceGroupManagers.delete",
+    "compute.instanceGroupManagers.get",
+    "compute.instanceGroups.create",
+    "compute.instanceGroups.delete",
+    "compute.instanceTemplates.create",
+    "compute.instanceTemplates.delete",
+    "compute.instanceTemplates.get",
+    "compute.instanceTemplates.useReadOnly",
+    "compute.instances.create",
+    "compute.instances.delete",
+    "compute.instances.get",
+    "compute.instances.setLabels",
+    "compute.instances.setMetadata",
+    "compute.instances.setServiceAccount",
+    "compute.instances.setTags",
+    "compute.networks.create",
+    "compute.networks.delete",
+    "compute.networks.get",
+    "compute.networks.updatePolicy",
+    "compute.regionOperations.get",
+    "compute.subnetworks.create",
+    "compute.subnetworks.delete",
+    "compute.subnetworks.get",
+    "compute.subnetworks.use",
+    "compute.subnetworks.useExternalIp",
+    "compute.zones.get",
+    "iam.roles.create",
+    "iam.roles.delete",
+    "iam.roles.get",
+    "iam.roles.list",
+    "iam.roles.update",
+    "iam.serviceAccounts.actAs",
+    "iam.serviceAccounts.create",
+    "iam.serviceAccounts.delete",
+    "iam.serviceAccounts.get",
+    "iam.serviceAccounts.list",
+    "resourcemanager.projects.get",
+    "resourcemanager.projects.getIamPolicy",
+    "resourcemanager.projects.setIamPolicy",
+    "storage.buckets.create",
+    "storage.buckets.delete",
+    "storage.buckets.get",
+    "storage.buckets.getIamPolicy",
+    "storage.buckets.setIamPolicy"
+  ],
+  "stage": "BETA"
+}
+EOF
+
+gcloud iam roles create GRITProvisioner --project=[projectID] --file=./grit-provisioner-role.json
+```
+
+</details>
+
+where `[projectID]` is the ID of your Google Cloud project.
 
 ## Variables
 

@@ -32,6 +32,10 @@ resource "aws_subnet" "jobs-vpc-subnet" {
 # adding tags to aws_route_table causes an error: query returned no results
 resource "aws_route_table" "rtb_public" {
   vpc_id = aws_vpc.vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
 }
 
 resource "aws_route_table_association" "rta_subnet_public" {

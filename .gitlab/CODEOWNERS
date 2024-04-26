@@ -2,7 +2,7 @@
 # project here: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/project_members
 # As described in https://docs.gitlab.com/ee/user/project/code_owners.html
 
-* @gitlab-com/runner-group/saas
+* @gitlab-com/runner-group/saas @amknight
 
 [Documentation]
 .markdownlint-cli2.yaml @gitlab-com/runner-docs-maintainers

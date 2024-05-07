@@ -45,6 +45,8 @@ module "ec2" {
   security_group_ids         = var.security_group_ids
   privileged                 = var.privileged
   region                     = var.region
+  runner_version             = var.runner_version
+  aws_plugin_version         = var.aws_plugin_version
   instance_role_profile_name = var.instance_role_profile_name
   install_cloudwatch_agent   = var.install_cloudwatch_agent
   cloudwatch_agent_json      = var.cloudwatch_agent_json

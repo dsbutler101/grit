@@ -61,6 +61,14 @@ variable "region" {
   type = string
 }
 
+variable "runner_version" {
+  type = string
+}
+
+variable "aws_plugin_version" {
+  type = string
+}
+
 variable "instance_role_profile_name" {
   type = string
 }

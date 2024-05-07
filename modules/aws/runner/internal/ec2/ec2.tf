@@ -23,16 +23,18 @@ locals {
         owner       = "root:root"
         permissions = "0755"
         content = templatefile("${path.module}/config.toml", {
-          gitlab_url         = var.gitlab.url
-          runner_token       = var.gitlab.runner_token
-          aws_asg_name       = var.fleeting.autoscaling_group_name
-          username           = var.fleeting.username
-          executor           = var.executor
-          idle_count         = var.scale_min * var.capacity_per_instance
-          scale_max          = var.scale_max
-          privileged         = var.privileged
-          region             = var.region
-          aws_plugin_version = var.aws_plugin_version
+          gitlab_url              = var.gitlab.url
+          runner_token            = var.gitlab.runner_token
+          aws_asg_name            = var.fleeting.autoscaling_group_name
+          username                = var.fleeting.username
+          executor                = var.executor
+          idle_count              = var.scale_min * var.capacity_per_instance
+          scale_max               = var.scale_max
+          privileged              = var.privileged
+          region                  = var.region
+          enable_metrics_export   = var.enable_metrics_export
+          metrics_export_endpoint = var.metrics_export_endpoint
+          aws_plugin_version      = var.aws_plugin_version
         })
       }
       ],

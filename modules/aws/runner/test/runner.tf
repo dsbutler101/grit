@@ -32,6 +32,8 @@ module "ec2" {
   instance_role_profile_name = var.instance_role_profile_name
   install_cloudwatch_agent   = var.install_cloudwatch_agent
   cloudwatch_agent_json      = var.cloudwatch_agent_json
+  enable_metrics_export      = var.enable_metrics_export
+  metrics_export_endpoint    = var.metrics_export_endpoint
 
   name   = var.metadata.name
   labels = var.metadata.labels

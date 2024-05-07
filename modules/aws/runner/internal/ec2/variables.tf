@@ -84,3 +84,13 @@ variable "install_cloudwatch_agent" {
 variable "cloudwatch_agent_json" {
   type = string
 }
+
+variable "enable_metrics_export" {
+  type        = bool
+  description = "Enable GitLab runner metrics export to the specified endpoint"
+}
+
+variable "metrics_export_endpoint" {
+  type        = string
+  description = "GitLab runner metrics export endpoint"
+}

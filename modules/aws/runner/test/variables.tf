@@ -69,6 +69,18 @@ variable "region" {
   default     = "us-east-1"
 }
 
+variable "runner_version" {
+  description = "The version of gitlab-runner"
+  type        = string
+  default     = "16.11.1-1"
+}
+
+variable "aws_plugin_version" {
+  description = "The version of gitlab-runner"
+  type        = string
+  default     = "0.5.0"
+}
+
 variable "instance_role_profile_name" {
   description = "Instance role profile to attach to the runner manager instances"
   type        = string

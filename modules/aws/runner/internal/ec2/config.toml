@@ -24,7 +24,7 @@ concurrent = ${scale_max}
 
     # Autoscaler config
     [runners.autoscaler]
-        plugin = "/etc/gitlab-runner/fleeting-plugin-aws"
+        plugin = "aws:${aws_plugin_version}"
 
         capacity_per_instance = 1
         max_use_count = 10

@@ -23,15 +23,16 @@ locals {
         owner       = "root:root"
         permissions = "0755"
         content = templatefile("${path.module}/config.toml", {
-          gitlab_url   = var.gitlab.url
-          runner_token = var.gitlab.runner_token
-          aws_asg_name = var.fleeting.autoscaling_group_name
-          username     = var.fleeting.username
-          executor     = var.executor
-          idle_count   = var.scale_min * var.capacity_per_instance
-          scale_max    = var.scale_max
-          privileged   = var.privileged
-          region       = var.region
+          gitlab_url         = var.gitlab.url
+          runner_token       = var.gitlab.runner_token
+          aws_asg_name       = var.fleeting.autoscaling_group_name
+          username           = var.fleeting.username
+          executor           = var.executor
+          idle_count         = var.scale_min * var.capacity_per_instance
+          scale_max          = var.scale_max
+          privileged         = var.privileged
+          region             = var.region
+          aws_plugin_version = var.aws_plugin_version
         })
       }
       ],
@@ -62,8 +63,9 @@ locals {
   ]
 
   install_runner_cmd = [
+    "export PATH=\"/etc/gitlab-runner:$PATH\"",
     "curl -L \"https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh\" | sudo bash",
-    "sudo apt-get install gitlab-runner",
+    "sudo apt-get install gitlab-runner=${var.runner_version}",
   ]
 
   install_fleeting_plugin_cmd = [
@@ -74,7 +76,7 @@ locals {
     "aws --profile default configure set aws_access_key_id \"${var.iam.fleeting_access_key_id}\"",
     "aws --profile default configure set aws_secret_access_key \"${var.iam.fleeting_secret_access_key}\"",
     "aws --profile default configure set region \"${var.region}\"",
-    "curl -Lo /etc/gitlab-runner/fleeting-plugin-aws \"https://gitlab.com/gitlab-org/fleeting/fleeting-plugin-aws/-/releases/permalink/latest/downloads/fleeting-plugin-aws-linux-amd64\"",
+    "gitlab-runner fleeting install",
     "chmod +x /etc/gitlab-runner/fleeting-plugin-aws && chown gitlab-runner /etc/gitlab-runner/fleeting-plugin-aws",
     "chown gitlab-runner /etc/gitlab-runner/keypair.pem"
   ]

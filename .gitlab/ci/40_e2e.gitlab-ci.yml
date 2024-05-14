@@ -1,5 +1,6 @@
 e2e:prod:aws:
   stage: e2e
+  needs: []
   extends:
     - .rules:merge_request_pipelines:no_docs
     - .go-cache

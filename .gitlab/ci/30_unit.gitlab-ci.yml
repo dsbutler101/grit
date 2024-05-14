@@ -1,5 +1,6 @@
 unit tests:
   stage: unit
+  needs: []
   extends:
     - .rules:merge_request_pipelines:no_docs
     - .go-cache

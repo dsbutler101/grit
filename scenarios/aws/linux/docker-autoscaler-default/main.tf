@@ -1,5 +1,3 @@
-# TODO: create variables and move them to main.tf
-
 module "vpc" {
   source   = "../../../../modules/aws/vpc/prod"
   metadata = local.metadata
@@ -16,44 +14,35 @@ module "iam" {
   metadata = local.metadata
 }
 
+## TODO Add module cache - currently not in `../modules/aws/`
+
 module "fleeting" {
   source   = "../../../../modules/aws/fleeting/prod"
 
   metadata = local.metadata
+
+  service       = "ec2"
+  os            = "linux"
 
   vpc = {
     id        = module.vpc.id
     subnet_id = module.vpc.subnet_id
   }
 
-  service       = "ec2"
-  os            = "linux"
-  ami           = var.ephemeral_runner.source_image
-  instance_type = var.ephemeral_runner.machine_type
-  scale_min     = 1
-  scale_max     = 10
-
   security_group_ids = [module.security_groups.fleeting.id]
-}
 
-# The gitlab modules will register the created runner to GitLab as a
-# project runner.
-module "gitlab" {
-  source   = "../.local/grit/modules/gitlab/prod"
-  metadata = local.metadata
+  instance_type = var.ephemeral_runner.machine_type
+  ami           = var.ephemeral_runner.source_image
+  scale_min     = var.autoscaling_policies.scale_min
+  scale_max     = var.max_instances
 
-  url                = "https://gitlab.com"
-  project_id         = "56778975"
-  runner_description = "An example docker-autoscaler runner on EC2"
-  runner_tags        = ["my-runner"]
 }
 
 module "runner" {
-  source   = "../.local/grit/modules/aws/runner/prod"
+  source   = "../../../../modules/aws/runner/prod"
+
   metadata = local.metadata
 
-  # All the module outputs are ultimately fed into the runner module
-  # to create and configure the runner manager.
   vpc = {
     id        = module.vpc.id
     subnet_id = module.vpc.subnet_id
@@ -74,18 +63,28 @@ module "runner" {
 
   service               = "ec2"
   executor              = "docker-autoscaler"
-  scale_min             = 1
-  scale_max             = 10
-  idle_percentage       = 10
-  capacity_per_instance = 1
+  scale_min             = var.autoscaling_policies.scale_min
+  scale_max             = var.autoscaling_policies.scale_max
+  idle_percentage       = var.autoscaling_policies.scale_factor
+  capacity_per_instance = var.capacity_per_instance
 
   security_group_ids = [module.security_groups.runner_manager.id]
 }
 
 module "security_groups" {
-  source   = "../.local/grit/modules/aws/security_groups/prod"
+  source   = "../../../../modules/aws/security_groups/prod"
   metadata = local.metadata
 
   vpc_id = module.vpc.id
 
+}
+
+module "gitlab" {
+  source   = "../../../../modules/gitlab/prod"
+  metadata = local.metadata
+
+  url                = var.gitlab_url
+  project_id         = var.gitlab_url
+  runner_description = var.runner_description
+  runner_tags        = var.runner_tags
 }

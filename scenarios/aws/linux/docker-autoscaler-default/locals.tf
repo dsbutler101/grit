@@ -10,22 +10,11 @@ locals {
   }
 
   required_autoscaling_policy = {
-    periods            = ["* * * * *"]
-    timezone           = ""
-    scale_min          = 10
-    idle_time          = "20m0s"
-    scale_factor       = 0.2
-    scale_factor_limit = 100
-  }
-}
-
-locals {
-  # Metadata is common input to all modules.
-  metadata = {
-    name = "autoscaling"
-    labels = tomap({
-      env = "grit-e2e"
-    })
-    min_support = "experimental"
+    periods            = var.autoscaling_policies.periods
+    timezone           = var.autoscaling_policies.timezone
+    scale_min          = var.autoscaling_policies.scale_min
+    idle_time          = var.autoscaling_policies.idle_time
+    scale_factor       = var.autoscaling_policies.scale_factor
+    scale_factor_limit = var.autoscaling_policies.scale_factor_limit
   }
 }

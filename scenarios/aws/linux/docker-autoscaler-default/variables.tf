@@ -72,7 +72,7 @@ variable "ephemeral_runner" {
 variable "runner_description" {
   type = string
 
-  default = "example-grit-docker-autoscaler-runner"]
+  default = "example-grit-docker-autoscaler-runner"
 }
 
 variable "runner_tags" {

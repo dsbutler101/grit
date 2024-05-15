@@ -2,14 +2,14 @@ module "vpc" {
   source   = "../../../../modules/aws/vpc/prod"
   metadata = local.metadata
 
-  zone        = var.aws_zone
+  zone = var.aws_zone
 
   cidr        = "10.0.0.0/16"
   subnet_cidr = "10.0.0.0/24"
 }
 
 module "iam" {
-  source   = "../../../../modules/aws/iam/prod"
+  source = "../../../../modules/aws/iam/prod"
 
   metadata = local.metadata
 }
@@ -17,12 +17,12 @@ module "iam" {
 ## TODO Add module cache - currently not in `../modules/aws/`
 
 module "fleeting" {
-  source   = "../../../../modules/aws/fleeting/prod"
+  source = "../../../../modules/aws/fleeting/prod"
 
   metadata = local.metadata
 
-  service       = "ec2"
-  os            = "linux"
+  service = "ec2"
+  os      = "linux"
 
   vpc = {
     id        = module.vpc.id
@@ -33,13 +33,13 @@ module "fleeting" {
 
   instance_type = var.ephemeral_runner.machine_type
   ami           = var.ephemeral_runner.source_image
-  scale_min     = var.autoscaling_policies.scale_min
-  scale_max     = var.max_instances
+  scale_min     = var.autoscaling_policy.scale_min
+  scale_max     = var.autoscaling_policy.scale_max
 
 }
 
 module "runner" {
-  source   = "../../../../modules/aws/runner/prod"
+  source = "../../../../modules/aws/runner/prod"
 
   metadata = local.metadata
 
@@ -63,9 +63,9 @@ module "runner" {
 
   service               = "ec2"
   executor              = "docker-autoscaler"
-  scale_min             = var.autoscaling_policies.scale_min
-  scale_max             = var.autoscaling_policies.scale_max
-  idle_percentage       = var.autoscaling_policies.scale_factor
+  scale_min             = var.autoscaling_policy.scale_min
+  scale_max             = var.autoscaling_policy.scale_max
+  idle_percentage       = var.autoscaling_policy.scale_factor
   capacity_per_instance = var.capacity_per_instance
 
   security_group_ids = [module.security_groups.runner_manager.id]
@@ -84,7 +84,7 @@ module "gitlab" {
   metadata = local.metadata
 
   url                = var.gitlab_url
-  project_id         = var.gitlab_url
+  project_id         = var.gitlab_project_id
   runner_description = var.runner_description
   runner_tags        = var.runner_tags
 }

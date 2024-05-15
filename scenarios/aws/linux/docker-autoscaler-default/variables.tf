@@ -56,8 +56,8 @@ variable "autoscaling_policy" {
   })
 
   default = {
-    scale_min = 10
-    scale_max = 20
+    scale_min    = 10
+    scale_max    = 20
     scale_factor = 10
   }
 }

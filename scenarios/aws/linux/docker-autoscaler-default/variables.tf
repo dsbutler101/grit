@@ -1,7 +1,7 @@
 variable "name" {
   type = string
 
-  default = "aws-docker-autoscaler-default"
+  default = "aws-docker-as"
 }
 
 variable "labels" {
@@ -23,9 +23,7 @@ variable "gitlab_url" {
 }
 
 variable "gitlab_project_id" {
-  type = number
-
-  default = "56778975" # TODO: Delete default
+  type = string
 }
 
 variable "capacity_per_instance" {
@@ -40,17 +38,28 @@ variable "max_instances" {
   default = 20
 }
 
-variable "autoscaling_policies" {
-  type = list(object({
+variable "concurrent" {
+  type = number
+
+  default = 50
+}
+
+variable "autoscaling_policy" {
+  type = object({
     periods            = optional(list(string), ["* * * * *"])
     timezone           = optional(string, "")
     scale_min          = optional(number, 1)
+    scale_max          = optional(number, 10)
     idle_time          = optional(string, "2m0s")
     scale_factor       = optional(number, 0)
     scale_factor_limit = optional(number, 0)
-  }))
+  })
 
-  default = []
+  default = {
+    scale_min = 10
+    scale_max = 20
+    scale_factor = 10
+  }
 }
 
 variable "ephemeral_runner" {
@@ -61,7 +70,7 @@ variable "ephemeral_runner" {
     source_image = optional(string, "ami-0735db9b38fcbdb39")
   })
 
-    default = {
+  default = {
     disk_type    = ""
     disk_size    = 25
     machine_type = "t2.medium"

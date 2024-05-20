@@ -68,16 +68,16 @@ variable "autoscaling_policy" {
 
 variable "ephemeral_runner" {
   type = object({
-    disk_type    = optional(string, "")
+    disk_type    = optional(string, "gp3")
     disk_size    = optional(number, 25)
-    machine_type = optional(string, "t2.medium")
+    machine_type = optional(string, "t3.medium")
     source_image = optional(string, "ami-0735db9b38fcbdb39")
   })
 
   default = {
     disk_type    = ""
     disk_size    = 25
-    machine_type = "t2.medium"
+    machine_type = "t3.medium"
     source_image = "ami-0735db9b38fcbdb39"
   }
 }

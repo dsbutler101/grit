@@ -10,6 +10,12 @@ variable "labels" {
   default = {}
 }
 
+variable "aws_region" {
+  type = string
+
+  default = "us-east-1"
+}
+
 variable "aws_zone" {
   type = string
 
@@ -46,8 +52,6 @@ variable "concurrent" {
 
 variable "autoscaling_policy" {
   type = object({
-    periods            = optional(list(string), ["* * * * *"])
-    timezone           = optional(string, "")
     scale_min          = optional(number, 1)
     scale_max          = optional(number, 10)
     idle_time          = optional(string, "2m0s")

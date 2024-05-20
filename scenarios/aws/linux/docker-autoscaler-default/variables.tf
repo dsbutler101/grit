@@ -47,7 +47,7 @@ variable "max_instances" {
 variable "concurrent" {
   type = number
 
-  default = 50
+  default = 20
 }
 
 variable "autoscaling_policy" {

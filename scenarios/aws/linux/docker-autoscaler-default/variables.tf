@@ -50,6 +50,12 @@ variable "concurrent" {
   default = 20
 }
 
+variable "idle_percentage" {
+  type = number
+
+  default = 80
+}
+
 variable "autoscaling_policy" {
   type = object({
     scale_min          = optional(number, 1)

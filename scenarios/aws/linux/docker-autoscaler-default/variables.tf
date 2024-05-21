@@ -53,11 +53,17 @@ variable "concurrent" {
 variable "autoscaling_policy" {
   type = object({
     scale_min          = optional(number, 1)
-    scale_max          = optional(number, 10)
+    scale_max          = optional(number, 20)
     idle_time          = optional(string, "2m0s")
     scale_factor       = optional(number, 0)
     scale_factor_limit = optional(number, 0)
   })
+
+  default = {
+    scale_min    = 1
+    scale_max    = 20
+    scale_factor = 0
+  }
 }
 
 variable "ephemeral_runner" {
@@ -67,7 +73,15 @@ variable "ephemeral_runner" {
     machine_type = optional(string, "t3.medium")
     source_image = optional(string, "ami-0735db9b38fcbdb39")
   })
+
+  default = {
+    disk_type    = ""
+    disk_size    = 25
+    machine_type = "t3.medium"
+    source_image = "ami-0735db9b38fcbdb39"
+  }
 }
+
 
 variable "runner_description" {
   type = string

@@ -34,7 +34,7 @@ module "fleeting" {
   instance_type = var.ephemeral_runner.machine_type
   ami           = var.ephemeral_runner.source_image
   scale_min     = var.autoscaling_policy.scale_min
-  scale_max     = var.autoscaling_policy.scale_max
+  scale_max     = var.max_instances
 
 }
 
@@ -64,7 +64,7 @@ module "runner" {
   service               = "ec2"
   executor              = "docker-autoscaler"
   scale_min             = var.autoscaling_policy.scale_min
-  scale_max             = var.autoscaling_policy.scale_max
+  scale_max             = var.max_instances
   idle_percentage       = var.autoscaling_policy.scale_factor
   capacity_per_instance = var.capacity_per_instance
 

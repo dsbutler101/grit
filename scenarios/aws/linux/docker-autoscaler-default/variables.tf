@@ -53,7 +53,6 @@ variable "concurrent" {
 variable "autoscaling_policy" {
   type = object({
     scale_min          = optional(number, 1)
-    scale_max          = optional(number, 20)
     idle_time          = optional(string, "2m0s")
     scale_factor       = optional(number, 0)
     scale_factor_limit = optional(number, 0)
@@ -61,7 +60,6 @@ variable "autoscaling_policy" {
 
   default = {
     scale_min    = 1
-    scale_max    = 20
     scale_factor = 0
   }
 }

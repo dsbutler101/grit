@@ -78,3 +78,21 @@ For more information, see [Check if billing is enabled on a project](https://clo
 Scenarios to deploy GitLab Runner configurations that execute CI/CD jobs on Linux platform.
 
 1. [Docker Autoscaler default](google/linux/docker-autoscaler-default)
+
+### AWS
+
+GRIT deployment scenarios to AWS
+
+#### AWS integration prerequisites
+
+##### AWS CLI
+
+`awscli` is required to use AWS Scenarios. See [Install or update to the latest version of the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) for more information.
+
+##### AWS IAM credentials
+
+
+
+#### Linux
+
+1. [Docker Autoscaler default](aws/linux/docker-autoscaler-default)

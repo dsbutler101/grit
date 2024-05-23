@@ -32,5 +32,7 @@ module "gke" {
   nodes_count       = var.nodes_count
   node_machine_type = var.node_machine_type
 
+  deletion_protection = var.deletion_protection
+
   vpc = var.vpc
 }

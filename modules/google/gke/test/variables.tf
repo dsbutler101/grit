@@ -40,8 +40,9 @@ variable "node_machine_type" {
 }
 
 variable "deletion_protection" {
-  type    = bool
-  default = false
+  type        = bool
+  description = "Set deletion protection for the cluster"
+  default     = false
 }
 
 ##############

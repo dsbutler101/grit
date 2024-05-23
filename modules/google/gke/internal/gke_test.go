@@ -23,6 +23,7 @@ var defaultModuleVars = moduleVars{
 		"id":        "",
 		"subnet_id": "",
 	},
+	"deletion_protection": "false",
 }
 
 func TestGKE(t *testing.T) {

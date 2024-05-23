@@ -55,6 +55,5 @@ variable "vpc" {
 }
 
 variable "deletion_protection" {
-  type    = bool
-  default = true
+  type = bool
 }

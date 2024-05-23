@@ -41,8 +41,9 @@ locals {
   default_vpc_network    = "projects/${var.google_project}/global/networks/default"
 
   metadata = {
-    name   = var.name
-    labels = var.labels
+    name        = var.name
+    labels      = var.labels
+    min_support = "experimental"
   }
 }
 

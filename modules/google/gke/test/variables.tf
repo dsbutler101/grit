@@ -39,6 +39,11 @@ variable "node_machine_type" {
   default     = "n2d-standard-2"
 }
 
+variable "deletion_protection" {
+  type    = bool
+  default = false
+}
+
 ##############
 # VPC CONFIG #
 ##############

@@ -1,12 +1,11 @@
 locals {
-  gke_version_prefix = "1.27."
-
   node_tags = ["gke-node", "grit-gke"]
+
+  release_channel = "STABLE"
 }
 
 data "google_container_engine_versions" "gke_version" {
-  location       = var.google_zone
-  version_prefix = local.gke_version_prefix
+  location = var.google_zone
 }
 
 resource "google_container_cluster" "primary" {
@@ -18,6 +17,12 @@ resource "google_container_cluster" "primary" {
 
   network    = var.vpc.id
   subnetwork = var.vpc.subnet_id
+
+  deletion_protection = var.deletion_protection
+
+  release_channel {
+    channel = local.release_channel
+  }
 }
 
 resource "google_container_node_pool" "primary_nodes" {
@@ -25,7 +30,7 @@ resource "google_container_node_pool" "primary_nodes" {
   location = var.google_zone
 
   cluster = google_container_cluster.primary.id
-  version = data.google_container_engine_versions.gke_version.release_channel_latest_version["STABLE"]
+  version = data.google_container_engine_versions.gke_version.release_channel_default_version[local.release_channel]
 
   node_count = var.nodes_count
 

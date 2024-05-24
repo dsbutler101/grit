@@ -22,6 +22,10 @@ variable "google_zone" {
   # default = "europe-north1-c"
 }
 
+variable "google_region" {
+  type = string
+}
+
 variable "google_project" {
   type = string
   # default = "hhoerl-e4e9f672"
@@ -45,22 +49,33 @@ variable "gitlab_project_id" {
 }
 
 locals {
-  # we only have the zone (europe-north1-c), so we split of the last part to get the region (europe-north1)
-  region = replace(var.google_zone, "/-[^-]+$/", "")
-
-  # TODO: use the vpc module
-  default_vpc_subnetwork = "projects/${var.google_project}/regions/${local.region}/subnetworks/default"
-  default_vpc_network    = "projects/${var.google_project}/global/networks/default"
-
   metadata = {
     name        = var.name
     labels      = var.labels
     min_support = "experimental"
   }
+
+  vpc = {
+    id        = module.vpc.id
+    subnet_id = module.vpc.subnetwork_ids[local.metadata.name]
+  }
 }
 
 provider "google" {
   project = var.google_project
+}
+
+
+module "vpc" {
+  source = "../../modules/google/vpc/test/"
+
+  metadata = local.metadata
+
+  google_region = var.google_region
+
+  subnetworks = {
+    "${local.metadata.name}" : "10.0.0.0/10"
+  }
 }
 
 module "cluster" {
@@ -74,10 +89,7 @@ module "cluster" {
   google_zone = var.google_zone
   nodes_count = 1
 
-  vpc = {
-    id        = local.default_vpc_network
-    subnet_id = local.default_vpc_subnetwork
-  }
+  vpc = local.vpc
 }
 
 provider "kubectl" {
@@ -88,7 +100,7 @@ provider "kubectl" {
 }
 
 module "operator" {
-  source = "../../modules/operator/internal/"
+  source = "../../modules/k8s/operator/test/"
 
   depends_on = [
     module.cluster
@@ -108,10 +120,9 @@ module "gitlab" {
 }
 
 module "runner" {
-  source = "../../modules/k8s/runner/internal/"
+  source = "../../modules/k8s/runner/test/"
 
-  name      = "some-runner"
+  name      = local.metadata.name
   namespace = module.operator.namespace
-  token     = module.gitlab.runner_token
-  url       = module.gitlab.url
+  gitlab    = module.gitlab
 }

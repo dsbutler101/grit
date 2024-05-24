@@ -1,30 +1,3 @@
-terraform {
-  required_version = ">= 0.13"
-
-  required_providers {
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = ">= 1.7.0"
-    }
-  }
-}
-
-variable "token" {
-  type = string
-}
-
-variable "url" {
-  type = string
-}
-
-variable "name" {
-  type = string
-}
-
-variable "namespace" {
-  type = string
-}
-
 locals {
   manifest = yamlencode({
     apiVersion = "apps.gitlab.com/v1beta2"
@@ -34,7 +7,7 @@ locals {
       namespace = var.namespace
     }
     spec = {
-      gitlabUrl = var.url
+      gitlabUrl = var.gitlab.url
       token     = var.name
       locked    = true
     }
@@ -47,7 +20,7 @@ locals {
       namespace = var.namespace
     }
     data = {
-      runner-registration-token = base64encode(var.token)
+      runner-registration-token = base64encode(var.gitlab.runner_token)
     }
   })
 }

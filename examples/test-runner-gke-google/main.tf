@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 5.30.0"
     }
+    gitlab = {
+      source  = "gitlabhq/gitlab"
+      version = ">= 17.0.0"
+    }
   }
 }
 
@@ -29,6 +33,14 @@ variable "labels" {
 }
 
 variable "name" {
+  type = string
+}
+
+variable "gitlab_pat" {
+  type = string
+}
+
+variable "gitlab_project_id" {
   type = string
 }
 
@@ -81,4 +93,25 @@ module "operator" {
   depends_on = [
     module.cluster
   ]
+}
+
+provider "gitlab" {
+  token = var.gitlab_pat
+}
+
+module "gitlab" {
+  source = "../../modules/gitlab/test/"
+
+  metadata           = local.metadata
+  project_id         = var.gitlab_project_id
+  runner_description = "this is just some runner, brought to you by GRIT"
+}
+
+module "runner" {
+  source = "../../modules/k8s/runner/internal/"
+
+  name      = "some-runner"
+  namespace = module.operator.namespace
+  token     = module.gitlab.runner_token
+  url       = module.gitlab.url
 }

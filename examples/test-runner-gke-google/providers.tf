@@ -7,8 +7,8 @@ provider "gitlab" {
 }
 
 provider "kubectl" {
-  host                   = module.cluster.host
-  cluster_ca_certificate = module.cluster.ca_certificate
-  token                  = module.cluster.access_token
+  host                   = module.gke_runner.cluster_host
+  cluster_ca_certificate = module.gke_runner.cluster_ca_certificate
+  token                  = module.gke_runner.cluster_access_token
   load_config_file       = false
 }

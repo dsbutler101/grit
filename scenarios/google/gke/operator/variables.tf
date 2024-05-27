@@ -1,8 +1,3 @@
-variable "google_project" {
-  description = "The google project to use"
-  type        = string
-}
-
 variable "google_region" {
   description = "The region to deploy the into, see `gcloud compute zones`"
   type        = string
@@ -13,27 +8,27 @@ variable "google_zone" {
   type        = string
 }
 
+variable "subnet_cidr" {
+  description = "The CIDR for the subnet the GKE cluster will be deployed on"
+  type        = string
+  default     = "10.0.0.0/10"
+}
+
 variable "labels" {
   description = "Labels to add to the created GKE cluster"
   type        = map(string)
   default     = {}
 }
 
-variable "name" {
-  description = "The name for the cluster, the runner and other created infra"
-  type        = string
-}
-
 variable "node_count" {
-  description = "The GKE cluster's node count"
+  description = "Number of nodes for the GKE cluster"
   type        = number
   default     = 1
 }
 
-variable "subnet_cidr" {
-  description = "The subnet's CIDR where the GKE cluster will be deployed on"
+variable "name" {
+  description = "The name for the cluster, the runner and other created infra"
   type        = string
-  default     = "10.0.0.0/10"
 }
 
 variable "gitlab_pat" {
@@ -47,7 +42,7 @@ variable "gitlab_project_id" {
 }
 
 variable "runner_description" {
-  description = "The description of the GitLab runner instance"
+  description = "The description for the GitLab runner"
   type        = string
-  default     = "GRIT deployed GitLab runner on GKE"
+  default     = "default GitLab Runner"
 }

@@ -7,7 +7,7 @@ locals {
       namespace = var.namespace
     }
     spec = {
-      gitlabUrl = var.gitlab.url
+      gitlabUrl = var.url
       token     = var.name
       locked    = true
     }
@@ -20,7 +20,7 @@ locals {
       namespace = var.namespace
     }
     data = {
-      runner-registration-token = base64encode(var.gitlab.runner_token)
+      runner-registration-token = base64encode(var.token)
     }
   })
 }

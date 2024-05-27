@@ -122,7 +122,7 @@ module "gitlab" {
 module "runner" {
   source = "../../modules/k8s/runner/test/"
 
-  name      = local.metadata.name
+  metadata  = local.metadata
   namespace = module.operator.namespace
   gitlab    = module.gitlab
 }

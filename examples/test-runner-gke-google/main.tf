@@ -1,58 +1,7 @@
-terraform {
-  # required_version = ">= 0.13"
-
-  required_providers {
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = ">= 1.7.0"
-    }
-    google = {
-      source  = "hashicorp/google"
-      version = ">= 5.30.0"
-    }
-    gitlab = {
-      source  = "gitlabhq/gitlab"
-      version = ">= 17.0.0"
-    }
-  }
-}
-
-variable "google_zone" {
-  type = string
-  # default = "europe-north1-c"
-}
-
-variable "google_region" {
-  type = string
-}
-
-variable "google_project" {
-  type = string
-  # default = "hhoerl-e4e9f672"
-}
-
-variable "labels" {
-  type    = map(string)
-  default = {}
-}
-
-variable "name" {
-  type = string
-}
-
-variable "gitlab_pat" {
-  type = string
-}
-
-variable "gitlab_project_id" {
-  type = string
-}
-
 locals {
   metadata = {
-    name        = var.name
-    labels      = var.labels
-    min_support = "experimental"
+    name   = var.name
+    labels = var.labels
   }
 
   vpc = {
@@ -61,11 +10,6 @@ locals {
   }
 }
 
-provider "google" {
-  project = var.google_project
-}
-
-
 module "vpc" {
   source = "../../modules/google/vpc/test/"
 
@@ -73,9 +17,10 @@ module "vpc" {
 
   google_region = var.google_region
 
-  subnetworks = {
-    "${local.metadata.name}" : "10.0.0.0/10"
-  }
+  subnetworks = zipmap(
+    [local.metadata.name],
+    ["10.0.0.0/10"],
+  )
 }
 
 module "cluster" {
@@ -83,8 +28,7 @@ module "cluster" {
 
   metadata = local.metadata
 
-  # TODO
-  google_region = "unused-but-mandatory"
+  google_region = var.google_region
 
   google_zone = var.google_zone
   nodes_count = 1
@@ -92,23 +36,10 @@ module "cluster" {
   vpc = local.vpc
 }
 
-provider "kubectl" {
-  host                   = module.cluster.host
-  cluster_ca_certificate = module.cluster.ca_certificate
-  token                  = module.cluster.access_token
-  load_config_file       = false
-}
-
 module "operator" {
   source = "../../modules/k8s/operator/test/"
 
-  depends_on = [
-    module.cluster
-  ]
-}
-
-provider "gitlab" {
-  token = var.gitlab_pat
+  depends_on = [module.cluster]
 }
 
 module "gitlab" {

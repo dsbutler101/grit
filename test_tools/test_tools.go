@@ -68,7 +68,10 @@ func Plan(t *testing.T, moduleVars map[string]any) *terraform.PlanStruct {
 
 func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []string) {
 	plan := Plan(t, moduleVars)
+	AssertWithPlan(t, plan, expectedModules)
+}
 
+func AssertWithPlan(t *testing.T, plan *terraform.PlanStruct, expectedModules []string) {
 	assert.Len(t, plan.ResourcePlannedValuesMap, len(expectedModules))
 
 	for _, v := range expectedModules {
@@ -99,4 +102,9 @@ func PlanAndAssertError(t *testing.T, moduleVars map[string]any, wantErr bool) {
 	} else {
 		require.NoError(t, err)
 	}
+}
+
+func AssertProviderConfigExists(t *testing.T, plan *terraform.PlanStruct, name string) {
+	t.Helper()
+	assert.Contains(t, plan.RawPlan.Config.ProviderConfigs, name, `Expected provider config "%s" to exist, but does not`, name)
 }

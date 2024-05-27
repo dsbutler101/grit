@@ -5,7 +5,7 @@ locals {
 
   metadata = {
     name        = var.name
-    labels      = var.labels
+    labels      = merge(local.default_labels, var.labels)
     min_support = "experimental"
   }
 
@@ -39,6 +39,8 @@ module "cluster" {
   nodes_count = var.node_count
 
   vpc = local.vpc
+
+  depends_on = [module.vpc]
 }
 
 module "operator" {
@@ -61,4 +63,6 @@ module "runner" {
   metadata  = local.metadata
   namespace = module.operator.namespace
   gitlab    = module.gitlab
+
+  depends_on = [module.operator]
 }

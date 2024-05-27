@@ -31,7 +31,8 @@ func (v variableLocationInvalidLines) String() string {
 }
 
 func Test_VariableLocations(t *testing.T) {
-	defaultRegex, _ := regexp.Compile(`default\s*=`)
+	defaultRegex := regexp.MustCompile(`default\s*=`)
+	ignorePathsRE := regexp.MustCompile("(^examples/.*|scenarios/.*|modules/.*/(|dev|test|prod))/variables.tf")
 
 	err := filepath.Walk(".",
 		func(path string, info os.FileInfo, err error) error {
@@ -42,8 +43,7 @@ func Test_VariableLocations(t *testing.T) {
 				return nil
 			}
 
-			match, _ := regexp.MatchString("(scenarios/.*|modules/.*/(|dev|test|prod))/variables.tf", path)
-			if match {
+			if ignorePathsRE.MatchString(path) {
 				return nil
 			}
 

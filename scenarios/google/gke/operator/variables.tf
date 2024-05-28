@@ -34,6 +34,7 @@ variable "name" {
 variable "gitlab_pat" {
   description = "The personal access token for GitLab instance, to create the runner registration token"
   type        = string
+  sensitive   = true
 }
 
 variable "gitlab_project_id" {

@@ -216,6 +216,7 @@ Variables can be:
 
 - **Complex**: Variables are either lists, maps, or objects, or combination of these types.
 
+<!-- begin: input vars -->
 | Name                     | Type                                                     | Required? | Default value | Description                                                                                                                                                                                         |
 |--------------------------|----------------------------------------------------------|-----------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `name`                   | `string`                                                 | yes       |               | Name of the deployment. Must be unique in scope of a Google Cloud project.                                                                                                                          |
@@ -234,6 +235,7 @@ Variables can be:
 | `max_use_count`          | `number`                                                 | no        | 1             | Maximum number of jobs executed on a single autoscaled ephemeral VM, after which the VM is marked for deletion.                                                                                     |
 | `autoscaling_policies`   | [`list(object)`](#autoscaling_policies-object-structure) | no        |               | List of objects defining autoscaling policies.                                                                                                                                                      |
 | `ephemeral_runner`       | [`object`](#ephemeral_runner-object-structure)           | no        |               | Configuration of autoscaled ephemeral VM.                                                                                                                                                           |
+<!-- end: input vars -->
 
 ### `autoscaling_policies` object structure
 

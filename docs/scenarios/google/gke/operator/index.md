@@ -1012,6 +1012,7 @@ Variables can be:
 
 - **Complex**: Variables are either lists, maps, or objects, or combination of these types.
 
+<!-- begin: input vars -->
 | Name                     | Type                                                     | Required? | Default value            | Description                                                                                |
 |--------------------------|----------------------------------------------------------|-----------|--------------------------|--------------------------------------------------------------------------------------------|
 | `name`                   | `string`                                                 | yes       |                          | Name of the deployment. Must be unique in scope of a Google Cloud project.                 |
@@ -1023,6 +1024,7 @@ Variables can be:
 | `node_count`             | `string`                                                 | no        | 1                        | The number of nodes to deploy the GKE cluster with.                                        |
 | `runner_description`     | `string`                                                 | no        | "default GitLab Runner"  | The description of the deployed Runner, visible on the GitLab Runner configuration page.   |
 | `subnet_cidr`            | `string`                                                 | no        | 10.0.0.0/10              | The CIDR for the subnetwork the GKE cluster will be deployed on.                           |
+<!-- end: input vars -->
 
 ## Usage
 

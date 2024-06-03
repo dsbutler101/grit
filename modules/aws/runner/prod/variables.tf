@@ -42,6 +42,12 @@ variable "scale_max" {
   default     = -1
 }
 
+variable "max_use_count" {
+  description = "The maximum number of times an instance can be used before it is scheduled for removal"
+  type        = number
+  default     = 10
+}
+
 variable "idle_percentage" {
   description = "The number of idle instances to maintain as a percentage of the current number of busy instances"
   type        = number

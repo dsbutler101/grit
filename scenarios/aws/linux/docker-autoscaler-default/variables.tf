@@ -79,7 +79,7 @@ variable "ephemeral_runner" {
   })
 
   default = {
-    disk_type    = ""
+    disk_type    = "gp3"
     disk_size    = 25
     machine_type = "t3.medium"
     source_image = "ami-0735db9b38fcbdb39"

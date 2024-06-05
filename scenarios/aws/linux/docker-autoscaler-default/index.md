@@ -227,7 +227,6 @@ terraform {
 }
 
 locals {
-  #aws_region  = "us-east-1"
   aws_zone = "us-east-1b"
 }
 
@@ -236,13 +235,21 @@ variable "runner_token" {
   sensitive = true
 }
 
+# Valid project id
+# How to get the project id? https://docs.gitlab.com/ee/user/project/working_with_projects.html#access-the-project-overview-page-by-using-the-project-id
+variable "gitlab_project_id" {
+  type      = string
+  sensitive = false
+}
+
 module "runner-deployment" {
+  # Pointing to GRIT's AWS Docker Autoscaler Scenario
+  # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default?ref=aws-docker-autoscaler-scenario"
 
-  #aws_region  = local.aws_region
   aws_zone = local.aws_zone
 
-  gitlab_project_id = 54764084
+  gitlab_project_id = var.gitlab_project_id
 
   ephemeral_runner = {
     source_image = "ami-00fcafc06ad915f51"
@@ -266,7 +273,6 @@ terraform {
 }
 
 locals {
-  #aws_region  = "us-east-1"
   aws_zone = "us-east-1b"
 }
 
@@ -275,16 +281,30 @@ variable "runner_token" {
   sensitive = true
 }
 
+variable "gitlab_url" {
+  type      = string
+  sensitive = false
+  default   = "https://gitlab.com"
+}
+
+# Valid project id
+# How to get the project id? https://docs.gitlab.com/ee/user/project/working_with_projects.html#access-the-project-overview-page-by-using-the-project-id
+variable "gitlab_project_id" {
+  type      = string
+  sensitive = false
+}
+
 module "runner-deployment" {
+  # Pointing to GRIT's AWS Docker Autoscaler Scenario
+  # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default?ref=aws-docker-autoscaler-scenario"
 
-  #aws_region  = local.aws_region
   aws_zone = local.aws_zone
 
   name = "gritexample1"
 
-  gitlab_url            = "https://gitlab.com"
-  gitlab_project_id     = 54764084
+  gitlab_url            = var.gitlab_url
+  gitlab_project_id     = var.project_id
   runner_token          = var.runner_token
   capacity_per_instance = 2
   max_use_count         = 10

@@ -214,7 +214,7 @@ terraform {
   required_providers {
     gitlab = {
       source  = "gitlabhq/gitlab"
-      version >= "17.0.0"
+      version = ">=17.0.0"
     }
     tls = {
       source  = "hashicorp/tls"
@@ -265,7 +265,7 @@ terraform {
   required_providers {
     gitlab = {
       source = "gitlabhq/gitlab"
-      version >= "17.0.0"
+      version = ">=17.0.0"
     }
     tls = {
       source  = "hashicorp/tls"

@@ -65,11 +65,11 @@ Variables can be:
 - **Complex**: Variables are either lists, maps, or objects, or combination of these types.
 
 | Name                     | Type                                                     | Required? | Default value | Description                                                                                                                                                                                         |
-|--------------------------|----------------------------------------------------------|-----------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `name`                   | `string`                                                 | yes       |               | Name of the deployment. Must be unique in scope of an AWS Account (20 chars max) project.                                                                                                                          |
+| ------------------------ | -------------------------------------------------------- | --------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                   | `string`                                                 | yes       |               | Name of the deployment. Must be unique in scope of an AWS Account (20 chars max) project.                                                                                                           |
 | `labels`                 | `map(string)`                                            | no        |               | Arbitrary list of `key=value` pairs that are added as labels to resources created by GRIT.                                                                                                          |
-| `aws_region`             | `string`                                                 | yes       |               | AWS region chosen for the deployment.                                                                                                                                                      |
-| `aws_zone`               | `string`                                                 | yes       |               | AWS availability zone chosen for the deployment.                                                                                                                                                        |
+| `aws_region`             | `string`                                                 | yes       |               | AWS region chosen for the deployment.                                                                                                                                                               |
+| `aws_zone`               | `string`                                                 | yes       |               | AWS availability zone chosen for the deployment.                                                                                                                                                    |
 | `gitlab_url`             | `string`                                                 | yes       |               | URL of GitLab instance.                                                                                                                                                                             |
 | `runner_token`           | `string`                                                 | yes       |               | Authentication token of the runner to deploy. See [how to obtain the token](https://docs.gitlab.com/ee/ci/runners/runners_scope.html#create-an-instance-runner-with-a-runner-authentication-token). |
 | `runner_machine_type`    | `string`                                                 | no        |               | Machine type for the runner manager instance. If not provided, GRIT uses one of predefined choices based on the value of defined concurrency.                                                       |
@@ -84,12 +84,12 @@ Variables can be:
 
 ### `autoscaling_policy` object structure
 
-| Key                  | Type           | Description                                                                                                                                                                                                                                 |
-|----------------------|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `scale_min`          | `number`       | The minimum size of the autoscaling instances fleet. This defines the number of `idle` Taskscaler slots and therefore Fleeting instances that should be sustained for all time to have space for jobs execution. Integer value is expected. |
-| `idle_time`          | `string`       | Minimal duration for which the `idle` instances should running, even if not used. Uses Go's time format, for example `1h20m30s`.                                                                                                            |
-| `scale_factor`       | `number`       | If used, the number of idle slots are calculated as `scale_factor * in_use_slots`, but not less than defined with `scale_min`. A `float64` value higher than 0 is expected.                                                                 |
-| `scale_factor_limit` | `number`       | Usable only when `scale_factor` is in use. If defined, the maximum value of `idle` is calculated with the equation described for `scale_factor`. An integer value is expected.                                                              |
+| Key                  | Type     | Description                                                                                                                                                                                                                                 |
+| -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scale_min`          | `number` | The minimum size of the autoscaling instances fleet. This defines the number of `idle` Taskscaler slots and therefore Fleeting instances that should be sustained for all time to have space for jobs execution. Integer value is expected. |
+| `idle_time`          | `string` | Minimal duration for which the `idle` instances should running, even if not used. Uses Go's time format, for example `1h20m30s`.                                                                                                            |
+| `scale_factor`       | `number` | If used, the number of idle slots are calculated as `scale_factor * in_use_slots`, but not less than defined with `scale_min`. A `float64` value higher than 0 is expected.                                                                 |
+| `scale_factor_limit` | `number` | Usable only when `scale_factor` is in use. If defined, the maximum value of `idle` is calculated with the equation described for `scale_factor`. An integer value is expected.                                                              |
 
 ### `ephemeral_runner` object structure
 
@@ -102,12 +102,12 @@ object {
 }
 ```
 
-| Key            | Type     | Description                                                                                                     |
-|----------------|----------|-----------------------------------------------------------------------------------------------------------------|
-| `disk_type`    | `string` | [Volume type](https://aws.amazon.com/ebs/volume-types/) to be used for autoscaled ephemeral VMs.               |
-| `disk_size`    | `number` | Disk size (in GiB) to be used for autoscaled ephemeral VMs. Integer value is expected.                          |
+| Key            | Type     | Description                                                                                         |
+| -------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| `disk_type`    | `string` | [Volume type](https://aws.amazon.com/ebs/volume-types/) to be used for autoscaled ephemeral VMs.    |
+| `disk_size`    | `number` | Disk size (in GiB) to be used for autoscaled ephemeral VMs. Integer value is expected.              |
 | `machine_type` |          | [Machine type](https://aws.amazon.com/ec2/instance-types/) to be used for autoscaled ephemeral VMs. |
-| `source_image` |          | Source AMI from which autoscaled ephemeral VMs are started.                                                   |
+| `source_image` |          | Source AMI from which autoscaled ephemeral VMs are started.                                         |
 
 If not defined by the user, the following default is applied:
 

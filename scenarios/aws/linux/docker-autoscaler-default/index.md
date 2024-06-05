@@ -247,8 +247,8 @@ module "runner-deployment" {
   # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default?ref=aws-docker-autoscaler-scenario"
 
-  aws_zone = local.aws_zone
-
+  # Needs to match the aws_region (default to us-east-1)
+  aws_zone          = local.aws_zone
   gitlab_project_id = var.gitlab_project_id
 
   ephemeral_runner = {
@@ -272,8 +272,14 @@ terraform {
   }
 }
 
+provider "gitlab" {
+  base_url = var.gitlab_url
+}
+
 locals {
-  aws_zone = "us-east-1b"
+  name       = "gritexample"
+  aws_zone   = "us-east-2a"
+  aws_region = "us-east-2"
 }
 
 variable "runner_token" {
@@ -299,10 +305,9 @@ module "runner-deployment" {
   # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default?ref=aws-docker-autoscaler-scenario"
 
-  aws_zone = local.aws_zone
-
-  name = "gritexample1"
-
+  name                  = local.name
+  aws_zone              = local.aws_zone
+  aws_region            = local.aws_region
   gitlab_url            = var.gitlab_url
   gitlab_project_id     = var.project_id
   runner_token          = var.runner_token

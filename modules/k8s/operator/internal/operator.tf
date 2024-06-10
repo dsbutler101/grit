@@ -1,4 +1,15 @@
 locals {
+  supported_versions = {
+    for file in sort(fileset(path.module, "versions/**/manifests.yaml")) :
+    basename(dirname(file)) => "${path.module}/${file}"
+  }
+
+  manifests_file = (
+    var.override_manifests == ""
+    ? local.supported_versions[var.operator_version]
+    : var.override_manifests
+  )
+
   operator_manifests = {
     # - split the multi-doc yaml
     # - parse it
@@ -6,7 +17,7 @@ locals {
     # - return map of name => parsed yaml
     for resource in [
       for yaml in [
-        for doc in split("\n---\n", file("${path.module}/manifests.yaml")) : yamldecode(doc)
+        for doc in split("\n---\n", file(local.manifests_file)) : yamldecode(doc)
       ] :
       {
         apiVersion = yaml.apiVersion

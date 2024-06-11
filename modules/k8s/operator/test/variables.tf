@@ -4,7 +4,9 @@ variable "operator_version" {
   description = <<-EOF
     The operator version to deploy.
 
-    For supported version see either https://gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/-/releases or this module's output 'supported_versions'.
+    For supported version see either
+    https://gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/-/releases
+    or this module's output 'supported_operator_versions'.
   EOF
 }
 

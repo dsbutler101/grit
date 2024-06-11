@@ -47,6 +47,13 @@ downloadVersion() {
 
   echo >&2 "## downloading ${ARTIFACT} from release ${name} (tag: ${tag})"
   curl "${src}" -o "${dest}"
+
+  jq -n \
+    --arg tag "$tag" \
+    --arg name "$name" \
+    --arg source "$src" \
+    '{"releaseTag": $tag, "releaseName": $name, "source": $source}' \
+    > "${dest}.meta"
 }
 
 main "$@"

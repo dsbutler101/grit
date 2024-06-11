@@ -1,12 +1,20 @@
 locals {
   supported_versions = {
     for file in sort(fileset(path.module, "versions/**/manifests.yaml")) :
-    basename(dirname(file)) => "${path.module}/${file}"
+    basename(dirname(file)) => {
+      file = "${path.module}/${file}"
+      meta = yamldecode(file("${path.module}/${file}.meta"))
+    }
+  }
+
+  supported_versions_info = {
+    for n, m in local.supported_versions :
+    n => m.meta
   }
 
   manifests_file = (
     var.override_manifests == ""
-    ? local.supported_versions[var.operator_version]
+    ? local.supported_versions[var.operator_version].file
     : var.override_manifests
   )
 

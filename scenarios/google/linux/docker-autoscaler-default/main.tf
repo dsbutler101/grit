@@ -35,6 +35,7 @@ module "fleeting" {
   metadata = local.metadata
 
   google_project = var.google_project
+  google_zone    = var.google_zone
 
   fleeting_service = "gce"
 

@@ -41,6 +41,10 @@ variable "scale_max" {
   type = number
 }
 
+variable "max_use_count" {
+  type = number
+}
+
 variable "executor" {
   type = string
 }

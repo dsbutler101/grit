@@ -30,7 +30,7 @@ listen_address = "${metrics_export_endpoint}"
         plugin = "aws:${aws_plugin_version}"
 
         capacity_per_instance = 1
-        max_use_count = 10
+        max_use_count = ${max_use_count}
         max_instances = ${scale_max}
 
         [runners.autoscaler.plugin_config]

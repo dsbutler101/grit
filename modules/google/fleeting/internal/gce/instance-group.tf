@@ -28,6 +28,7 @@ resource "google_compute_instance_template" "ephemeral-runner" {
 
 resource "google_compute_instance_group_manager" "ephemeral-runners" {
   name = var.name
+  zone = var.google_zone
 
   base_instance_name = "${var.name}-ephemeral"
 

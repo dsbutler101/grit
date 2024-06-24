@@ -125,6 +125,7 @@ resource "google_compute_instance" "runner-manager" {
   }
 
   labels = var.labels
+  zone   = var.google_zone
 
   tags = [
     local.runner_manager_tag

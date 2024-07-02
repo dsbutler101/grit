@@ -91,16 +91,16 @@ Variables can be:
 | `scale_factor`       | `number` | If used, the number of idle slots are calculated as `scale_factor * in_use_slots`, but not less than defined with `scale_min`. A `float64` value higher than 0 is expected.                                                                 |
 | `scale_factor_limit` | `number` | Usable only when `scale_factor` is in use. If defined, the maximum value of `idle` is calculated with the equation described for `scale_factor`. An integer value is expected.                                                              |
 
-### `ephemeral_runner` object structure
+If not defined by the user, the following default is applied:
 
 ```terraform
 object {
-  disk_type    = optional(string, "gp3")
-  disk_size    = optional(number, 25)
-  machine_type = optional(string, "t3.medium")
-  source_image = optional(string, "ami-0735db9b38fcbdb39")
+  scale_min          = 1
+  scale_factor       = 0
 }
 ```
+
+### `ephemeral_runner` object structure
 
 | Key            | Type     | Description                                                                                         |
 | -------------- | -------- | --------------------------------------------------------------------------------------------------- |

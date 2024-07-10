@@ -2,7 +2,7 @@ e2e:prod:aws:
   stage: e2e
   needs: []
   extends:
-    - .rules:merge_request_pipelines:no_docs
+    - .rules:merge_request_pipelines:code
     - .go-cache
   resource_group: e2e-prod-aws
   script:

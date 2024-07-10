@@ -9,9 +9,10 @@ RUN curl -sL "https://golang.org/dl/${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go
     tar -C /usr/local -xzf /tmp/go.tar.gz && \
     go version
 
-# Clone and prepare the Go project
-RUN git clone https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git /tmp/grit
+# store go modules
 WORKDIR /tmp/grit
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
 
 # Clean up the image

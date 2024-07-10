@@ -2,7 +2,7 @@
 # Version definitions #
 #######################
 
-GO_VERSION ?= go1.21.7
+GO_VERSION ?= go1.22.5
 
 #####################
 # CI Registry setup #
@@ -26,7 +26,7 @@ endif
 			--build-arg GO_VERSION=$(GO_VERSION) \
 			-t $(IMAGE) \
 			-f ./dockerfiles/ci/Dockerfile \
-			./dockerfiles/ci/
+			.
 ifdef CI_REGISTRY_USER
 	# Pushing $(IMAGE)
 	@docker push $(IMAGE)

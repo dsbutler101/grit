@@ -139,6 +139,13 @@ variable "runners_docker_section" {
   default = ""
 }
 
+variable "default_docker_image" {
+  type        = string
+  description = "Default docker image to use in jobs that don't specify it explicitely"
+
+  default = "ubuntu:latest"
+}
+
 ##########################
 # Fleeting configuration #
 ##########################

@@ -54,6 +54,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"instance_role_profile_name": nil,
 				"enable_metrics_export":      false,
 				"metrics_export_endpoint":    "0.0.0.0:9402",
+				"default_docker_image":       "ubuntu:latest",
 			},
 			expectedModules: expectedModules,
 		},

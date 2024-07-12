@@ -17,7 +17,7 @@ listen_address = "${metrics_export_endpoint}"
 
     # Docker Executor config
     [runners.docker]
-        image = "ubuntu:latest"
+        image = "${default_docker_image}"
 %{ if privileged == true }
         tls_verify = false
         privileged = true

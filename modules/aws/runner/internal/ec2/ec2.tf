@@ -35,6 +35,7 @@ locals {
           enable_metrics_export   = var.enable_metrics_export
           metrics_export_endpoint = var.metrics_export_endpoint
           aws_plugin_version      = var.aws_plugin_version
+          default_docker_image    = var.default_docker_image
         })
       }
       ],

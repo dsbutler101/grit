@@ -63,6 +63,13 @@ variable "privileged" {
   default     = false
 }
 
+variable "default_docker_image" {
+  type        = string
+  description = "When using docker - Default image to use in jobs that don't specify it explicitely"
+
+  default = "ubuntu:latest"
+}
+
 variable "region" {
   description = "Region to deploy the runner manager to"
   type        = string

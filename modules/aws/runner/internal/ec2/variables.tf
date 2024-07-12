@@ -94,3 +94,7 @@ variable "metrics_export_endpoint" {
   type        = string
   description = "GitLab runner metrics export endpoint"
 }
+
+variable "default_docker_image" {
+  type = string
+}

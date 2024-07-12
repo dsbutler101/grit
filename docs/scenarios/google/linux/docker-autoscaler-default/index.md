@@ -628,3 +628,30 @@ instance where runner manager was deployed.
 
 This instance can be now accessed with SSH, using [Google Cloud OS Login](https://cloud.google.com/compute/docs/oslogin)
 mechanism.
+
+## Troubleshooting
+
+If things go as expected, you should see a runner-manager VM alongside a few ephemeral VMs in
+the Google Cloud project you specified. If that's not the case, try investigating the issue:
+
+```shell
+## ssh into the runner-manager VM
+## replace the zone, VM and project names as needed
+gcloud compute ssh --zone "us-east1-b" "gritexample1-runner-manager" --project "{Your-GCP-Project-ID}"
+
+## Escalate your privileges
+$ sudo su
+## Check the init script output for any errors
+$ less /var/log/cloud-init-output.log
+## View the status of the runner service
+$ systemctl status gitlab-runner.service -l
+```
+
+If you make any changes to your Terraform definitions, you might need to execute the following:
+
+```shell
+## Try re-executing key init script
+$ /var/lib/cloud/instance/scripts/runcmd
+## View the status of the runner service
+$ systemctl status gitlab-runner.service -l
+```

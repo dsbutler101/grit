@@ -15,8 +15,8 @@
 .docs-patterns: &docs-patterns
   - ".vale.ini"
   - ".markdownlint-cli2.yaml"
-  - "docs/**/*"
-  - "scripts/lint-docs"
+  - "**/*.md"
+  - "scripts/lint-docs.sh"
 
 .ci-image-patterns: &ci-image-patterns
   - dockerfiles/ci/**

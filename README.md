@@ -1,5 +1,3 @@
-Demo: https://youtu.be/sWugZ_eW5nQ
-
 # GitLab Runner Infrastructure Toolkit (GRIT)
 
 The GitLab Runner Infrastructure Toolkit (GRIT) is a library of
@@ -7,6 +5,8 @@ Terraform modules for deploying GitLab Runner and managing its
 lifecycle. It covers everything from a single runner deployment to
 complex autoscaling configurations. It embodies the best-practices
 for configuration and operation of runner.
+
+[Watch this demo](https://youtu.be/sWugZ_eW5nQ) for more details.
 
 ## Current State
 
@@ -17,8 +17,7 @@ Follow [the epic](https://gitlab.com/groups/gitlab-org/ci-cd/runner-tools/-/epic
 
 ## Usage
 
-Download the [latest
-release](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/releases)
+Download the [latest release](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/releases)
 and reference the test or prod modules in your Terraform configuration.
 
 ### Test and Prod Modules
@@ -29,21 +28,21 @@ restrictions. They are useful for local development and automated
 testing.
 
 Prod modules have associated support levels and promises around
-backward compatability. Support levels follow [GitLab's
-definition](https://about.gitlab.com/support/statement-of-support/#alpha-beta-features)
+backward compatibility. Support levels follow the
+[GitLab definition](https://docs.gitlab.com/ee/policy/experiment-beta-support.html)
 of experimental, beta and GA. See APIs and Guarantees below for more
 information.
 
 Consumable modules are organized as follows:
 
 1. `modules` directory
-2. provider (e.g. `aws`, `google`, `azure`)
-3. module (e.g. `vpc`, `iam`, `fleeting`, `runner`)
-4. type (e.g. `prod` or `test`)
+1. provider (e.g. `aws`, `google`, `azure`)
+1. module (e.g. `vpc`, `iam`, `fleeting`, `runner`)
+1. type (e.g. `prod` or `test`)
 
 Example module source path:
 
-```
+```hcl
 module "my-runner" {
   source = "grit/modules/aws/runner/prod"
   ...
@@ -55,26 +54,25 @@ directly reference any modules within "internal" folders.
 
 ### Composable Modules
 
-The primary module is `runner` which can be used by itself ([example
-main.tf](examples/test-shell-runner-only-ec2/main.tf)). Required and
-optional inputs are documented in the `variables.tf` file ([example
-prod variables.tf](modules/aws/runner/prod/variables.tf)). Outputs are
-documented in the `outputs.tf` file ([example prod
-outputs.tf](modules/aws/runner/prod/outputs.tf)).
+The primary module is `runner`, which can be used by itself
+([example main.tf](examples/test-shell-runner-only-ec2/main.tf)).
+Required and optional inputs are documented in the `variables.tf` file
+([example prod variables.tf](modules/aws/runner/prod/variables.tf)).
+Outputs are documented in the `outputs.tf` file
+([example prod outputs.tf](modules/aws/runner/prod/outputs.tf)).
 
-Optional modules are available to setup additional configuration for
+Optional modules are available to set up additional configuration for
 runner which can be fed into the `runner` module. For example, the
 `gitlab`, `vpc`, `iam`, `fleeting` and `runner` modules can create a
 fully autoscaling runner on its own VPC and automatically register it
-to a GitLab project ([example
-main.tf](examples/prod-docker-autoscaler-ec2/main.tf)) The outputs of
-each optional module are exactly what is required as input to the
+to a GitLab project ([example main.tf](examples/prod-docker-autoscaler-ec2/main.tf)).
+The outputs of each optional module are exactly what is required as input to the
 `runner` module, so they should fit together easily.
 
 ### Examples
 
 - [Test shell runner on EC2](examples/test-shell-runner-only-ec2/main.tf)
-- [Production docker-autoscaler configuration on EC2](examples/prod-docker-autoscaler-ec2/main.tf)
+- [Production `docker-autoscaler` configuration on EC2](examples/prod-docker-autoscaler-ec2/main.tf)
 
 ## Value of GRIT
 
@@ -130,35 +128,15 @@ The `ga` modules are the set of battle-hardened modules that GRIT
 authors have experience running. They will be backward compatible,
 meaning they will not be refactored in a way that causes unnecessary
 resource destruction. Especially since that would likely cause an
-outage! When backward incompatable changes are necessary advance
+outage! When backward incompatible changes are necessary advance
 warning will be given in manner compatible with existing GitLab
 deprecation policies.
 
 ## Contributing
 
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
 GRIT is currently early in the development stage so if you want to
 contribute, reach out to us through Slack or open an
 [Issue](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/issues). There's
 lots to do, but you might need a little help getting started.
-
-### General Guidance
-
-The GRIT codebase should conform to [Google's best practices for using
-Terraform](https://cloud.google.com/docs/terraform/best-practices-for-terraform).
-
-The goal of GRIT is decompose runner infrastructure sufficiently that
-there is little repetition. It uses composable modules to reduce the
-complexity of each module. See [The Zen of
-Fabric](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/blob/master/CONTRIBUTING.md#the-zen-of-fabric).
-
-The structure should be very consistent and predicatable so the
-codebase is easy to navigate. All consumable modules must be in the
-`modules` directory. The next directory layer must be the provider.
-We separate modules by provider so consumers are not forced to configure
-any providers they are not using.
-
-The next layer must be a series of logical modules. The primary module
-must be `runner`. The rest can be a decomposition of runner setups on
-that provider platform.  E.g. `aws` container `iam`, `vpc`, `fleeting`
-and `runner` modules. Consider creating a separate module for aspects
-with low coupling, where consumers might want to "bring their own".

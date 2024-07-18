@@ -10,4 +10,4 @@ link: https://docs.gitlab.com/ee/development/documentation/styleguide/index.html
 level: error
 scope: raw
 raw:
-  - '\[[^\]]+\]\(https?:\/\/gitlab\.com\/gitlab-org\/ci-cd\/runner-tools\/grit.*\)'
+  - '\[[^\]]+\]\(https?:\/\/gitlab\.com\/gitlab-org\/ci-cd\/runner-tools\/grit\/.*\.md\)'

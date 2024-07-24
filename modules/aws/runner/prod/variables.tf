@@ -57,7 +57,11 @@ variable "idle_percentage" {
 variable "capacity_per_instance" {
   description = "The number of concurrent job each instances can run"
   type        = number
-  default     = -1
+  default     = 1
+  validation {
+    condition     = var.capacity_per_instance >= 1
+    error_message = "The capacity_per_instance value must be 1 or greater"
+  }
 }
 
 variable "security_group_ids" {

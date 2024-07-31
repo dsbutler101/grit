@@ -1,4 +1,4 @@
-//go:build e2e_aws
+//go:build e2e_google
 
 package e2e
 
@@ -8,15 +8,10 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	terratest_aws "github.com/gruntwork-io/terratest/modules/aws"
+	terratest_gcp "github.com/gruntwork-io/terratest/modules/gcp"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 	"github.com/xanzy/go-gitlab"
@@ -25,8 +20,8 @@ import (
 )
 
 const (
-	asgOutputKey = "autoscaling_group_name"
-	testKey      = "AWS_PROD_TESTENDTOEND"
+	groupOutputKey = "instance_group_name"
+	testKey        = "GOOGLE_PROD_TESTENDTOEND"
 )
 
 func TestEndToEnd(t *testing.T) {
@@ -42,14 +37,26 @@ func TestEndToEnd(t *testing.T) {
 	runnerToken := os.Getenv(test_tools.RunnerTokenVar)
 	require.NotEmpty(t, runnerToken)
 
+	projectID := terratest_gcp.GetGoogleProjectIDFromEnvVar(t)
+	require.NotEmpty(t, projectID)
+
+	region := terratest_gcp.GetGoogleRegionFromEnvVar(t)
+	require.NotEmpty(t, region)
+
+	zone := os.Getenv("GOOGLE_ZONE")
+	require.NotEmpty(t, zone)
+
 	// Create runner stack
 	options := &terraform.Options{
 		TerraformBinary: "terraform",
 		TerraformDir:    ".",
 		Vars: map[string]interface{}{
-			"runner_token": runnerToken,
-			"name":         name,
-			"job_id":       jobId,
+			"runner_token":  runnerToken,
+			"name":          name,
+			"job_id":        jobId,
+			"google_region": region,
+			"google_zone":   zone,
+			"google_project": projectID,
 		},
 	}
 	_, err = terraform.InitAndApplyE(t, options)
@@ -59,8 +66,11 @@ func TestEndToEnd(t *testing.T) {
 	require.NoError(t, err)
 
 	// TODO: implement check for runner stack health
-	instanceName := name + "_runner-manager"
-	requireRunnerManagerRunning(t, instanceName)
+	requireRunnerManagerRunning(t, projectID, zone, name)
+
+	groupName, err := terraform.OutputE(t, options, groupOutputKey)
+	require.NoError(t, err)
+	require.NotEmpty(t, groupName)
 
 	// Run a job
 	main := "main"
@@ -104,55 +114,22 @@ func TestEndToEnd(t *testing.T) {
 
 	// Assert the job printed our unique value
 	require.Contains(t, log, uniqueValue, fmt.Sprintf("looking for %v. found:\n%v", uniqueValue, log))
-
-	// Assert the job ran on our stack
-	asg, err := terraform.OutputE(t, options, asgOutputKey)
-	require.NoError(t, err)
-	autoscalingClient, err := terratest_aws.NewAsgClientE(t, test_tools.Region)
-	require.NoError(t, err)
-	groups, err := autoscalingClient.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
-		AutoScalingGroupNames: []*string{&asg},
-	})
-	if len(groups.AutoScalingGroups) != 1 {
-		t.Fatalf("expected 1 asg. found %v", len(groups.AutoScalingGroups))
-	}
-	jobRanOnAsg := false
-	for _, instance := range groups.AutoScalingGroups[0].Instances {
-		id := instance.InstanceId
-		if id == nil {
-			continue
-		}
-		if strings.Contains(log, *id) {
-			jobRanOnAsg = true
-		}
-	}
-	require.True(t, jobRanOnAsg)
+	// Assert the job ran on our stack (Matches `Instance https://www.googleapis.com/compute/v1/projects/ID/zones/ZONE/instances/u-7a1c395d97-9886c784ca0f316a connected`)
+	require.Contains(t, log, fmt.Sprintf("/instances/%s-", groupName), fmt.Sprintf("looking for %v. found:\n%v", fmt.Sprintf("/instances/%s-", groupName), log))
 }
 
-func requireRunnerManagerRunning(t *testing.T, instanceName string) {
-	sess, _ := session.NewSession(&aws.Config{
-		Region: aws.String("us-east-1")},
-	)
-
-	svc := ec2.New(sess)
-
-	input := &ec2.DescribeInstancesInput{
-		Filters: []*ec2.Filter{
-			{
-				Name:   aws.String("tag:Name"),
-				Values: []*string{aws.String(instanceName)},
-			},
-		},
+func requireRunnerManagerRunning(t *testing.T, projectID string, zone string, instancePrefix string) {
+	s, err := terratest_gcp.NewInstancesServiceE(t)
+	require.NoError(t, err)
+	list, err := s.List(projectID, zone).Do()
+	require.NoError(t, err)
+	found := false
+	for _, instance := range list.Items {
+		if instance.Name == instancePrefix+"-runner-manager" {
+			require.Equal(t, "RUNNING", instance.Status)
+			found = true
+			break
+		}
 	}
-
-	result, err := svc.DescribeInstances(input)
-	if err != nil {
-		fmt.Println("Error", err)
-		return
-	}
-
-	require.NotNil(t, result)
-	require.Len(t, result.Reservations, 1)
-	require.Len(t, result.Reservations[0].Instances, 1)
-	require.Equal(t, "running", *result.Reservations[0].Instances[0].State.Name)
+	require.True(t, found)
 }

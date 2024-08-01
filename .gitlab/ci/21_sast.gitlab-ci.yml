@@ -1,0 +1,11 @@
+include:
+  - project: gitlab-com/gl-security/security-operations/infrastructure-security-public/gandalf
+    ref: v2.4.1 # renovate:managed
+    file: template/kics-scanner.yml
+
+kics-iac-sast:
+  stage: unit
+  needs: []
+  variables:
+    GANDALF_IMAGE_LINK: registry.gitlab.com/gitlab-com/gl-security/security-operations/infrastructure-security-public/gandalf:latest
+    GITLAB_TOKEN: $GANDALF_GITLAB_TOKEN

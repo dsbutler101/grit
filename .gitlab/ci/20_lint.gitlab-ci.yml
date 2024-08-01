@@ -25,3 +25,12 @@ docs lint markdown:
   script:
     # Lint prose and Markdown
     - make lint-docs
+
+golang lint:
+  image: registry.gitlab.com/gitlab-org/ci-cd/runner-tools/runner-linters:1.59.1-go1.22.5-alpine
+  stage: lint
+  extends:
+    - .rules:merge_request_pipelines:code
+    - .go-cache
+  script:
+    - make lint-go

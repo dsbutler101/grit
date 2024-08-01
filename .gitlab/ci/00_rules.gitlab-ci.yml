@@ -10,6 +10,7 @@
   - "**/*.lock.hcl"
   - "**/*.go"
   - "go.*"
+  - ".golangci.yml"
   - "{scripts}/**/*"
 
 .docs-patterns: &docs-patterns

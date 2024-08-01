@@ -73,7 +73,7 @@ func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []st
 
 	// For easy troubleshooting, output keys that should be present
 	fmt.Println(t.Name(), "ResourceChangesMap keys:")
-	for k, _ := range plan.ResourceChangesMap {
+	for k := range plan.ResourceChangesMap {
 		fmt.Printf("\"%v\",\n", k)
 	}
 }

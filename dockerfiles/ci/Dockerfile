@@ -9,11 +9,5 @@ RUN curl -sL "https://golang.org/dl/${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go
     tar -C /usr/local -xzf /tmp/go.tar.gz && \
     go version
 
-# store go modules
-WORKDIR /tmp/grit
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
-
 # Clean up the image
 RUN rm -rf /tmp/*

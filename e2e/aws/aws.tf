@@ -45,7 +45,7 @@ module "fleeting" {
 
   service       = "ec2"
   os            = "linux"
-  ami           = "ami-0735db9b38fcbdb39"
+  ami           = module.ami_lookup.ami_id
   instance_type = "t2.medium"
   scale_min     = 1
   scale_max     = 10
@@ -53,6 +53,13 @@ module "fleeting" {
   security_group_ids = [
     module.security_groups.fleeting.id,
   ]
+}
+
+module "ami_lookup" {
+  source   = "../../modules/aws/ami_lookup/prod"
+  use_case = "aws-linux-ephemeral"
+  region   = "us-east-1"
+  metadata = local.metadata
 }
 
 module "runner" {

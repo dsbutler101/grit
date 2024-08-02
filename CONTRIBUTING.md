@@ -85,6 +85,14 @@ files with a `go` test to ensure variable definitions are in the correct place.
 Run `make terraform-fmt-check` to check Terraform formatting and
 `make lint-terraform` to lint variables.
 
+#### Go
+
+We lint Go with [golangci-lint](https://golangci-lint.run/).
+
+Run `make lint-go` to run golangci-lint.
+
+We're using a small number of linters as the Go code is minimal and consists only of tests.
+
 #### Documentation
 
 The documentation should follow the [GitLab documentation style guide](https://docs.gitlab.com/ee/development/documentation/styleguide/).

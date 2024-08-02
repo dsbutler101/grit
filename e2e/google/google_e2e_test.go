@@ -1,4 +1,4 @@
-//go:build e2e_google
+//go:build e2e
 
 package e2e
 
@@ -51,11 +51,11 @@ func TestEndToEnd(t *testing.T) {
 		TerraformBinary: "terraform",
 		TerraformDir:    ".",
 		Vars: map[string]interface{}{
-			"runner_token":  runnerToken,
-			"name":          name,
-			"job_id":        jobId,
-			"google_region": region,
-			"google_zone":   zone,
+			"runner_token":   runnerToken,
+			"name":           name,
+			"job_id":         jobId,
+			"google_region":  region,
+			"google_zone":    zone,
 			"google_project": projectID,
 		},
 	}

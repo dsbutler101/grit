@@ -9,3 +9,7 @@ terraform-fmt-check:
 .PHONY: lint-terraform
 lint-terraform:
 	go test -tags lint .
+
+.PHONY: lint-go
+lint-go:
+	golangci-lint run

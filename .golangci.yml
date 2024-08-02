@@ -1,0 +1,15 @@
+run:
+  timeout: 5m
+  build-tags:
+  - e2e
+  - lint
+
+linters:
+  enable:
+  - bodyclose
+  - contextcheck
+  - errname
+  - errorlint
+  - gocheckcompilerdirectives
+  - goconst
+  - nolintlint

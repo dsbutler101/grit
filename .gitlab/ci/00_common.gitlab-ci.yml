@@ -31,6 +31,7 @@ variables:
       paths:
         - $CI_PROJECT_DIR/.gocache-false/
     - key:
+        prefix: gomod
         files:
           - $CI_PROJECT_DIR/go.mod
           - $CI_PROJECT_DIR/go.sum

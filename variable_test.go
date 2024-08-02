@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -39,6 +40,11 @@ func Test_VariableLocations(t *testing.T) {
 			if err != nil {
 				return err
 			}
+			// prevent walking . dirs as they can contain third party modules (e.g. CI module cache)
+			if path != "." && info.IsDir() && strings.HasPrefix(info.Name(), ".") {
+				return filepath.SkipDir
+			}
+
 			if info.IsDir() || filepath.Base(path) != "variables.tf" {
 				return nil
 			}

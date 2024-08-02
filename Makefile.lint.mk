@@ -8,7 +8,7 @@ terraform-fmt-check:
 
 .PHONY: lint-terraform
 lint-terraform:
-	go test -tags lint .
+	go test -count=1 -tags lint .
 
 .PHONY: lint-go
 lint-go:

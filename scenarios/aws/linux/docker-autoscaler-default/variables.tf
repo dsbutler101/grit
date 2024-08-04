@@ -52,7 +52,7 @@ variable "max_instances" {
 variable "concurrent" {
   type = number
 
-  default = 20
+  default = 1
 
   validation {
     condition     = var.concurrent <= 2000

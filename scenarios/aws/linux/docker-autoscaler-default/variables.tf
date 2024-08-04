@@ -42,12 +42,22 @@ variable "max_instances" {
   type = number
 
   default = 20
+
+  validation {
+    condition     = var.max_instances <= 1000
+    error_message = "Fleeting plugin for Google will not allow to manage more than 1000 instances at once"
+  }
 }
 
 variable "concurrent" {
   type = number
 
   default = 20
+
+  validation {
+    condition     = var.concurrent <= 2000
+    error_message = "Configuration (especially network size) will not be able to handle more than 2000 concurrent jobs"
+  }
 }
 
 variable "idle_percentage" {
@@ -85,7 +95,6 @@ variable "ephemeral_runner" {
     source_image = "ami-0735db9b38fcbdb39"
   }
 }
-
 
 variable "runner_description" {
   type = string

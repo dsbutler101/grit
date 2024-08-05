@@ -325,7 +325,7 @@ object {
   disk_type    = "gp3"
   disk_size    = 25
   machine_type = "t3.medium"
-  source_image = "ami-0735db9b38fcbdb39"
+  source_image = module.ami_lookup.ami_id
 }
 ```
 
@@ -467,7 +467,6 @@ module "runner-deployment" {
 
   ephemeral_runner = {
     disk_size    = 50
-    source_image = "ami-00fcafc06ad915f51"
   }
 
   runners_global_section = <<EOS

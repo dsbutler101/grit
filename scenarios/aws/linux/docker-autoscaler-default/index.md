@@ -120,67 +120,6 @@ object {
 }
 ```
 
-### `runners_global_section` customization
-
-This setting can be used to add custom configuration to
-the [`[[runners]]` section](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section)
-of the generated `config.toml` file.
-
-> The `runners_global_section` content is written to the `config.toml`
-> file at a location specified in the template. Terraform does not check the syntax.
-> If you customize a runner setting that has already been managed by GRIT, GRIT might end with a failing configuration.
-> You should deploy the runner before you customize it to review
-> the generated `config.toml` file. After you deploy the runner, add the customization.
-
-In the following example:
-
-- The `environment` setting is added to the configuration file.
-- The HEREDOC syntax is used to pass multiline content.
-
-```terraform
-module "grit-scenario" {
-  # (...)
-  runners_global_section = <<EOS
-  environment = [
-    "DOCKER_TLS_CERTDIR=",
-  ]
-EOS
-  # (...)
-}
-```
-
-### `runners_docker_section` customization
-
-The `runners_docker_section` variable adds customization to the
-[`[runners.docker]` section](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersdocker-section)
-of the generated `config.toml` file.
-
-> The `runners_docker_section` content is written to the `config.toml`
-> file at a location specified in the template. Terraform does not check the syntax.
-> If you customize a runner setting that has already been managed by GRIT, GRIT might end with a failing configuration.
-> You should deploy the runner before you customize it to review
-> the generated `config.toml` file. After you deploy the runner, add the customization.
-
-In the following example:
-
-- The `privileged` mode has been enabled for Docker executor.
-- Custom volume mapping has been added for every container that starts when jobs are executed.
-- The HEREDOC syntax is used to pass multiline content.
-
-```terraform
-module "grit-scenario" {
-  # (...)
-  runners_docker_section = <<EOS
-    volumes = [
-      "/certs/client"
-    ]
-
-    privileged = true
-EOS
-  # (...)
-}
-```
-
 ## Usage
 
 ### Terraform code

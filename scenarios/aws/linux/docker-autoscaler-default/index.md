@@ -41,6 +41,7 @@ Below, the list of AWS services used and the recommended IAM policy.
 - AWS Security Token Service
 
 #### IAM Policy
+
 **Disclaimer**
 
 This IAM policy is provided as an example only and not intended for direct production use.

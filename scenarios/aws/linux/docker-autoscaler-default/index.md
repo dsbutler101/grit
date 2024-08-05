@@ -25,7 +25,7 @@ To use this scenario, you must have:
 
 In order to control AWS resources, an AWS key must be provided by setting the following environment variables:
 
-```
+```markdown
 export AWS_SECRET_ACCESS_KEY=<value>
 export AWS_ACCESS_KEY_ID=<value>
 ```

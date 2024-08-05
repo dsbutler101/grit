@@ -216,6 +216,7 @@ Variables can be:
 
 - **Complex**: Variables are either lists, maps, or objects, or combination of these types.
 
+<!-- begin: input vars -->
 | Name                     | Type                                                     | Required? | Default value | Description                                                                                                                                                                                         |
 |--------------------------|----------------------------------------------------------|-----------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `name`                   | `string`                                                 | yes       |               | Name of the deployment. Must be unique in scope of a Google Cloud project.                                                                                                                          |
@@ -226,6 +227,7 @@ Variables can be:
 | `gitlab_url`             | `string`                                                 | yes       |               | URL of GitLab instance.                                                                                                                                                                             |
 | `runner_token`           | `string`                                                 | yes       |               | Authentication token of the runner to deploy. See [how to obtain the token](https://docs.gitlab.com/ee/ci/runners/runners_scope.html#create-an-instance-runner-with-a-runner-authentication-token). |
 | `runner_machine_type`    | `string`                                                 | no        |               | Machine type for the runner manager instance. If not provided, GRIT uses one of predefined choices based on the value of defined concurrency.                                                       |
+| `runner_tags`            | `list(string)`                                           | no        | []            | Tags to register the runner with                                                                                                                                                                    |
 | `concurrent`             | `number`                                                 | no        | 50            | Value for `config.toml`'s `concurrent` setting. Defines maximum total number of jobs executed concurrently by the runner.                                                                           |
 | `runners_global_section` | `string`                                                 | no        |               | [Allows to customize](#runners_global_section-customization) the global part of `[[runners]]` section in generated `config.toml`.                                                                   |
 | `runners_docker_section` | `string`                                                 | no        |               | [Allows to customize](#runners_docker_section-customization) the global part of `[runners.docker]` section in generated `config.toml`.                                                              |
@@ -234,6 +236,7 @@ Variables can be:
 | `max_use_count`          | `number`                                                 | no        | 1             | Maximum number of jobs executed on a single autoscaled ephemeral VM, after which the VM is marked for deletion.                                                                                     |
 | `autoscaling_policies`   | [`list(object)`](#autoscaling_policies-object-structure) | no        |               | List of objects defining autoscaling policies.                                                                                                                                                      |
 | `ephemeral_runner`       | [`object`](#ephemeral_runner-object-structure)           | no        |               | Configuration of autoscaled ephemeral VM.                                                                                                                                                           |
+<!-- end: input vars -->
 
 ### `autoscaling_policies` object structure
 
@@ -572,53 +575,7 @@ output "runner-manager-external-ip" {
 
 ### Terraform execution
 
-When the Terraform code is ready, in the directory where the `*.tf` files are created,
-complete the following steps to execute the Terraform code:
-
-#### Initialize
-
-Use the `init` call to initialize the directory that contains the Terraform configuration files.
-The `init` call downloads all providers and external modules referenced by the code.:
-
-```shell
-terraform init
-```
-
-You must run this command when:
-
-- You first use Terraform in this directory.
-- Version definitions in `terraform` block are changed.
-- The GRIT code has been updated.
-
-#### Plan
-
-Use the `plan` call to compare the local Terraform state stored in the file with the
-resources in Google Cloud.
-
-```shell
-terraform plan -var runner_token="your-glrt-runner-token" -out plan.out
-```
-
-The `plan` call prints all changes that will be provisioned and stores them
-in the `plan.out` file that you use in the last step to execute Terraform.
-
-The value for `runner_token` variable is passed with the flag, `-var runner_token="glrt-runner-token-here"`.
-Alternatively, you can export a `TF_VAR_runner_token="glrt-runner-token-here"` before
-you run the `plan` call, for example:
-
-```shell
-export TF_VAR_runner_token="glrt-runner-token-here"
-terraform plan -out plan.out
-```
-
-#### Apply the plan
-
-Use the `apply` call to execute runner provisioning steps in the `plan.out` file. Runner
-provisioning is executed with calls to the Google Cloud API.
-
-```shell
-terraform apply plan.out
-```
+Plan and deploy the example as [documented](../../../terraform.md).
 
 ### Access to the runner manager instance
 

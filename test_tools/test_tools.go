@@ -34,7 +34,7 @@ func JobName(_ *testing.T) string {
 	return fmt.Sprintf("u-%x", hash[:5])
 }
 
-func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []string) {
+func Plan(t *testing.T, moduleVars map[string]any) *terraform.PlanStruct {
 	tempDir := t.TempDir()
 	tempFilePath := filepath.Join(tempDir, "plan.json")
 
@@ -63,8 +63,15 @@ func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []st
 	// help in case of GitLab CI/CD execution.
 	//
 	// Therefore - we need to disable logging in this specific case.
-	plan := terraform.ShowWithStruct(t, &optionsDiscardLogger)
+	return terraform.ShowWithStruct(t, &optionsDiscardLogger)
+}
 
+func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []string) {
+	plan := Plan(t, moduleVars)
+	AssertWithPlan(t, plan, expectedModules)
+}
+
+func AssertWithPlan(t *testing.T, plan *terraform.PlanStruct, expectedModules []string) {
 	assert.Len(t, plan.ResourcePlannedValuesMap, len(expectedModules))
 
 	for _, v := range expectedModules {
@@ -95,4 +102,9 @@ func PlanAndAssertError(t *testing.T, moduleVars map[string]any, wantErr bool) {
 	} else {
 		require.NoError(t, err)
 	}
+}
+
+func AssertProviderConfigExists(t *testing.T, plan *terraform.PlanStruct, name string) {
+	t.Helper()
+	assert.Contains(t, plan.RawPlan.Config.ProviderConfigs, name, `Expected provider config "%s" to exist, but does not`, name)
 }

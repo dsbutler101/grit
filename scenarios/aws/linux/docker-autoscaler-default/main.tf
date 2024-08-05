@@ -37,7 +37,7 @@ module "fleeting" {
   security_group_ids = [module.security_groups.fleeting.id]
 
   instance_type = var.ephemeral_runner.machine_type
-  ami           = var.ephemeral_runner.source_image
+  ami           = module.ami_lookup.ami_id
   scale_min     = var.autoscaling_policy.scale_min
   scale_max     = var.max_instances
 

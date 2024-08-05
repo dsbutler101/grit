@@ -25,7 +25,7 @@ To use this scenario, you must have:
 
 In order to control AWS resources, an AWS key must be provided by setting the following environment variables:
 
-```bash
+```
 export AWS_SECRET_ACCESS_KEY=<value>
 export AWS_ACCESS_KEY_ID=<value>
 ```
@@ -41,9 +41,8 @@ Below, the list of AWS services used and the recommended IAM policy.
 - AWS Security Token Service
 
 #### IAM Policy
-TO-DO: add the policy using the least privilege principle
-```yml
-```
+
+Placeholder
 
 ## Variables
 

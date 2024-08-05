@@ -85,14 +85,14 @@ variable "ephemeral_runner" {
     disk_type    = optional(string, "gp3")
     disk_size    = optional(number, 25)
     machine_type = optional(string, "t3.medium")
-    source_image = optional(string, module.ami_lookup.ami_id)
+    source_image = optional(string, locals.ami_id)
   })
 
   default = {
     disk_type    = "gp3"
     disk_size    = 25
     machine_type = "t3.medium"
-    source_image = module.ami_lookup.ami_id
+    source_image = locals.ami_id
   }
 }
 

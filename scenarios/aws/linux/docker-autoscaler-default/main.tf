@@ -14,8 +14,6 @@ module "iam" {
   metadata = local.metadata
 }
 
-## TODO Add module cache - currently not in `../modules/aws/`
-
 module "fleeting" {
   source = "../../../../modules/aws/fleeting/prod"
 

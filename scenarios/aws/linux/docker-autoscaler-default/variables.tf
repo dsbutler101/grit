@@ -45,7 +45,7 @@ variable "max_instances" {
 
   validation {
     condition     = var.max_instances <= 1000
-    error_message = "Fleeting plugin for Google will not allow to manage more than 1000 instances at once"
+    error_message = "Fleeting plugin for AWS will not allow to manage more than 1000 instances at once"
   }
 }
 

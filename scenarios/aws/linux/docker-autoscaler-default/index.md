@@ -41,8 +41,217 @@ Below, the list of AWS services used and the recommended IAM policy.
 - AWS Security Token Service
 
 #### IAM Policy
+**Disclaimer**
 
-Placeholder
+This IAM policy is provided as an example only and not intended for direct production use.
+
+User's responsibility: 
+
+- Review, test, and modify this policy to align with your company's security policies and requirements
+- Minimum permissions: Tailor the policy to grant only necessary permissions for your specific use case
+- Regular maintenance: Conduct periodic audits and updates to maintain security as your needs evolve
+- Best practices: Consult your security team and AWS documentation for current IAM policy best practices
+
+The author and contributors are not responsible for any security issues arising from the use or misuse of this policy.
+
+Always apply the principle of least privilege when working with IAM policies.
+
+```yaml
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeScalingActivities",
+                "ec2:CreateTags",
+                "ec2:DeleteKeyPair",
+                "ec2:DescribeImages",
+                "ec2:DescribeInstanceCreditSpecifications",
+                "ec2:DescribeInstanceTypes",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeKeyPairs",
+                "ec2:DescribeLaunchTemplateVersions",
+                "ec2:DescribeLaunchTemplates",
+                "ec2:DescribeNetworkAcls",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DescribeRouteTables",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeTags",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeVpcs",
+                "ec2:DisassociateRouteTable",
+                "sts:GetCallerIdentity",
+                "iam:ListAccessKeys",
+                "iam:DeleteUser",
+                "iam:DeletePolicy",
+                "iam:ListUsers",
+                "iam:ListUserPolicies",
+                "iam:GetUserPolicy",
+                "iam:GetUser",
+                "iam:CreateUser",
+                "iam:RemoveUserFromGroup",
+                "iam:AddUserToGroup",
+                "iam:UpdateUser",
+                "iam:AttachUserPolicy",
+                "iam:DeleteUserPolicy",
+                "iam:DetachUserPolicy",
+                "iam:TagUser",
+                "iam:TagRole",
+                "iam:UntagPolicy",
+                "iam:UntagRole",
+                "iam:UntagUser",
+                "iam:TagPolicy",
+                "ec2:CreateLaunchTemplateVersion",
+                "ec2:CreateLaunchTemplate",
+                "ec2:DeleteLaunchTemplate",
+                "ec2:DeleteLaunchTemplateVersions",
+                "ec2:ModifyLaunchTemplate"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:CreateAutoScalingGroup",
+                "autoscaling:DeleteAutoScalingGroup",
+                "autoscaling:SetInstanceProtection",
+                "autoscaling:UpdateAutoScalingGroup"
+            ],
+            "Resource": "arn:aws:autoscaling:*:${Account}:*:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeInstanceAttribute",
+                "ec2:ModifyInstanceAttribute",
+                "ec2:RunInstances",
+                "ec2:TerminateInstances"
+            ],
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AttachInternetGateway",
+                "ec2:CreateInternetGateway",
+                "ec2:DeleteInternetGateway",
+                "ec2:DetachInternetGateway"
+            ],
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ec2:ImportKeyPair",
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateLaunchTemplate",
+                "ec2:DeleteLaunchTemplate"
+            ],
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ec2:RunInstances",
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AssociateRouteTable",
+                "ec2:CreateRoute",
+                "ec2:CreateRouteTable",
+                "ec2:DeleteRoute",
+                "ec2:DeleteRouteTable"
+            ],
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:CreateSecurityGroup",
+                "ec2:DeleteSecurityGroup",
+                "ec2:RevokeSecurityGroupEgress",
+                "ec2:RunInstances"
+            ],
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateSubnet",
+                "ec2:DeleteSubnet",
+                "ec2:ModifySubnetAttribute",
+                "ec2:RunInstances"
+            ],
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AttachInternetGateway",
+                "ec2:CreateRouteTable",
+                "ec2:CreateSubnet",
+                "ec2:CreateVpc",
+                "ec2:DeleteVpc",
+                "ec2:DescribeVpcAttribute",
+                "ec2:DetachInternetGateway",
+                "ec2:ModifyVpcAttribute"
+            ],
+            "Resource": "arn:aws:ec2:*:${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ec2:RunInstances",
+            "Resource": "arn:aws:ec2:*::*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreatePolicy",
+                "iam:GetPolicy",
+                "iam:GetPolicyVersion",
+                "iam:ListPolicyVersions"
+            ],
+            "Resource": "arn:aws:iam::${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "arn:aws:iam::${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:AttachUserPolicy",
+                "iam:CreateAccessKey",
+                "iam:CreateUser",
+                "iam:DeleteAccessKey",
+                "iam:DetachUserPolicy",
+                "iam:GetUser",
+                "iam:ListAttachedUserPolicies",
+                "iam:ListGroupsForUser"
+            ],
+            "Resource": "arn:aws:iam::${Account}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ssm:GetParameters",
+            "Resource": "arn:aws:ssm:*:${Account}:*"
+        }
+    ]
+}
+```
 
 ## Variables
 

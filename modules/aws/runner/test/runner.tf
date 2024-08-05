@@ -24,6 +24,7 @@ module "ec2" {
   capacity_per_instance      = var.capacity_per_instance
   scale_min                  = var.scale_min
   scale_max                  = var.scale_max
+  max_use_count              = var.max_use_count
   security_group_ids         = var.security_group_ids
   privileged                 = var.privileged
   region                     = var.region
@@ -34,6 +35,7 @@ module "ec2" {
   cloudwatch_agent_json      = var.cloudwatch_agent_json
   enable_metrics_export      = var.enable_metrics_export
   metrics_export_endpoint    = var.metrics_export_endpoint
+  default_docker_image       = var.default_docker_image
 
   name   = var.metadata.name
   labels = var.metadata.labels

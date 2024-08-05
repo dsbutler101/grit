@@ -48,6 +48,7 @@ func TestRunner(t *testing.T) {
 				"cache_gcs_bucket":                      "cache-bucket",
 				"runners_global_section":                "global section custom part",
 				"runners_docker_section":                "docker section custom part",
+				"default_docker_image":                  "ubuntu:latest",
 				"fleeting_googlecompute_plugin_version": "v0.1.0",
 				"fleeting_instance_group_name":          "instance-group-name",
 				"capacity_per_instance":                 5,

@@ -16,7 +16,7 @@ variable "use_case_support" {
 
 locals {
   support      = try(var.use_case_support[var.use_case], "unsupported")
-  fail_message = "Support for this use case is ${local.support} but min_support is ${var.min_support}"
+  fail_message = "Support for the '${var.use_case}' use case is ${local.support} but min_support is ${var.min_support}"
 }
 
 // min_support experimental can be satisfied by experimental, beta or ga

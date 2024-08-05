@@ -90,6 +90,10 @@ variable "runners_docker_section" {
   type = string
 }
 
+variable "default_docker_image" {
+  type = string
+}
+
 #
 # Autoscaling configuration
 #

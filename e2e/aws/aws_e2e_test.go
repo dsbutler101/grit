@@ -113,6 +113,7 @@ func TestEndToEnd(t *testing.T) {
 	groups, err := autoscalingClient.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
 		AutoScalingGroupNames: []*string{&asg},
 	})
+	require.NoError(t, err)
 	if len(groups.AutoScalingGroups) != 1 {
 		t.Fatalf("expected 1 asg. found %v", len(groups.AutoScalingGroups))
 	}

@@ -20,6 +20,7 @@ module "gce" {
   labels = var.metadata.labels
 
   google_project = var.google_project
+  google_zone    = var.google_zone
 
   service_account_email = var.service_account_email
 

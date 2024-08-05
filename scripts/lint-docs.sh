@@ -12,14 +12,14 @@ if command -v vale >/dev/null 2>&1; then
     if [ -n "${VALE_MIN_ALERT_LEVEL}" ]; then
         args+=("--minAlertLevel" "${VALE_MIN_ALERT_LEVEL}")
     fi
-    vale --config "${GIT_ROOT}/.vale.ini" "${args[@]}" "${GIT_ROOT}/docs" || ((ERROR_RESULTS++))
+    vale --config "${GIT_ROOT}/.vale.ini" --glob "!**/.terraform/**" "${args[@]}" "${GIT_ROOT}" || ((ERROR_RESULTS++))
 else
-    echo "vale is missing, please install it from https://errata-ai.gitbook.io/vale/#installation"
+    echo "vale is missing, please install it from https://vale.sh/docs/vale-cli/installation/"
 fi
 
 echo "Lint Markdown"
 if command -v markdownlint-cli2 >/dev/null 2>&1; then
-    markdownlint-cli2 'docs/**/*.md' || ((ERROR_RESULTS++))
+    markdownlint-cli2 "**/*.md" '!**/.terraform/**' || ((ERROR_RESULTS++))
 else
     echo "markdownlint-cli2 is missing, please install it from https://github.com/DavidAnson/markdownlint-cli2#install"
 fi

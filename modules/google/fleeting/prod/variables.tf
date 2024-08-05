@@ -34,6 +34,11 @@ variable "google_project" {
   description = "Google Cloud project to use"
 }
 
+variable "google_zone" {
+  type        = string
+  description = "The zone that instances in this group should be created in"
+}
+
 variable "service_account_email" {
   type        = string
   description = "Email of service account that will be allowed to manage instances through the instance group"

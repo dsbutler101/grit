@@ -41,6 +41,10 @@ variable "scale_max" {
   type = number
 }
 
+variable "max_use_count" {
+  type = number
+}
+
 variable "executor" {
   type = string
 }
@@ -93,4 +97,8 @@ variable "enable_metrics_export" {
 variable "metrics_export_endpoint" {
   type        = string
   description = "GitLab runner metrics export endpoint"
+}
+
+variable "default_docker_image" {
+  type = string
 }

@@ -10,17 +10,18 @@
   - "**/*.lock.hcl"
   - "**/*.go"
   - "go.*"
+  - ".golangci.yml"
   - "{scripts}/**/*"
 
 .docs-patterns: &docs-patterns
   - ".vale.ini"
   - ".markdownlint-cli2.yaml"
-  - "docs/**/*"
-  - "scripts/lint-docs"
+  - "**/*.md"
+  - "scripts/lint-docs.sh"
 
 .ci-image-patterns: &ci-image-patterns
   - dockerfiles/ci/**
-  - Makefile.image-ci.mk
+  - Makefile.ci-image.mk
   - .gitlab/ci/11_build_ci_image.gitlab-ci.yml
 
 ##############
@@ -42,12 +43,19 @@
     - <<: *if-merge-request-pipeline
     - <<: *if-default-branch
 
-.rules:merge_request_pipelines:no_docs:
+.rules:merge_request_pipelines:code:
   rules:
     - <<: *if-merge-request-pipeline
       changes: *code-backstage-patterns
     - <<: *if-default-branch
       changes: *code-backstage-patterns
+
+.rules:merge_request_pipelines:docs:
+  rules:
+    - <<: *if-merge-request-pipeline
+      changes: *docs-patterns
+    - <<: *if-default-branch
+      changes: *docs-patterns
 
 .rules:merge_request_pipelines:build-ci-image:
   rules:

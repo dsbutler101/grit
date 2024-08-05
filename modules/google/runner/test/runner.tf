@@ -40,6 +40,7 @@ module "runner" {
 
   runners_global_section = var.runners_global_section
   runners_docker_section = var.runners_docker_section
+  default_docker_image   = var.default_docker_image
 
   fleeting_googlecompute_plugin_version = var.fleeting_googlecompute_plugin_version
   fleeting_instance_group_name          = var.fleeting_instance_group_name

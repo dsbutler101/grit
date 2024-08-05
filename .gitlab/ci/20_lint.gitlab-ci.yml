@@ -1,25 +1,36 @@
 terraform formatting:
   stage: lint
   extends:
-    - .rules:merge_request_pipelines:no_docs
+    - .rules:merge_request_pipelines:code
   script:
-    - terraform fmt -check -recursive
+    - make terraform-fmt-check
 
-terraform variables:
+terraform lint:
   stage: lint
   extends:
-    - .rules:merge_request_pipelines:no_docs
+    - .rules:merge_request_pipelines:code
     - .go-cache
   script:
-    - go test -tags lint .
+    - make lint-terraform
 
 docs lint markdown:
-  image: registry.gitlab.com/gitlab-org/gitlab-docs/lint-markdown:alpine-3.19-vale-3.0.7-markdownlint-0.39.0-markdownlint2-0.12.1
+  image: registry.gitlab.com/gitlab-org/gitlab-docs/lint-markdown:alpine-3.20-vale-3.6.1-markdownlint2-0.13.0-lychee-0.15.1
   stage: lint
   extends:
-    - .rules:merge_request_pipelines
+    - .rules:merge_request_pipelines:docs
     - .no_cache_and_dependencies
   needs: []
+  variables:
+    VALE_MIN_ALERT_LEVEL: error
   script:
     # Lint prose and Markdown
-    - scripts/lint-docs.sh VALE_MIN_ALERT_LEVEL=error
+    - make lint-docs
+
+golang lint:
+  image: registry.gitlab.com/gitlab-org/ci-cd/runner-tools/runner-linters:1.59.1-go1.22.5-alpine
+  stage: lint
+  extends:
+    - .rules:merge_request_pipelines:code
+    - .go-cache
+  script:
+    - make lint-go

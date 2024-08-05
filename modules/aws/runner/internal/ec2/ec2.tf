@@ -23,6 +23,7 @@ locals {
         owner       = "root:root"
         permissions = "0755"
         content = templatefile("${path.module}/config.toml", {
+          concurrent              = var.scale_max * var.capacity_per_instance
           gitlab_url              = var.gitlab.url
           runner_token            = var.gitlab.runner_token
           aws_asg_name            = var.fleeting.autoscaling_group_name
@@ -30,11 +31,14 @@ locals {
           executor                = var.executor
           idle_count              = var.scale_min * var.capacity_per_instance
           scale_max               = var.scale_max
+          max_use_count           = var.max_use_count
           privileged              = var.privileged
           region                  = var.region
           enable_metrics_export   = var.enable_metrics_export
           metrics_export_endpoint = var.metrics_export_endpoint
           aws_plugin_version      = var.aws_plugin_version
+          capacity_per_instance   = var.capacity_per_instance
+          default_docker_image    = var.default_docker_image
         })
       }
       ],

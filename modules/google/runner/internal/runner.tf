@@ -84,6 +84,7 @@ data "cloudinit_config" "config" {
 
             runners_global_section = var.runners_global_section
             runners_docker_section = var.runners_docker_section
+            default_docker_image   = var.default_docker_image
 
             fleeting_google_project      = var.google_project
             fleeting_google_zone         = var.google_zone
@@ -125,6 +126,7 @@ resource "google_compute_instance" "runner-manager" {
   }
 
   labels = var.labels
+  zone   = var.google_zone
 
   tags = [
     local.runner_manager_tag

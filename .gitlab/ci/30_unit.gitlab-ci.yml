@@ -2,11 +2,10 @@ unit tests:
   stage: unit
   needs: []
   extends:
-    - .rules:merge_request_pipelines:no_docs
+    - .rules:merge_request_pipelines:code
     - .go-cache
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   script:
     - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
-    - cd modules
-    - go test ./... -v
+    - make test

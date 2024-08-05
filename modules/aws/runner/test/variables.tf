@@ -40,6 +40,12 @@ variable "scale_max" {
   default     = 10
 }
 
+variable "max_use_count" {
+  description = "The maximum number of times an instance can be used before it is scheduled for removal"
+  type        = number
+  default     = 10
+}
+
 variable "idle_percentage" {
   description = "The number of idle instances to maintain as a percentage of the current number of busy instances"
   type        = number
@@ -61,6 +67,13 @@ variable "privileged" {
   description = "When using docker - whether to run docker in privileged mode"
   type        = bool
   default     = false
+}
+
+variable "default_docker_image" {
+  type        = string
+  description = "When using docker - Default image to use in jobs that don't specify it explicitely"
+
+  default = "ubuntu:latest"
 }
 
 variable "region" {

@@ -44,7 +44,7 @@
 
 %{ if use_docker }
   [runners.docker]
-    image = "alpine:latest"
+    image = "${default_docker_image}"
 
 %{ if runners_docker_section != "" }
     ${runners_docker_section}

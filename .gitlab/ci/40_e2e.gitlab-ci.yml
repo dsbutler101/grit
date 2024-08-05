@@ -2,9 +2,21 @@ e2e:prod:aws:
   stage: e2e
   needs: []
   extends:
-    - .rules:merge_request_pipelines:no_docs
+    - .rules:merge_request_pipelines:code
     - .go-cache
   resource_group: e2e-prod-aws
   script:
-    - cd e2e/aws
-    - go test . -tags e2e -timeout 30m
+    - go test ./e2e/aws -tags e2e -timeout 30m
+
+e2e:prod:google:
+  stage: e2e
+  needs: []
+  extends:
+    - .rules:merge_request_pipelines:code
+    - .go-cache
+  resource_group: e2e-prod-google
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+  script:
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+    - go test ./e2e/google -tags e2e -timeout 1h

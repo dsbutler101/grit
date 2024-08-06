@@ -20,7 +20,7 @@ locals {
       namespace = var.namespace
     }
     data = {
-      runner-registration-token = base64encode(var.token)
+      runner-token = base64encode(var.token)
     }
   })
 }

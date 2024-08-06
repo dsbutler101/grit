@@ -22,6 +22,7 @@ variable "labels" {
 variable "name" {
   description = "The name for the cluster, the runner and other created infra"
   type        = string
+  default     = "grit-gitlab-runner"
 }
 
 variable "node_count" {

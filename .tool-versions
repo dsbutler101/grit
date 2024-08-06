@@ -1,4 +1,6 @@
 golang 1.22.5
 golangci-lint 1.59.1
-terraform 1.7.0
 vale 3.6.1
+
+# do not blindly bump the terraform version, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/issues/94
+terraform 1.5.7

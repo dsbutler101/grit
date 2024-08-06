@@ -4,7 +4,7 @@ e2e:prod:aws:
   extends:
     - .rules:merge_request_pipelines:code
     - .go-cache
-  resource_group: e2e-prod-aws
+  resource_group: e2e-prod
   script:
     - go test ./e2e/aws -tags e2e -timeout 30m
 
@@ -14,7 +14,7 @@ e2e:prod:google:
   extends:
     - .rules:merge_request_pipelines:code
     - .go-cache
-  resource_group: e2e-prod-google
+  resource_group: e2e-prod
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   script:

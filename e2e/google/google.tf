@@ -32,8 +32,8 @@ module "vpc" {
   google_region = var.google_region
 
   subnetworks = {
-    runner-manager    = "10.0.0.0/29"
-    ephemeral-runners = "10.1.0.0/21"
+    "${var.name}-runner-manager"    = "10.0.0.0/29"
+    "${var.name}-ephemeral-runners" = "10.1.0.0/21"
   }
 }
 

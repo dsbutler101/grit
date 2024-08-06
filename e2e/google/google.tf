@@ -42,7 +42,7 @@ module "fleeting" {
   metadata = local.metadata
   vpc = {
     id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids["ephemeral-runners"]
+    subnet_id = module.vpc.subnetwork_ids["${var.name}-ephemeral-runners"]
   }
 
   fleeting_service      = "gce"
@@ -50,7 +50,7 @@ module "fleeting" {
   google_zone           = var.google_zone
   service_account_email = module.iam.service_account_email
   machine_type          = "n2d-standard-2"
-  manager_subnet_cidr   = module.vpc.subnetwork_cidrs["runner-manager"]
+  manager_subnet_cidr   = module.vpc.subnetwork_cidrs["${var.name}-runner-manager"]
 
 }
 
@@ -65,7 +65,7 @@ module "runner" {
 
   vpc = {
     id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids["runner-manager"]
+    subnet_id = module.vpc.subnetwork_ids["${var.name}-runner-manager"]
   }
 
   gitlab_url   = local.gitlab.url

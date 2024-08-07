@@ -47,3 +47,9 @@ variable "runner_description" {
   type        = string
   default     = "default GitLab Runner"
 }
+
+variable "config_template" {
+  description = "A config.toml template provided to configure the runner"
+  type        = string
+  default     = ""
+}

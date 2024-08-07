@@ -63,6 +63,7 @@ module "runner" {
   metadata  = local.metadata
   namespace = module.operator.namespace
   gitlab    = module.gitlab
+  config_template = var.config_template
 
   depends_on = [module.operator]
 }

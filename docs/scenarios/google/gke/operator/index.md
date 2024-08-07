@@ -1023,6 +1023,7 @@ Variables can be:
 | `gitlab_project_id`      | `string`                                                 | yes       |                          | The GitLab project ID to register the Runner to.                                           |
 | `node_count`             | `string`                                                 | no        | 1                        | The number of nodes to deploy the GKE cluster with.                                        |
 | `runner_description`     | `string`                                                 | no        | "default GitLab Runner"  | The description of the deployed Runner, visible on the GitLab Runner configuration page.   |
+| `config_template`        | `string`                                                 | yes       |                          | A configuration TOML template provided to configure the runner.                            |
 | `subnet_cidr`            | `string`                                                 | no        | 10.0.0.0/10              | The CIDR for the subnetwork the GKE cluster will be deployed on.                           |
 <!-- end: input vars -->
 

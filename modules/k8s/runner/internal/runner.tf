@@ -1,5 +1,5 @@
 locals {
-  config_template_name = format("%s-%s","config-template",var.name)
+  config_template_name = format("%s-%s", "config-template", var.name)
   manifest = yamlencode({
     apiVersion = "apps.gitlab.com/v1beta2"
     kind       = "Runner"

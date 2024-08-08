@@ -148,7 +148,7 @@ a variables file. Read more about [how to use input variables with Terraform](ht
 
 #### Simple example, deployed using GitLab CI
 
-To quickest way to get started is to follow the [Docker Autoscaler EC2 - deployed with GitLab CI](../../../../examples/docker-autoscaler-ec2-deployed-with-gitlab-ci/) example. This will get you a semi-production ready autoscaling GitLab runner, deployed using GitLab CI with a remote Terraform state file, in under 10 mins.
+To quickest way to get started is to follow the [Docker Autoscaler EC2 - deployed with GitLab CI](../../../../examples/docker-autoscaler-ec2-deployed-with-gitlab-ci) example. This will get you a semi-production ready autoscaling GitLab runner, deployed using GitLab CI with a remote Terraform state file, in under 10 mins.
 
 #### Simple example with local deployment
 

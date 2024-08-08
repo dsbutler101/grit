@@ -23,7 +23,7 @@ This IAM policy is provided as an example and usage comes at your own risk. The 
 
 ### Add `main.tf` file
 
-The GRIT configuration is used from [`aws/linux/docker-autoscaler-default`](../../scenarios/aws/linux/docker-autoscaler-default/) scenario in the "runner-deployment" module as such `source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default"`
+The GRIT configuration is used from [`aws/linux/docker-autoscaler-default`](../../scenarios/aws/linux/docker-autoscaler-default) scenario in the "runner-deployment" module as such `source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default"`
 
 Steps:
 
@@ -31,7 +31,7 @@ Steps:
 1. Copy content from `./main.tf`
 1. Change the `gitlab_project_id` to your project
 
-### Add `gitlab-ci.yml` file
+### Add `.gitlab-ci.yml` file
 
 We are now adding a GitLab CI configuration, to build, test, and deploy the runner infrastructure using a GitLab-managed state file.
 

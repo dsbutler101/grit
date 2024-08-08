@@ -1,9 +1,3 @@
----
-stage: Verify
-group: Runner
-info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://handbook.gitlab.com/handbook/product/ux/technical-writing/#assignments
----
-
 # Scenario: AWS - Linux - Docker Autoscaler default
 
 This scenario template deploys GitLab Runner to AWS, with configuration
@@ -19,7 +13,7 @@ To use this scenario, you must have:
 
 - [Terraform prerequisites](../../../index.md#prerequisites)
 - [AWS prerequisites](../../../index.md)
-- Terraform 1.5 or later to use Terraform features and syntax specific to this scenario
+- Terraform 1.5 or later
 
 ### IAM Role
 
@@ -42,10 +36,6 @@ Below, the list of AWS services used and the recommended IAM policy.
 
 #### IAM Policy
 
-**Disclaimer**
-
-This IAM policy is provided as an example only and not intended for direct production use.
-
 User's responsibility: 
 
 - Review, test, and modify this policy to align with your company's security policies and requirements
@@ -53,206 +43,7 @@ User's responsibility:
 - Regular maintenance: Conduct periodic audits and updates to maintain security as your needs evolve
 - Best practices: Consult your security team and AWS documentation for current IAM policy best practices
 
-The author and contributors are not responsible for any security issues arising from the use or misuse of this policy.
-
-Always apply the principle of least privilege when working with IAM policies.
-
-```yaml
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:DescribeScalingActivities",
-                "ec2:CreateTags",
-                "ec2:DeleteKeyPair",
-                "ec2:DescribeImages",
-                "ec2:DescribeInstanceCreditSpecifications",
-                "ec2:DescribeInstanceTypes",
-                "ec2:DescribeInstances",
-                "ec2:DescribeInternetGateways",
-                "ec2:DescribeKeyPairs",
-                "ec2:DescribeLaunchTemplateVersions",
-                "ec2:DescribeLaunchTemplates",
-                "ec2:DescribeNetworkAcls",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DescribeRouteTables",
-                "ec2:DescribeSecurityGroups",
-                "ec2:DescribeSubnets",
-                "ec2:DescribeTags",
-                "ec2:DescribeVolumes",
-                "ec2:DescribeVpcs",
-                "ec2:DisassociateRouteTable",
-                "sts:GetCallerIdentity",
-                "iam:ListAccessKeys",
-                "iam:DeleteUser",
-                "iam:DeletePolicy",
-                "iam:ListUsers",
-                "iam:ListUserPolicies",
-                "iam:GetUserPolicy",
-                "iam:GetUser",
-                "iam:CreateUser",
-                "iam:RemoveUserFromGroup",
-                "iam:AddUserToGroup",
-                "iam:UpdateUser",
-                "iam:AttachUserPolicy",
-                "iam:DeleteUserPolicy",
-                "iam:DetachUserPolicy",
-                "iam:TagUser",
-                "iam:TagRole",
-                "iam:UntagPolicy",
-                "iam:UntagRole",
-                "iam:UntagUser",
-                "iam:TagPolicy",
-                "ec2:CreateLaunchTemplateVersion",
-                "ec2:CreateLaunchTemplate",
-                "ec2:DeleteLaunchTemplate",
-                "ec2:DeleteLaunchTemplateVersions",
-                "ec2:ModifyLaunchTemplate"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "autoscaling:CreateAutoScalingGroup",
-                "autoscaling:DeleteAutoScalingGroup",
-                "autoscaling:SetInstanceProtection",
-                "autoscaling:UpdateAutoScalingGroup"
-            ],
-            "Resource": "arn:aws:autoscaling:*:${Account}:*:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DescribeInstanceAttribute",
-                "ec2:ModifyInstanceAttribute",
-                "ec2:RunInstances",
-                "ec2:TerminateInstances"
-            ],
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AttachInternetGateway",
-                "ec2:CreateInternetGateway",
-                "ec2:DeleteInternetGateway",
-                "ec2:DetachInternetGateway"
-            ],
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "ec2:ImportKeyPair",
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:CreateLaunchTemplate",
-                "ec2:DeleteLaunchTemplate"
-            ],
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "ec2:RunInstances",
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AssociateRouteTable",
-                "ec2:CreateRoute",
-                "ec2:CreateRouteTable",
-                "ec2:DeleteRoute",
-                "ec2:DeleteRouteTable"
-            ],
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AuthorizeSecurityGroupEgress",
-                "ec2:AuthorizeSecurityGroupIngress",
-                "ec2:CreateSecurityGroup",
-                "ec2:DeleteSecurityGroup",
-                "ec2:RevokeSecurityGroupEgress",
-                "ec2:RunInstances"
-            ],
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:CreateSubnet",
-                "ec2:DeleteSubnet",
-                "ec2:ModifySubnetAttribute",
-                "ec2:RunInstances"
-            ],
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AttachInternetGateway",
-                "ec2:CreateRouteTable",
-                "ec2:CreateSubnet",
-                "ec2:CreateVpc",
-                "ec2:DeleteVpc",
-                "ec2:DescribeVpcAttribute",
-                "ec2:DetachInternetGateway",
-                "ec2:ModifyVpcAttribute"
-            ],
-            "Resource": "arn:aws:ec2:*:${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "ec2:RunInstances",
-            "Resource": "arn:aws:ec2:*::*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "iam:CreatePolicy",
-                "iam:GetPolicy",
-                "iam:GetPolicyVersion",
-                "iam:ListPolicyVersions"
-            ],
-            "Resource": "arn:aws:iam::${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "iam:CreateServiceLinkedRole",
-            "Resource": "arn:aws:iam::${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "iam:AttachUserPolicy",
-                "iam:CreateAccessKey",
-                "iam:CreateUser",
-                "iam:DeleteAccessKey",
-                "iam:DetachUserPolicy",
-                "iam:GetUser",
-                "iam:ListAttachedUserPolicies",
-                "iam:ListGroupsForUser"
-            ],
-            "Resource": "arn:aws:iam::${Account}:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "ssm:GetParameters",
-            "Resource": "arn:aws:ssm:*:${Account}:*"
-        }
-    ]
-}
-```
+Always apply the principle of least privilege when working with IAM policies. We provide an example in [IAM Policy](../../../../examples/docker-autoscaler-ec2-deployed-with-gitlab-ci/index.md#prepare-aws-account)] which can be used as a reference.
 
 ## Variables
 
@@ -355,7 +146,13 @@ or commit it to any version control system. Instead, it should be passed
 to Terraform as a variable, as an environment variable, with the CLI flag or
 a variables file. Read more about [how to use input variables with Terraform](https://developer.hashicorp.com/terraform/language/values/variables#assigning-values-to-root-module-variables).
 
-**Simple example**
+#### Simple example, deployed using GitLab CI
+
+To quickest way to get started is to follow the [Docker Autoscaler EC2 - deployed with GitLab CI](../../../../examples/docker-autoscaler-ec2-deployed-with-gitlab-ci/) example. This will get you a semi-production ready autoscaling GitLab runner, deployed using GitLab CI with a remote Terraform state file, in under 10 mins.
+
+#### Simple example with local deployment
+
+To see how to apply this example locally with Terraform CLI, see [deploy locally with terraform CLI](../../../index.md#deploy-locally-with-terraform-cli).
 
 ```terraform
 terraform {
@@ -379,11 +176,6 @@ locals {
   aws_zone = "us-east-1b"
 }
 
-variable "runner_token" {
-  type      = string
-  sensitive = true
-}
-
 # Valid project id
 # How to get the project id? https://docs.gitlab.com/ee/user/project/working_with_projects.html#access-the-project-overview-page-by-using-the-project-id
 variable "gitlab_project_id" {
@@ -394,19 +186,13 @@ variable "gitlab_project_id" {
 module "runner-deployment" {
   # Pointing to GRIT's AWS Docker Autoscaler Scenario
   # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
-  source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default?ref=aws-docker-autoscaler-scenario"
+  source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default"
 
-  # Needs to match the aws_region (default to us-east-1)
-  aws_zone          = local.aws_zone
   gitlab_project_id = var.gitlab_project_id
-
-  ephemeral_runner = {
-    source_image = "ami-00fcafc06ad915f51"
-  }
 }
 ```
 
-**Advanced example**
+#### Advanced example
 
 ```terraform
 terraform {
@@ -484,61 +270,3 @@ EOS
 EOS
 }
 ```
-
-### Terraform execution
-
-When the Terraform code is ready, in the directory where the `*.tf` files are created,
-complete the following steps to execute the Terraform code:
-
-#### Initialize
-
-Use the `init` call to initialize the directory that contains the Terraform configuration files.
-The `init` call downloads all providers and external modules referenced by the code.:
-
-```shell
-terraform init
-```
-
-You must run this command when:
-
-- You first use Terraform in this directory.
-- Version definitions in `terraform` block are changed.
-- The GRIT code has been updated.
-
-#### Plan
-
-Use the `plan` call to compare the local Terraform state stored in the file with the
-resources in AWS.
-
-```shell
-terraform plan -var runner_token="your-glrt-runner-token" -out plan.out
-```
-
-The `plan` call prints all changes that will be provisioned and stores them
-in the `plan.out` file that you use in the last step to execute Terraform.
-
-The value for `runner_token` variable is passed with the flag, `-var runner_token="glrt-runner-token-here"`.
-Alternatively, you can export a `TF_VAR_runner_token="glrt-runner-token-here"` before
-you run the `plan` call, for example:
-
-```shell
-export TF_VAR_runner_token="glrt-runner-token-here"
-terraform plan -out plan.out
-```
-
-#### Apply the plan
-
-Use the `apply` call to execute runner provisioning steps in the `plan.out` file. Runner
-provisioning is executed with calls to the AWS API.
-
-```shell
-terraform apply plan.out
-```
-
-### Access to the runner manager instance
-
-After the `terraform apply` step is finished, Terraform prints defined outputs.
-In the advanced and simple examples, Terraform prints the external IP of the
-instance where runner manager was deployed.
-
-This instance can be now accessed with SSH.

@@ -30,7 +30,12 @@ variable "gitlab_project_id" {
 module "runner-deployment" {
   # Pointing to GRIT's AWS Docker Autoscaler Scenario
   # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
-  source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default"
+  
+  # If you add GRIT to your repository
+  source = "../../scenarios/aws/linux/docker-autoscaler-default"
+
+  # Uncomment if you instead want to use remote source
+  # source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default"
 
   gitlab_project_id = var.gitlab_project_id
 }

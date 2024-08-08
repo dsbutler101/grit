@@ -10,10 +10,10 @@ terraform {
       version = "~> 4.0"
     }
   }
-  # Delete this if you don't want to use GitLab-managed Terraform state
+  # Uncomment if you want to use GitLab-managed Terraform state - reccomended if deployed with GitLab CI
   # Documentation: https://docs.gitlab.com/ee/administration/terraform_state.html
-  backend "http" {
-  }
+  # backend "http" {
+  # }
 }
 
 locals {

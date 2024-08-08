@@ -10,30 +10,11 @@ terraform {
       version = "~> 4.0"
     }
   }
-    # Delete this if you don't want to use GitLab-managed Terraform state
-    # Documentation: https://docs.gitlab.com/ee/administration/terraform_state.html
-    backend "http" {
-    }
-}
-
-terraform {
-  # Uses the gitlab terraform provider to manage terraform
-  required_providers {
-    gitlab = {
-      source  = "gitlabhq/gitlab"
-      version = ">=17.0.0"
-    }
-    tls = {
-      source  = "hashicorp/tls"
-      version = "~> 4.0"
-    }
-  }
   # Delete this if you don't want to use GitLab-managed Terraform state
   # Documentation: https://docs.gitlab.com/ee/administration/terraform_state.html
   backend "http" {
   }
 }
-
 
 locals {
   aws_zone = "us-east-1b"

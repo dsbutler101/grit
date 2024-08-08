@@ -30,6 +30,7 @@ Steps:
 1. Add `main.tf` file
 1. Copy content from `./main.tf`
 1. Change the `gitlab_project_id` to your project
+1. Uncomment the terraform backend, if you want to use the GitLab-managed state file, and avoid conflicts
 
 ### Add `.gitlab-ci.yml` file
 

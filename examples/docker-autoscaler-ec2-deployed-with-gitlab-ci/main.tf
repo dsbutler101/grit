@@ -10,10 +10,10 @@ terraform {
       version = "~> 4.0"
     }
   }
-  # Delete if you don't want to use GitLab-managed Terraform state - reccomended if deployed with GitLab CI
+  # Uncomment to use GitLab-managed Terraform state - reccomended if deployed with GitLab CI
   # Documentation: https://docs.gitlab.com/ee/administration/terraform_state.html
-  backend "http" {
-  }
+  # backend "http" {
+  # }
 }
 
 locals {
@@ -24,12 +24,12 @@ locals {
 # How to get the project id? https://docs.gitlab.com/ee/user/project/working_with_projects.html#access-the-project-overview-page-by-using-the-project-id
 variable "gitlab_project_id" {
   type      = string
-  sensitive = false
 }
 
 module "runner-deployment" {
   # Pointing to GRIT's AWS Docker Autoscaler Scenario
   # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
+  
   # If you add GRIT to your repository
   source = "../../scenarios/aws/linux/docker-autoscaler-default"
 

@@ -15,20 +15,12 @@ terraform {
   # }
 }
 
-locals {
-  aws_zone = "us-east-1b"
-}
-
-variable "gitlab_project_id" {
-  type        = string
-  description = "The GitLab project ID where the Terraform code is being executed."
-}
-
 module "runner-deployment" {
   source = "../../scenarios/aws/linux/docker-autoscaler-default"
 
-  # Uncomment if you instead want to use remote source
+  # Uncomment if you instead want to use remote source instead
   # source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default"
 
-  gitlab_project_id = var.gitlab_project_id
+  # Change to your project ID
+  gitlab_project_id = "48756626"
 }

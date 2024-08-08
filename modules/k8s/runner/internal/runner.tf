@@ -1,5 +1,5 @@
 locals {
-  config_template_name = format("%s-%s", "config-template", var.name)
+  config_template_name = format("%s-%s", var.name, "config-template")
   manifest = yamlencode({
     apiVersion = "apps.gitlab.com/v1beta2"
     kind       = "Runner"
@@ -11,7 +11,7 @@ locals {
       gitlabUrl = var.url
       token     = var.name
       locked    = true
-      config    = local.config_template_name
+      config    = var.config_template == "" ? null : local.config_template_name
     }
   })
   token_secret = yamlencode({
@@ -43,6 +43,7 @@ resource "kubectl_manifest" "token_secret" {
 }
 
 resource "kubectl_manifest" "config_template" {
+  count     = var.config_template == "" ? 0 : 1
   yaml_body = local.config_template
 }
 

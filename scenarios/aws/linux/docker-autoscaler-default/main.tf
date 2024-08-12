@@ -1,0 +1,95 @@
+module "vpc" {
+  source   = "../../../../modules/aws/vpc/prod"
+  metadata = local.metadata
+
+  zone = var.aws_zone
+
+  cidr        = "10.0.0.0/16"
+  subnet_cidr = "10.0.0.0/24"
+}
+
+module "iam" {
+  source = "../../../../modules/aws/iam/prod"
+
+  metadata = local.metadata
+}
+
+module "ami_lookup" {
+  source   = "../../../../modules/aws/ami_lookup/prod"
+  use_case = "aws-linux-ephemeral"
+  region   = var.aws_region
+  metadata = local.metadata
+}
+
+module "fleeting" {
+  source = "../../../../modules/aws/fleeting/prod"
+
+  metadata = local.metadata
+
+  service = "ec2"
+  os      = "linux"
+
+  vpc = {
+    id        = module.vpc.id
+    subnet_id = module.vpc.subnet_id
+  }
+
+  security_group_ids = [module.security_groups.fleeting.id]
+
+  instance_type = var.ephemeral_runner.machine_type
+  ami           = var.ephemeral_runner.source_image != "" ? var.ephemeral_runner.source_image : module.ami_lookup.ami_id
+  scale_min     = var.autoscaling_policy.scale_min
+  scale_max     = var.max_instances
+
+}
+
+module "runner" {
+  source = "../../../../modules/aws/runner/prod"
+
+  metadata = local.metadata
+
+  vpc = {
+    id        = module.vpc.id
+    subnet_id = module.vpc.subnet_id
+  }
+  iam = {
+    fleeting_access_key_id     = module.iam.fleeting_access_key_id
+    fleeting_secret_access_key = module.iam.fleeting_secret_access_key
+  }
+  fleeting = {
+    ssh_key_pem_name       = module.fleeting.ssh_key_pem_name
+    ssh_key_pem            = module.fleeting.ssh_key_pem
+    autoscaling_group_name = module.fleeting.autoscaling_group_name
+  }
+  gitlab = {
+    runner_token = module.gitlab.runner_token
+    url          = module.gitlab.url
+  }
+
+  service               = "ec2"
+  executor              = "docker-autoscaler"
+  scale_min             = var.autoscaling_policy.scale_min
+  scale_max             = var.max_instances
+  idle_percentage       = var.autoscaling_policy.scale_factor
+  capacity_per_instance = var.capacity_per_instance
+
+  security_group_ids = [module.security_groups.runner_manager.id]
+}
+
+module "security_groups" {
+  source   = "../../../../modules/aws/security_groups/prod"
+  metadata = local.metadata
+
+  vpc_id = module.vpc.id
+
+}
+
+module "gitlab" {
+  source   = "../../../../modules/gitlab/prod"
+  metadata = local.metadata
+
+  url                = var.gitlab_url
+  project_id         = var.gitlab_project_id
+  runner_description = var.runner_description
+  runner_tags        = var.runner_tags
+}

@@ -44,4 +44,4 @@ Steps:
 
 ### Commit changes & Test
 
-Once you have commited your changes, your CI/CD pipeline should be created based off the `.gitlab-ci.yml` configuration, and allow you to deplot your first `GRIT` runner.
+Once you have committed your changes, your CI/CD pipeline should be created based off the `.gitlab-ci.yml` configuration, and allow you to deploy your first `GRIT` runner.

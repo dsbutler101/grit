@@ -12,4 +12,5 @@ module "gke_runner" {
   gitlab_pat         = var.gitlab_pat
   gitlab_project_id  = var.gitlab_project_id
   runner_description = var.runner_description
+  config_template    = var.config_template
 }

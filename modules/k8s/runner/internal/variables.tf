@@ -13,3 +13,7 @@ variable "name" {
 variable "namespace" {
   type = string
 }
+
+variable "config_template" {
+  type = string
+}

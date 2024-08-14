@@ -1,4 +1,5 @@
 locals {
+  config_template_name = format("%s-%s", var.name, "config-template")
   manifest = yamlencode({
     apiVersion = "apps.gitlab.com/v1beta2"
     kind       = "Runner"
@@ -10,6 +11,7 @@ locals {
       gitlabUrl = var.url
       token     = var.name
       locked    = true
+      config    = var.config_template == "" ? null : local.config_template_name
     }
   })
   token_secret = yamlencode({
@@ -20,7 +22,18 @@ locals {
       namespace = var.namespace
     }
     data = {
-      runner-registration-token = base64encode(var.token)
+      runner-token = base64encode(var.token)
+    }
+  })
+  config_template = yamlencode({
+    apiVersion = "v1"
+    kind       = "ConfigMap"
+    metadata = {
+      name      = local.config_template_name
+      namespace = var.namespace
+    }
+    data = {
+      "config.toml" = var.config_template
     }
   })
 }
@@ -28,9 +41,16 @@ locals {
 resource "kubectl_manifest" "token_secret" {
   yaml_body = local.token_secret
 }
+
+resource "kubectl_manifest" "config_template" {
+  count     = var.config_template == "" ? 0 : 1
+  yaml_body = local.config_template
+}
+
 resource "kubectl_manifest" "manifest" {
   yaml_body = local.manifest
   depends_on = [
-    kubectl_manifest.token_secret
+    kubectl_manifest.token_secret,
+    kubectl_manifest.config_template
   ]
 }

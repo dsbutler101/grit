@@ -49,7 +49,13 @@ variable "gitlab_project_id" {
 }
 
 variable "runner_description" {
-  description = "The description of the GitLab runner instance"
+  description = "The description of the GitLab Runner instance"
   type        = string
-  default     = "GRIT deployed GitLab runner on GKE"
+  default     = "GRIT deployed runner on GKE"
+}
+
+variable "config_template" {
+  description = "The config.toml template to use for the runner"
+  type        = string
+  default     = ""
 }

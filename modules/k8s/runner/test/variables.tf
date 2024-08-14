@@ -25,3 +25,7 @@ variable "name_override" {
 variable "namespace" {
   type = string
 }
+
+variable "config_template" {
+  type = string
+}

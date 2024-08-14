@@ -1019,10 +1019,11 @@ Variables can be:
 | `labels`                 | `map(string)`                                            | no        |                          | Arbitrary list of `key=value` pairs that are added as labels to resources created by GRIT. |
 | `google_region`          | `string`                                                 | yes       |                          | Google Cloud region chosen for the deployment.                                             |
 | `google_zone`            | `string`                                                 | yes       |                          | Google Cloud zone chosen for the deployment.                                               |
-| `gitlab_pat`             | `string`                                                 | yes       |                          | GitLab Personal Access token, which allows creating a Runner Registration token.           |
-| `gitlab_project_id`      | `string`                                                 | yes       |                          | The GitLab project ID to register the Runner to.                                           |
-| `node_count`             | `string`                                                 | no        | 1                        | The number of nodes to deploy the GKE cluster with.                                        |
-| `runner_description`     | `string`                                                 | no        | "default GitLab Runner"  | The description of the deployed Runner, visible on the GitLab Runner configuration page.   |
+| `gitlab_pat`             | `string`                                                 | yes       |                          | GitLab personal access token, which allows creating a runner token.                        |
+| `gitlab_project_id`      | `string`                                                 | yes       |                          | The GitLab project ID to register the runner to.                                           |
+| `node_count`             | `string`                                                 | no        | 1                        | The number of nodes you need when you deploy the GKE cluster.                              |
+| `runner_description`     | `string`                                                 | no        | "default GitLab Runner"  | The description of the deployed runner, visible on the GitLab Runner configuration page.   |
+| `config_template`        | `string`                                                 | yes       |                          | A configuration TOML template provided to configure the runner.                            |
 | `subnet_cidr`            | `string`                                                 | no        | 10.0.0.0/10              | The CIDR for the subnetwork the GKE cluster will be deployed on.                           |
 <!-- end: input vars -->
 

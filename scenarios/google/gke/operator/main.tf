@@ -60,9 +60,10 @@ module "gitlab" {
 module "runner" {
   source = "../../../../modules/k8s/runner/test/"
 
-  metadata  = local.metadata
-  namespace = module.operator.namespace
-  gitlab    = module.gitlab
+  metadata        = local.metadata
+  namespace       = module.operator.namespace
+  gitlab          = module.gitlab
+  config_template = var.config_template
 
   depends_on = [module.operator]
 }

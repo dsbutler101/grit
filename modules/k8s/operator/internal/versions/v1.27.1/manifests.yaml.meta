@@ -1,0 +1,5 @@
+{
+  "releaseTag": "v1.27.1",
+  "releaseName": "v1.27.1",
+  "source": "https://gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/-/releases/v1.27.1/downloads/operator.k8s.yaml"
+}

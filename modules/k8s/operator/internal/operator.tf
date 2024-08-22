@@ -39,6 +39,15 @@ locals {
   }
 }
 
+module "check-supported-versions" {
+  source = "../../../internal/validation/is_one_of"
+
+  value   = var.operator_version
+  allowed = keys(local.supported_versions)
+  disable = var.override_manifests != ""
+  prefix  = "Operator version"
+}
+
 resource "kubectl_manifest" "operator_resources" {
   for_each = {
     for n, m in local.operator_manifests : n => yamlencode(m)

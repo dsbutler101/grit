@@ -63,6 +63,12 @@ module "runner" {
   metadata        = local.metadata
   namespace       = module.operator.namespace
   gitlab          = module.gitlab
+  concurrent      = var.concurrent
+  check_interval  = var.check_interval
+  locked          = var.locked
+  protected       = var.protected
+  run_untagged    = var.run_untagged
+  runner_tags     = var.runner_tags
   config_template = var.config_template
 
   depends_on = [module.operator]

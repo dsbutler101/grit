@@ -6,7 +6,7 @@ import (
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
-func TestK8sRunnerWithConfigTemplate(t *testing.T) {
+func TestK8sRunner(t *testing.T) {
 	testCases := map[string]struct {
 		vars            map[string]any
 		expectedModules []string

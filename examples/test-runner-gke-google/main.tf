@@ -12,5 +12,11 @@ module "gke_runner" {
   gitlab_pat         = var.gitlab_pat
   gitlab_project_id  = var.gitlab_project_id
   runner_description = var.runner_description
+  concurrent         = var.concurrent
+  check_interval     = var.check_interval
+  locked             = var.locked
+  protected          = var.protected
+  run_untagged       = var.run_untagged
+  runner_tags        = var.runner_tags
   config_template    = var.config_template
 }

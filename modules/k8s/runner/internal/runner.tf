@@ -8,10 +8,15 @@ locals {
       namespace = var.namespace
     }
     spec = {
-      gitlabUrl = var.url
-      token     = var.name
-      locked    = true
-      config    = var.config_template == "" ? null : local.config_template_name
+      gitlabUrl   = var.url
+      token       = var.name
+      locked      = var.locked
+      protected   = var.protected
+      tags        = join(",", var.runner_tags)
+      runUntagged = length(var.runner_tags) == 0 ? true : var.run_untagged
+      interval    = var.check_interval
+      concurrent  = var.concurrent
+      config      = var.config_template == "" ? null : local.config_template_name
     }
   })
   token_secret = yamlencode({
@@ -36,6 +41,13 @@ locals {
       "config.toml" = var.config_template
     }
   })
+
+  config_template_check = length(var.config_template) == 0 || (length(var.config_template) > 0 && strcontains(var.config_template, "[[runners]]"))
+}
+
+module "check_config_template" {
+  source  = "../../../internal/validation/fail_validation"
+  message = local.config_template_check ? "" : "The config template must contains the definition of a [[runners]]."
 }
 
 resource "kubectl_manifest" "token_secret" {

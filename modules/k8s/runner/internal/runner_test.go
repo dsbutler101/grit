@@ -7,39 +7,78 @@ import (
 )
 
 func TestK8sRunnerWithConfigTemplate(t *testing.T) {
-	plan := test_tools.Plan(t, map[string]any{
-		"url":       "some-gitlab-url",
-		"token":     "some-runner-registration-token",
-		"namespace": "some-runner-namespace",
-		"name":      "some-runner-name",
-		"config_template": `shutdown_timeout = 100
-[[runners]]
-    [runners.kubernetes]
-    image = "alpine"`,
-	})
+	testCases := map[string]struct {
+		vars            map[string]any
+		expectedModules []string
+		wantErr         bool
+	}{
+		"runner with config template": {
+			vars: map[string]any{
+				"url":             "some-gitlab-url",
+				"token":           "some-runner-registration-token",
+				"namespace":       "some-runner-namespace",
+				"name":            "some-runner-name",
+				"concurrent":      5,
+				"check_interval":  10,
+				"locked":          false,
+				"protected":       false,
+				"run_untagged":    true,
+				"runner_tags":     []string{},
+				"config_template": "[[runners]]\\n		[runners.kubernetes]\\n		image=\\\"alpine\\\"",
+			},
+			expectedModules: []string{
+				"kubectl_manifest.manifest",
+				"kubectl_manifest.token_secret",
+				"kubectl_manifest.config_template[0]",
+			},
+		},
+		"runner with faulty config template": {
+			vars: map[string]any{
+				"url":             "some-gitlab-url",
+				"token":           "some-runner-registration-token",
+				"namespace":       "some-runner-namespace",
+				"name":            "some-runner-name",
+				"concurrent":      5,
+				"check_interval":  10,
+				"locked":          false,
+				"protected":       false,
+				"run_untagged":    true,
+				"runner_tags":     []string{},
+				"config_template": "image=\\\"alpine\\\"",
+			},
+			wantErr: true,
+		},
+		"runner without config template": {
+			vars: map[string]any{
+				"url":             "some-gitlab-url",
+				"token":           "some-runner-registration-token",
+				"namespace":       "some-runner-namespace",
+				"name":            "some-runner-name",
+				"concurrent":      5,
+				"check_interval":  10,
+				"locked":          false,
+				"protected":       false,
+				"run_untagged":    true,
+				"runner_tags":     []string{},
+				"config_template": "",
+			},
+			expectedModules: []string{
+				"kubectl_manifest.manifest",
+				"kubectl_manifest.token_secret",
+			},
+		},
+	}
 
-	test_tools.AssertProviderConfigExists(t, plan, "kubectl")
+	for tn, tc := range testCases {
+		t.Run(tn, func(t *testing.T) {
+			if tc.wantErr {
+				test_tools.PlanAndAssertError(t, tc.vars, tc.wantErr)
+				return
+			}
 
-	test_tools.AssertWithPlan(t, plan, []string{
-		"kubectl_manifest.manifest",
-		"kubectl_manifest.token_secret",
-		"kubectl_manifest.config_template[0]",
-	})
-}
-
-func TestK8sRunnerWithoutConfigTemplate(t *testing.T) {
-	plan := test_tools.Plan(t, map[string]any{
-		"url":             "some-gitlab-url",
-		"token":           "some-runner-registration-token",
-		"namespace":       "some-runner-namespace",
-		"name":            "some-runner-name",
-		"config_template": "",
-	})
-
-	test_tools.AssertProviderConfigExists(t, plan, "kubectl")
-
-	test_tools.AssertWithPlan(t, plan, []string{
-		"kubectl_manifest.manifest",
-		"kubectl_manifest.token_secret",
-	})
+			plan := test_tools.Plan(t, tc.vars)
+			test_tools.AssertProviderConfigExists(t, plan, "kubectl")
+			test_tools.AssertWithPlan(t, plan, tc.expectedModules)
+		})
+	}
 }

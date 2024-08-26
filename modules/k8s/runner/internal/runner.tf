@@ -47,7 +47,7 @@ locals {
 
 module "check_config_template" {
   source  = "../../../internal/validation/fail_validation"
-  message = local.config_template_check ? "" : "The config template must contains the definition of a [[runners]]."
+  message = local.config_template_check ? "" : "The config template must contain the definition of [[runners]]."
 }
 
 resource "kubectl_manifest" "token_secret" {

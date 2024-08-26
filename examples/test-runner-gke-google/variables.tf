@@ -84,13 +84,13 @@ variable "protected" {
 
 variable "runner_tags" {
   type        = list(string)
-  description = "Specify if jobs without tags should be run. When no runner_tags are set, it will always be true, else it will default to false"
+  description = "List of tags to be applied to the runner"
   default     = []
 }
 
 variable "run_untagged" {
   type        = bool
-  description = "List of comma separated tags to be applied to the runner"
+  description = "Specify if jobs without tags should be run. When no runner_tags are set, it will always be true, else it will default to false"
   default     = false
 }
 

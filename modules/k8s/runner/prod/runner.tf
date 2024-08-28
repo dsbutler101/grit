@@ -1,3 +1,20 @@
+#######################
+# METADATA VALIDATION #
+#######################
+
+module "validate-support" {
+  source   = "../../../internal/validation/support"
+  use_case = "k8s-operator-runner"
+  use_case_support = tomap({
+    "k8s-operator-runner" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
+##########################
+# K8S RUNNER PROD MODULE #
+##########################
+
 module "runner" {
   source = "../internal/"
 

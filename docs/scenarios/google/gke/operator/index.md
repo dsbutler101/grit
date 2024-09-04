@@ -1012,20 +1012,45 @@ Variables can be:
 
 - **Complex**: Variables are either lists, maps, or objects, or combination of these types.
 
+Note: In addition to this scenario's input variables, some of the Google provider's configuration can also be set via environment variables,
+see [the provider default configurations for more details](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#provider-default-values-configuration).
+
 <!-- begin: input vars -->
-| Name                     | Type                                                     | Required? | Default value            | Description                                                                                |
-|--------------------------|----------------------------------------------------------|-----------|--------------------------|--------------------------------------------------------------------------------------------|
-| `name`                   | `string`                                                 | yes       |                          | Name of the deployment. Must be unique in scope of a Google Cloud project.                 |
-| `labels`                 | `map(string)`                                            | no        |                          | Arbitrary list of `key=value` pairs that are added as labels to resources created by GRIT. |
-| `google_region`          | `string`                                                 | yes       |                          | Google Cloud region chosen for the deployment.                                             |
-| `google_zone`            | `string`                                                 | yes       |                          | Google Cloud zone chosen for the deployment.                                               |
-| `gitlab_pat`             | `string`                                                 | yes       |                          | GitLab personal access token, which allows creating a runner token.                        |
-| `gitlab_project_id`      | `string`                                                 | yes       |                          | The GitLab project ID to register the runner to.                                           |
-| `node_count`             | `string`                                                 | no        | 1                        | The number of nodes you need when you deploy the GKE cluster.                              |
-| `runner_description`     | `string`                                                 | no        | "default GitLab Runner"  | The description of the deployed runner, visible on the GitLab Runner configuration page.   |
-| `config_template`        | `string`                                                 | yes       |                          | A configuration TOML template provided to configure the runner.                            |
-| `subnet_cidr`            | `string`                                                 | no        | 10.0.0.0/10              | The CIDR for the subnetwork the GKE cluster will be deployed on.                           |
+| Name                     | Type                                                     | Required? | Default value           | Description                                                                                |
+|--------------------------|----------------------------------------------------------|-----------|-------------------------|--------------------------------------------------------------------------------------------|
+| `name`                   | `string`                                                 | yes       |                         | Name of the deployment. Must be unique in scope of a Google Cloud project.                 |
+| `labels`                 | `map(string)`                                            | no        |                         | Arbitrary list of `key=value` pairs that are added as labels to resources created by GRIT. |
+| `google_region`          | `string`                                                 | yes       |                         | Google Cloud region chosen for the deployment.                                             |
+| `google_zone`            | `string`                                                 | yes       |                         | Google Cloud zone chosen for the deployment.                                               |
+| `gitlab_pat`             | `string`                                                 | yes       |                         | GitLab personal access token, which allows creating a runner token.                        |
+| `gitlab_project_id`      | `string`                                                 | yes       |                         | The GitLab project ID to register the runner to.                                           |
+| `node_pools`             | `string`                                                 | no        | map(node_pools)         | The configuration required for each node pool added to the GKE cluster.                    |
+| `runner_description`     | `string`                                                 | no        | "default GitLab Runner" | The description of the deployed runner, visible on the GitLab Runner configuration page.   |
+| `config_template`        | `string`                                                 | yes       |                         | A configuration TOML template provided to configure the runner.                            |
+| `subnet_cidr`            | `string`                                                 | no        | 10.0.0.0/10             | The CIDR for the subnetwork the GKE cluster will be deployed on.                           |
 <!-- end: input vars -->
+
+### `node_pools` object
+
+| Name                     | Type                                                     | Required? | Default value           | Description                                                                                |
+|--------------------------|----------------------------------------------------------|-----------|-------------------------|--------------------------------------------------------------------------------------------|
+| `node_count`             | `number`                                                 | no        | 1                       | The number of nodes you need when you deploy the GKE cluster.                              |
+| `node_config`            | `map(any)`                                               | no        |                         | Parameters used in creating the node pool.                                                 |
+
+### `node_config` object
+
+This object configures the node group, thus each node, created and added to the GKE cluster.
+The currently supported configs can be seen in the [gke module's variable declaration](../../../../modules/google/gke/internal/variables.tf),
+and are documented in [container_cluster node_config documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster#nested_node_config).
+
+Notes:
+
+- All nodes created with the `google/gke` module are:
+  - tagged with `gke-node` & `grit-gke` in addition to the tags configured in `node_config.tags`.
+  - labeled with the module's `labels` in addition to the labels configured in `node_config.labels`.
+- Following config are set when not explicitly set on `node_config`:
+  - `oauth_scopes`: defaults to `["https://www.googleapis.com/auth/logging.write", "https://www.googleapis.com/auth/monitoring"]`.
+  - `metadata`: defaults to `{disable-legacy-endpoints = "true"}`.
 
 ## Usage
 
@@ -1111,6 +1136,18 @@ module "gke_runner" {
   gitlab_pat         = var.gitlab_pat
   gitlab_project_id  = "123121213"
   runner_description = "my new GRIT runner"
+
+  node_pools = {
+    "default" = {
+      node_count = 1,
+      node_config = {
+        machine_type = "e2-medium",
+        disk_size_gb = 100,
+        disk_type    = "pd-standard",
+        image_type   = "cos_containerd",
+      }
+    }
+  }
 }
 ```
 

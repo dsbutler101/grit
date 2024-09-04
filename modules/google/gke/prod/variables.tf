@@ -30,22 +30,17 @@ variable "google_zone" {
   description = "The Google Cloud zone in which to create your cluster"
 }
 
-variable "nodes_count" {
-  type        = string
-  description = "The number of GKE nodes in your cluster"
-  default     = 3
-}
-
-variable "node_machine_type" {
-  type        = string
-  description = "Machine type of cluster nodes"
-  default     = "n2d-standard-2"
-}
-
 variable "deletion_protection" {
   type        = bool
   description = "Set deletion protection for the cluster"
   default     = true
+}
+
+variable "node_pools" {
+  type = map(object({
+    node_count  = optional(number)
+    node_config = optional(map(any), {})
+  }))
 }
 
 ##############

@@ -36,7 +36,7 @@ module "cluster" {
   google_region = var.google_region
 
   google_zone = var.google_zone
-  nodes_count = var.node_count
+  node_pools  = var.node_pools
 
   vpc = local.vpc
 

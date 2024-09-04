@@ -20,10 +20,11 @@ variable "labels" {
   default     = {}
 }
 
-variable "node_count" {
-  description = "Number of nodes for the GKE cluster"
-  type        = number
-  default     = 1
+variable "node_pools" {
+  type = map(object({
+    node_count  = optional(number)
+    node_config = optional(map(any), {})
+  }))
 }
 
 variable "name" {

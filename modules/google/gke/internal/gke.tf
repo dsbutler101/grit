@@ -46,6 +46,11 @@ resource "google_container_node_pool" "node_pool" {
     oauth_scopes = each.value.node_config.oauth_scopes
     metadata     = each.value.node_config.metadata
   }
+
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
 }
 
 # Needed to provide access token in the outputs

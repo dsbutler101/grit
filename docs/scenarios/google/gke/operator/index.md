@@ -1012,8 +1012,8 @@ Variables can be:
 
 - **Complex**: Variables are either lists, maps, or objects, or combination of these types.
 
-Note: In addition to this scenario's input variables, some of the Google provider's configuration can also be set via environment variables,
-see [the provider default configurations for more details](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#provider-default-values-configuration).
+You can also set some of the Google Cloud provider configuration by using environment variables.
+See the [provider default configurations](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#provider-default-values-configuration) for more details.
 
 <!-- begin: input vars -->
 | Name                     | Type                                                     | Required? | Default value           | Description                                                                                |
@@ -1035,13 +1035,13 @@ see [the provider default configurations for more details](https://registry.terr
 | Name                     | Type                                                     | Required? | Default value           | Description                                                                                |
 |--------------------------|----------------------------------------------------------|-----------|-------------------------|--------------------------------------------------------------------------------------------|
 | `node_count`             | `number`                                                 | no        | 1                       | The number of nodes you need when you deploy the GKE cluster.                              |
-| `node_config`            | `map(any)`                                               | no        |                         | Parameters used in creating the node pool.                                                 |
+| `node_config`            | `map(any)`                                               | no        |                         | Parameters used to create the node pool.                                                   |
 
 ### `node_config` object
 
-This object configures the node group, thus each node, created and added to the GKE cluster.
-The currently supported configs can be seen in the [gke module's variable declaration](../../../../modules/google/gke/internal/variables.tf),
-and are documented in [container_cluster node_config documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster#nested_node_config).
+This object configures the node group. It creates and adds each node to the GKE cluster.
+See [gke module's variable declaration](../../../../modules/google/gke/internal/variables.tf) for the currently supported configuration.
+See [container_cluster node_config documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster#nested_node_config) for more details.
 
 Notes:
 

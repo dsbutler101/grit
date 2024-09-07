@@ -55,6 +55,7 @@ module "gitlab" {
   metadata           = local.metadata
   project_id         = var.gitlab_project_id
   runner_description = var.runner_description
+  runner_tags        = var.runner_tags
 }
 
 module "runner" {

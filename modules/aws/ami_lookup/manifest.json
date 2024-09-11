@@ -1,113 +1,225 @@
 {
   "linux-amd64-ephemeral": {
     "ap-south-1": {
-      "id": "ami-00164d7bcde8dbee1",
+      "id": "ami-0b2fffec2cb169b35",
       "name": "ubuntu",
+      "region": "ap-south-1",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "ap-south-1",
-      "deprecation_time": "2026-07-17T16:19:49.000Z",
+      "deprecation_time": "2026-09-11T15:46:00.000Z",
       "public": true
     },
     "ap-southeast-1": {
-      "id": "ami-00e45153f5e1bd2f2",
+      "id": "ami-0e40c68a826564993",
       "name": "ubuntu",
+      "region": "ap-southeast-1",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "ap-southeast-1",
-      "deprecation_time": "2026-07-17T16:19:48.000Z",
+      "deprecation_time": "2026-09-11T15:45:59.000Z",
       "public": true
     },
     "ap-southeast-2": {
-      "id": "ami-03a21bbf513fc3a65",
+      "id": "ami-08949d6b0e23e8041",
       "name": "ubuntu",
+      "region": "ap-southeast-2",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "ap-southeast-2",
-      "deprecation_time": "2026-07-17T16:19:44.000Z",
+      "deprecation_time": "2026-09-11T15:46:01.000Z",
       "public": true
     },
     "ca-central-1": {
-      "id": "ami-033ce41b8328a368d",
+      "id": "ami-0320b7e8bc62531a7",
       "name": "ubuntu",
+      "region": "ca-central-1",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "ca-central-1",
-      "deprecation_time": "2026-07-17T16:19:44.000Z",
+      "deprecation_time": "2026-09-11T15:45:58.000Z",
       "public": true
     },
     "eu-central-1": {
-      "id": "ami-09ff80a90c66f73ef",
+      "id": "ami-0088a56ac70e37fc9",
       "name": "ubuntu",
+      "region": "eu-central-1",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "eu-central-1",
-      "deprecation_time": "2026-07-17T16:19:46.000Z",
+      "deprecation_time": "2026-09-11T15:45:59.000Z",
       "public": true
     },
     "eu-west-1": {
-      "id": "ami-097c94275f44a4d04",
+      "id": "ami-0e33c26ae97f4b7ce",
+      "name": "ubuntu",
+      "region": "eu-west-1",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "name": "ubuntu",
-      "region": "eu-west-1",
-      "deprecation_time": "2026-07-17T16:19:46.000Z",
+      "deprecation_time": "2026-09-11T15:46:00.000Z",
       "public": true
     },
     "eu-west-2": {
-      "id": "ami-0cc15667cd29891a2",
+      "id": "ami-0117827288ff81261",
       "name": "ubuntu",
+      "region": "eu-west-2",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "eu-west-2",
-      "deprecation_time": "2026-07-17T16:19:44.000Z",
+      "deprecation_time": "2026-09-11T15:45:59.000Z",
       "public": true
     },
     "us-east-1": {
-      "id": "ami-00f9e4f804d9763ce",
+      "id": "ami-0625d9437946ccd67",
       "name": "ubuntu",
+      "region": "us-east-1",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "us-east-1",
-      "deprecation_time": "2026-07-17T16:19:43.000Z",
+      "deprecation_time": "2026-09-11T15:45:57.000Z",
       "public": true
     },
     "us-east-2": {
-      "id": "ami-014deb658250fd368",
+      "id": "ami-0a16592fe7e71cc69",
       "name": "ubuntu",
+      "region": "us-east-2",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "us-east-2",
-      "deprecation_time": "2026-07-17T16:19:42.000Z",
+      "deprecation_time": "2026-09-11T15:45:58.000Z",
       "public": true
     },
     "us-west-1": {
-      "id": "ami-0a93e50fd58298007",
+      "id": "ami-06b1231865aaf69e2",
       "name": "ubuntu",
+      "region": "us-west-1",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
-      "region": "us-west-1",
-      "deprecation_time": "2026-07-17T16:19:42.000Z",
+      "deprecation_time": "2026-09-11T15:45:57.000Z",
       "public": true
     },
     "us-west-2": {
-      "id": "ami-0a7a99b25fbb596fe",
+      "id": "ami-083892fc5e6c5c027",
       "name": "ubuntu",
+      "region": "us-west-2",
       "os": "linux",
       "arch": "amd64",
       "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:45:57.000Z",
+      "public": true
+    }
+  },
+  "linux-arm64-ephemeral": {
+    "ap-south-1": {
+      "id": "ami-007f26e978d7209ed",
+      "name": "ubuntu",
+      "region": "ap-south-1",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:28.000Z",
+      "public": true
+    },
+    "ap-southeast-1": {
+      "id": "ami-0160c596f2d467893",
+      "name": "ubuntu",
+      "region": "ap-southeast-1",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:18.000Z",
+      "public": true
+    },
+    "ap-southeast-2": {
+      "id": "ami-04c54e4b94e006c2d",
+      "name": "ubuntu",
+      "region": "ap-southeast-2",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:15.000Z",
+      "public": true
+    },
+    "ca-central-1": {
+      "id": "ami-01baaf8d54505f340",
+      "name": "ubuntu",
+      "region": "ca-central-1",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:25.000Z",
+      "public": true
+    },
+    "eu-central-1": {
+      "id": "ami-0a3d0ae4d6f109074",
+      "name": "ubuntu",
+      "region": "eu-central-1",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:31.000Z",
+      "public": true
+    },
+    "eu-west-1": {
+      "id": "ami-0884465ea0ca6e301",
+      "name": "ubuntu",
+      "region": "eu-west-1",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:14.000Z",
+      "public": true
+    },
+    "eu-west-2": {
+      "id": "ami-0cadd5b4287f4fcc7",
+      "name": "ubuntu",
+      "region": "eu-west-2",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:15.000Z",
+      "public": true
+    },
+    "us-east-1": {
+      "id": "ami-0a0b16856630f10d1",
+      "name": "ubuntu",
+      "region": "us-east-1",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:12.000Z",
+      "public": true
+    },
+    "us-east-2": {
+      "id": "ami-0c6a1d9fba1a47184",
+      "name": "ubuntu",
+      "region": "us-east-2",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:15.000Z",
+      "public": true
+    },
+    "us-west-1": {
+      "id": "ami-0cf51815376da5cc8",
+      "name": "ubuntu",
+      "region": "us-west-1",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:27.000Z",
+      "public": true
+    },
+    "us-west-2": {
+      "id": "ami-0364c45e03de32c86",
+      "name": "ubuntu",
       "region": "us-west-2",
-      "deprecation_time": "2026-07-17T16:19:44.000Z",
+      "os": "linux",
+      "arch": "arm64",
+      "role": "ephemeral",
+      "deprecation_time": "2026-09-11T15:47:16.000Z",
       "public": true
     }
   }

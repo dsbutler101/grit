@@ -4,9 +4,10 @@
 
 module "validate-support" {
   source   = "../../../internal/validation/support"
-  use_case = var.use_case
+  use_case = local.use_case
   use_case_support = tomap({
-    "aws-linux-ephemeral" = "experimental"
+    "linux-amd64-ephemeral" = "experimental"
+    "linux-arm64-ephemeral" = "experimental"
   })
   min_support = var.metadata.min_support
 }

@@ -21,8 +21,39 @@ variable "metadata" {
 #################
 
 variable "use_case" {
-  description = "The use case for the AMI"
+  description = "The use case for the AMI. DEPRECATED: use os, arch and role instead."
   type        = string
+  default     = ""
+}
+
+variable "os" {
+  description = "The AMI operating system"
+  type        = string
+  default     = ""
+  validation {
+    condition     = contains(["", "linux"], var.os)
+    error_message = "Variable `os` must be `linux`"
+  }
+}
+
+variable "arch" {
+  description = "The AMI architecture"
+  type        = string
+  default     = ""
+  validation {
+    condition     = contains(["", "amd64", "arm64"], var.arch)
+    error_message = "Variable `arch` must be `amd64` or `arm64"
+  }
+}
+
+variable "role" {
+  description = "The role of the AMI"
+  type        = string
+  default     = ""
+  validation {
+    condition     = contains(["", "ephemeral"], var.role)
+    error_message = "Variable `role` must be `ephemeral`"
+  }
 }
 
 variable "region" {

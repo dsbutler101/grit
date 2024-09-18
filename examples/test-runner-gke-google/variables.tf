@@ -27,10 +27,7 @@ variable "name" {
 
 variable "node_pools" {
   description = "The configuration required for each node pool added to the GKE cluster"
-  type = map(object({
-    node_count  = optional(number)
-    node_config = optional(map(any), {})
-  }))
+  type        = map(any)
   default = {
     default = {}
   }

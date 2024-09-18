@@ -21,10 +21,7 @@ variable "labels" {
 }
 
 variable "node_pools" {
-  type = map(object({
-    node_count  = optional(number)
-    node_config = optional(map(any), {})
-  }))
+  type = map(any)
 }
 
 variable "name" {

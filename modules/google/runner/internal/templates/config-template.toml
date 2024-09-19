@@ -28,7 +28,7 @@
     [[runners.autoscaler.policy]]
       periods = [${policy.periods}]
 %{ if policy.timezone != "" }
-      timezone = ${policy.timezone}
+      timezone = "${policy.timezone}"
 %{ endif }
 
       idle_count = ${policy.idle_count}

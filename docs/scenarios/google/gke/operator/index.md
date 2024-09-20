@@ -1040,17 +1040,18 @@ See the [provider default configurations](https://registry.terraform.io/provider
 ### `node_config` object
 
 This object configures the node group. It creates and adds each node to the GKE cluster.
-See [gke module's variable declaration](../../../../modules/google/gke/internal/variables.tf) for the currently supported configuration.
-See [container_cluster node_config documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster#nested_node_config) for more details.
+
+For the current supported configuration, see [gke module's variable declaration](../../../../modules/google/gke/internal/variables.tf).
+For more details, see [container_cluster node_config documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster#nested_node_config).
 
 Notes:
 
 - All nodes created with the `google/gke` module are:
-  - tagged with `gke-node` & `grit-gke` in addition to the tags configured in `node_config.tags`.
-  - labeled with the module's `labels` in addition to the labels configured in `node_config.labels`.
-- Following config are set when not explicitly set on `node_config`:
-  - `oauth_scopes`: defaults to `["https://www.googleapis.com/auth/logging.write", "https://www.googleapis.com/auth/monitoring"]`.
-  - `metadata`: defaults to `{disable-legacy-endpoints = "true"}`.
+  - Tagged with `gke-node` and `grit-gke` in addition to the tags configured in `node_config.tags`.
+  - Labeled with the module's `labels` in addition to the labels configured in `node_config.labels`.
+- The following configurations are set when not explicitly set on `node_config`:
+  - `oauth_scopes`: Defaults to `["https://www.googleapis.com/auth/logging.write", "https://www.googleapis.com/auth/monitoring"]`.
+  - `metadata`: Defaults to `{disable-legacy-endpoints = "true"}`.
 
 ## Usage
 

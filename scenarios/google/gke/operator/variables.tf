@@ -20,10 +20,8 @@ variable "labels" {
   default     = {}
 }
 
-variable "node_count" {
-  description = "Number of nodes for the GKE cluster"
-  type        = number
-  default     = 1
+variable "node_pools" {
+  type = map(any)
 }
 
 variable "name" {

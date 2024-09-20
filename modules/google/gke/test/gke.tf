@@ -20,8 +20,7 @@ module "gke" {
   google_region = var.google_region
   google_zone   = var.google_zone
 
-  nodes_count       = var.nodes_count
-  node_machine_type = var.node_machine_type
+  node_pools = var.node_pools
 
   deletion_protection = var.deletion_protection
 

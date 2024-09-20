@@ -11,13 +11,19 @@ import (
 type moduleVars = map[string]any
 
 var defaultModuleVars = moduleVars{
-	"name":              test_tools.JobName(nil),
-	"google_region":     "us-east1",
-	"google_zone":       "us-east1-b",
-	"nodes_count":       10,
-	"node_machine_type": "e2-micro",
+	"name":          test_tools.JobName(nil),
+	"google_region": "us-east1",
+	"google_zone":   "us-east1-b",
 	"labels": map[string]string{
 		"some": "label",
+	},
+	"node_pools": map[string]any{
+		"default": map[string]any{
+			"node_count": 1,
+			"node_config": map[string]any{
+				"machine_type": "e2-micro",
+			},
+		},
 	},
 	"vpc": map[string]string{
 		"id":        "",
@@ -29,7 +35,7 @@ var defaultModuleVars = moduleVars{
 func TestGKE(t *testing.T) {
 	expectedModules := []string{
 		"google_container_cluster.primary",
-		"google_container_node_pool.primary_nodes",
+		`google_container_node_pool.node_pool["default"]`,
 	}
 
 	testCases := map[string]struct {

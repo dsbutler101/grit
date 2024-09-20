@@ -25,10 +25,12 @@ variable "name" {
   default     = "grit-gitlab-runner"
 }
 
-variable "node_count" {
-  description = "The GKE cluster's node count"
-  type        = number
-  default     = 1
+variable "node_pools" {
+  description = "The configuration required for each node pool added to the GKE cluster"
+  type        = map(any)
+  default = {
+    default = {}
+  }
 }
 
 variable "subnet_cidr" {

@@ -25,29 +25,31 @@ resource "google_container_cluster" "primary" {
   }
 }
 
-resource "google_container_node_pool" "primary_nodes" {
-  name     = var.name
+resource "google_container_node_pool" "node_pool" {
+  for_each = var.node_pools
+
+  name     = format("%s-%s", var.name, each.key)
   location = var.google_zone
 
   cluster = google_container_cluster.primary.id
   version = data.google_container_engine_versions.gke_version.release_channel_default_version[local.release_channel]
 
-  node_count = var.nodes_count
+  node_count = each.value.node_count
 
   node_config {
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/logging.write",
-      "https://www.googleapis.com/auth/monitoring",
-    ]
+    labels       = merge(var.labels, each.value.node_config.labels)
+    tags         = concat(local.node_tags, each.value.node_config.tags)
+    machine_type = each.value.node_config.machine_type
+    image_type   = each.value.node_config.image_type
+    disk_size_gb = each.value.node_config.disk_size_gb
+    disk_type    = each.value.node_config.disk_type
+    oauth_scopes = each.value.node_config.oauth_scopes
+    metadata     = each.value.node_config.metadata
+  }
 
-    labels = var.labels
-    tags   = local.node_tags
-
-    machine_type = var.node_machine_type
-
-    metadata = {
-      disable-legacy-endpoints = "true"
-    }
+  management {
+    auto_repair  = true
+    auto_upgrade = true
   }
 }
 

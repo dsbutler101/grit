@@ -39,12 +39,44 @@ variable "google_zone" {
   type = string
 }
 
-variable "nodes_count" {
-  type = string
+###########################
+# NODE POOL CONFIGURATION #
+###########################
+
+variable "node_pools" {
+  type = map(object({
+    node_count = optional(number, 1)
+    node_config = optional(object({
+      labels = optional(map(string))
+      tags   = optional(list(string), [])
+      oauth_scopes = optional(list(string), [
+        "https://www.googleapis.com/auth/logging.write",
+        "https://www.googleapis.com/auth/monitoring"
+      ])
+      metadata = optional(map(string), {
+        disable-legacy-endpoints = "true"
+      })
+      machine_type = optional(string)
+      image_type   = optional(string, "cos_containerd")
+      disk_size_gb = optional(number)
+      disk_type    = optional(string)
+    }), {})
+  }))
+
+  validation {
+    condition     = length(var.node_pools) > 0
+    error_message = "at least one node pool needs to be configured"
+  }
 }
 
-variable "node_machine_type" {
-  type = string
+module "validate-image-type" {
+  source = "../../../internal/validation/is_one_of"
+
+  for_each = var.node_pools
+
+  value   = each.value.node_config.image_type
+  allowed = ["cos_containerd", "cos", "ubuntu_containerd", "ubuntu", "windows_ltsc_containerd", "windows_ltsc", "windows_sac_containerd", "windows_sac"]
+  prefix  = "Image type for node pool ${each.key}"
 }
 
 variable "vpc" {

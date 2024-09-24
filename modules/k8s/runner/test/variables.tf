@@ -71,3 +71,21 @@ variable "config_template" {
   description = "A config.toml template provided to configure the runner"
   default     = ""
 }
+
+variable "runner_image" {
+  type        = string
+  description = "The container image for the GitLab Runner manager"
+  default     = ""
+}
+
+variable "helper_image" {
+  type        = string
+  description = "The container image for the GitLab Runner helper"
+  default     = ""
+}
+
+variable "pod_spec_patches" {
+  type        = any
+  description = "A JSON or YAML format string that describes the changes which must be applied to the final PodSpec object before it is generated."
+  default     = []
+}

@@ -52,3 +52,32 @@ variable "config_template" {
   type        = string
   description = "A config.toml template provided to configure the runner"
 }
+
+variable "runner_image" {
+  type        = string
+  description = "The container image for the GitLab Runner manager"
+}
+
+variable "helper_image" {
+  type        = string
+  description = "The container image for the GitLab Runner helper"
+}
+
+variable "pod_spec_patches" {
+  type = list(object({
+    name      = optional(string)
+    patch     = optional(string)
+    patchType = optional(string, "strategic")
+  }))
+  description = "A JSON or YAML format string that describes the changes which must be applied to the final PodSpec object before it is generated."
+
+  validation {
+    condition     = length([for patch in var.pod_spec_patches : true if patch.name != null && patch.name != ""]) == length(var.pod_spec_patches)
+    error_message = "All pod_spec_patches must have name parameter set with a non empty value."
+  }
+
+  validation {
+    condition     = length([for patch in var.pod_spec_patches : true if patch.patch != null && patch.patch != ""]) == length(var.pod_spec_patches)
+    error_message = "All pod_spec_patches must have patch parameter set with a non empty value."
+  }
+}

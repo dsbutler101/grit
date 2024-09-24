@@ -17,6 +17,9 @@ locals {
       interval    = var.check_interval
       concurrent  = var.concurrent
       config      = var.config_template == "" ? null : local.config_template_name
+      podSpec     = var.pod_spec_patches
+      runnerImage = var.runner_image
+      helperImage = var.helper_image
     }
   })
   token_secret = yamlencode({

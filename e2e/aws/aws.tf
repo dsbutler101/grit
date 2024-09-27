@@ -62,6 +62,12 @@ module "ami_lookup" {
   metadata = local.metadata
 }
 
+module "s3_cache" {
+  source                = "../../modules/aws/cache/prod"
+  metadata              = local.metadata
+  cache_object_lifetime = 2
+}
+
 module "runner" {
   source   = "../../modules/aws/runner/prod"
   metadata = local.metadata
@@ -69,6 +75,7 @@ module "runner" {
   iam      = local.iam
   fleeting = local.fleeting
   gitlab   = local.gitlab
+  s3_cache = local.s3_cache
 
   service               = "ec2"
   executor              = "docker-autoscaler"
@@ -102,6 +109,15 @@ locals {
   gitlab = {
     runner_token = var.runner_token
     url          = "https://gitlab.com"
+  }
+
+  s3_cache = {
+    enabled           = module.s3_cache.enabled
+    server_address    = module.s3_cache.server_address
+    bucket_name       = module.s3_cache.bucket_name
+    bucket_location   = module.s3_cache.bucket_location
+    access_key_id     = module.s3_cache.access_key_id
+    secret_access_key = module.s3_cache.secret_access_key
   }
 }
 

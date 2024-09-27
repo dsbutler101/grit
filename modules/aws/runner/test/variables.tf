@@ -179,3 +179,28 @@ variable "iam" {
   })
   default = {}
 }
+
+#########
+# CACHE #
+#########
+
+variable "s3_cache" {
+  description = "Output from the cache module. Or your own"
+  type = object({
+    enabled           = bool
+    server_address    = string
+    bucket_name       = string
+    bucket_location   = string
+    access_key_id     = string
+    secret_access_key = string
+  })
+
+  default = {
+    enabled           = false
+    server_address    = ""
+    bucket_name       = ""
+    bucket_location   = ""
+    access_key_id     = ""
+    secret_access_key = ""
+  }
+}

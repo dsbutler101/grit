@@ -37,6 +37,7 @@ module "ec2" {
   fleeting = var.fleeting
   iam      = var.iam
   vpc      = var.vpc
+  s3_cache = var.s3_cache
 
   executor                   = var.executor
   capacity_per_instance      = var.capacity_per_instance

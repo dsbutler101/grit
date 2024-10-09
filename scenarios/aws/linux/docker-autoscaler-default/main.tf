@@ -43,6 +43,12 @@ module "fleeting" {
 
 }
 
+module "cache" {
+  source = "../../../../modules/aws/cache/prod"
+
+  metadata = local.metadata
+}
+
 module "runner" {
   source = "../../../../modules/aws/runner/prod"
 
@@ -64,6 +70,14 @@ module "runner" {
   gitlab = {
     runner_token = module.gitlab.runner_token
     url          = module.gitlab.url
+  }
+  s3_cache = {
+    enabled           = module.cache.enabled
+    server_address    = module.cache.server_address
+    bucket_name       = module.cache.bucket_name
+    bucket_location   = module.cache.bucket_location
+    access_key_id     = module.cache.access_key_id
+    secret_access_key = module.cache.secret_access_key
   }
 
   service               = "ec2"

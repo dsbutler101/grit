@@ -29,6 +29,17 @@ variable "vpc" {
   })
 }
 
+variable "s3_cache" {
+  type = object({
+    enabled           = bool
+    server_address    = string
+    bucket_name       = string
+    bucket_location   = string
+    access_key_id     = string
+    secret_access_key = string
+  })
+}
+
 variable "capacity_per_instance" {
   type = number
 }

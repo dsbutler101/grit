@@ -49,3 +49,16 @@ listen_address = "${metrics_export_endpoint}"
             idle_count = ${idle_count}
             idle_time = "20m0s"
 %{ endif }
+
+%{ if s3_cache.enabled == true }
+    [runners.cache]
+        Type = "s3"
+        Shared = true
+        [runners.cache.s3]
+            ServerAddress = "${s3_cache.server_address}"
+            BucketName = "${s3_cache.bucket_name}"
+            BucketLocation = "${s3_cache.bucket_location}"
+            AccessKey = "${s3_cache.access_key_id}"
+            SecretKey = "${s3_cache.secret_access_key}"
+            Insecure = false
+%{ endif }

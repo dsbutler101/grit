@@ -1216,9 +1216,9 @@ terraform {
 }
 
 provider "kubectl" {
-  host                   = module.cluster.host
-  cluster_ca_certificate = module.cluster.ca_certificate
-  token                  = module.cluster.access_token
+  host                   = module.gke_runner_deployment.cluster_host
+  cluster_ca_certificate = module.gke_runner_deployment.cluster_ca_certificate
+  token                  = module.gke_runner_deployment.cluster_access_token
   load_config_file       = false
 }
 
@@ -1257,7 +1257,7 @@ variable "config_template" {
 }
 
 # Added available customisation
-module "gke-runner-deployment" {
+module "gke_runner_deployment" {
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/google/gke/default"
 
   name = "gke-gitlab-runner-auth-token"
@@ -1286,22 +1286,22 @@ module "gke-runner-deployment" {
 
 output "cluster_host" {
   description = "The GKE cluster's control plane URL"
-  value       = module.cluster.host
+  value       = module.gke_runner_deployment.cluster_host
 }
 
 output "cluster_ca_certificate" {
   description = "The GKE cluster's CA certificate"
-  value       = module.cluster.ca_certificate
+  value       = module.gke_runner_deployment.cluster_ca_certificate
 }
 
 output "cluster_access_token" {
   description = "The GKE cluster's admin token"
-  value       = module.cluster.access_token
+  value       = module.gke_runner_deployment.cluster_access_token
   sensitive   = true
 }
 
 output "supported_operator_versions" {
-  value = module.operator.supported_operator_versions
+  value = module.gke_runner_deployment.supported_operator_versions
 }
 ```
 

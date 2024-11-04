@@ -89,6 +89,7 @@ module "runner" {
   runners_docker_section = var.runners_docker_section
 
   machine_type = var.runner_machine_type
+  disk_type    = var.runner_disk_type
 
   concurrent     = var.concurrent
   check_interval = 3

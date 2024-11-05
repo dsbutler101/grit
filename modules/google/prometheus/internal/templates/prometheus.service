@@ -1,0 +1,24 @@
+[Unit]
+Description=Start Prometheus container
+After=docker.service docker.socket
+Wants=docker.service docker.socket
+
+[Service]
+Environment="HOME=/home/cloudservice"
+
+ExecStart=/usr/bin/docker run \
+            --rm \
+            --name=prometheus \
+            -p 127.0.0.1:9090:9090 \
+            -v /etc/prometheus:/etc/prometheus \
+            -v ${prometheus_volume}:/prometheus \
+            ${prometheus_image} \
+                --web.enable-admin-api \
+                --config.file=/etc/prometheus/config.yml \
+                --storage.tsdb.path=/prometheus \
+                --storage.tsdb.retention=7d
+
+ExecStop=/usr/bin/docker stop prometheus
+ExecStopPost=/usr/bin/docker rm prometheus
+
+TimeoutStopSec=30

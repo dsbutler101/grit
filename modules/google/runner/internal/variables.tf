@@ -18,6 +18,13 @@ variable "google_zone" {
   type = string
 }
 
+variable "node_exporter" {
+  type = object({
+    version = string
+    port    = number
+  })
+}
+
 variable "runner_version" {
   type = string
 }
@@ -54,8 +61,16 @@ variable "log_level" {
   type = string
 }
 
+// DEBRECATED: use runner_metrics_listener instead
 variable "listen_address" {
   type = string
+}
+
+variable "runner_metrics_listener" {
+  type = object({
+    address = string
+    port    = number
+  })
 }
 
 #
@@ -132,6 +147,22 @@ variable "autoscaling_policies" {
 #
 # VPC
 #
+
+variable "runner_manager_additional_firewall_rules" {
+  type = map(object({
+    direction = string
+    priority  = number
+    allow = optional(list(object({
+      protocol = string
+      ports    = list(number)
+    })), [])
+    deny = optional(list(object({
+      protocol = string
+      ports    = list(number)
+    })), [])
+    source_ranges = list(string)
+  }))
+}
 
 variable "vpc" {
   type = object({

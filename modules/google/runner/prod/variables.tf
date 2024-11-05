@@ -30,6 +30,16 @@ variable "google_zone" {
   description = "Google Cloud zone to use"
 }
 
+variable "node_exporter" {
+  description = "Configuration of Node Exporter to deploy on the runner instance"
+  type = object({
+    version = optional(string, "v1.8.2")
+    port    = optional(number, 9100)
+  })
+
+  default = {}
+}
+
 variable "machine_type" {
   type        = string
   description = "Machine type for runner manager instance"
@@ -88,11 +98,22 @@ variable "log_level" {
   default = "info"
 }
 
+// DEPRECATED: use runner_metrics_listener instead
 variable "listen_address" {
   type        = string
-  description = "Listener address for binding metrics and debug server to"
+  description = "Listener address for binding metrics and debug server to (DEPRECATED: use runner_metrics_listener instead)"
 
-  default = ":9252"
+  default = ""
+}
+
+variable "runner_metrics_listener" {
+  type = object({
+    address = optional(string, "0.0.0.0")
+    port    = optional(number, 9252)
+  })
+  description = "TCP address and port to which runner metrics and debug server listener should be attached"
+
+  default = {}
 }
 
 ########################
@@ -203,6 +224,24 @@ variable "autoscaling_policies" {
 #######
 # VPC #
 #######
+
+variable "runner_manager_additional_firewall_rules" {
+  type = map(object({
+    direction = string
+    priority  = number
+    allow = optional(list(object({
+      protocol = string
+      ports    = list(number)
+    })), [])
+    deny = optional(list(object({
+      protocol = string
+      ports    = list(number)
+    })), [])
+    source_ranges = list(string)
+  }))
+
+  default = {}
+}
 
 variable "vpc" {
   type = object({

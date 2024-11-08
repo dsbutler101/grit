@@ -1,5 +1,9 @@
 resource "google_compute_instance_template" "ephemeral-runner" {
-  name = var.name
+  name_prefix = "${var.name}-"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tags   = [local.ephemeral_runner_tag]
   labels = var.labels

@@ -13,6 +13,8 @@ func TestRunner(t *testing.T) {
 		"google_project_iam_custom_role.runner-manager",
 		"google_project_iam_member.runner-manager",
 		"google_compute_firewall.runner-manager-ssh-access",
+		`google_compute_firewall.additional-rules["test-allow"]`,
+		`google_compute_firewall.additional-rules["test-deny"]`,
 		"data.cloudinit_config.config",
 		"google_compute_instance.runner-manager",
 		"google_kms_key_ring.default",
@@ -28,19 +30,23 @@ func TestRunner(t *testing.T) {
 	}{
 		"create runner": {
 			moduleVars: map[string]interface{}{
-				"name":                                  name,
-				"labels":                                map[string]string{"env": "another place"},
-				"google_project":                        "example-project-a1b2c3",
-				"google_zone":                           "us-east1-b",
-				"runner_version":                        "v16.8.0",
-				"machine_type":                          "e2-micro",
-				"disk_size_gb":                          25,
-				"disk_type":                             "pd-standard",
-				"service_account_email":                 "service-account@example.com",
-				"concurrent":                            5,
-				"check_interval":                        10,
-				"log_level":                             "info",
-				"listen_address":                        ":9402",
+				"name":                  name,
+				"labels":                map[string]string{"env": "another place"},
+				"google_project":        "example-project-a1b2c3",
+				"google_zone":           "us-east1-b",
+				"runner_version":        "v16.8.0",
+				"machine_type":          "e2-micro",
+				"disk_size_gb":          25,
+				"disk_type":             "pd-standard",
+				"service_account_email": "service-account@example.com",
+				"concurrent":            5,
+				"check_interval":        10,
+				"log_level":             "info",
+				"listen_address":        ":9402",
+				"runner_metrics_listener": map[string]any{
+					"address": "0.0.0.0",
+					"port":    9402,
+				},
 				"gitlab_url":                            "https://gitlab.example.com",
 				"runner_token":                          "glrt-SOME_TOKEN",
 				"request_concurrency":                   5,
@@ -62,6 +68,42 @@ func TestRunner(t *testing.T) {
 						"idle_time":          "20m0s",
 						"scale_factor":       0.5,
 						"scale_factor_limit": 10,
+					},
+				},
+				"node_exporter": map[string]any{
+					"version": "latest",
+					"port":    9100,
+				},
+				"runner_manager_additional_firewall_rules": map[string]any{
+					"test-allow": map[string]any{
+						"direction": "INGRESS",
+						"priority":  1000,
+						"allow": []map[string]any{
+							{
+								"protocol": "tcp",
+								"ports":    []int{22},
+							},
+						},
+						"source_ranges": []string{
+							"0.0.0.0/0",
+						},
+					},
+					"test-deny": map[string]any{
+						"direction": "INGRESS",
+						"priority":  1000,
+						"deny": []map[string]any{
+							{
+								"protocol": "tcp",
+								"ports":    []int{53},
+							},
+							{
+								"protocol": "udp",
+								"ports":    []int{53},
+							},
+						},
+						"source_ranges": []string{
+							"0.0.0.0/0",
+						},
 					},
 				},
 				"vpc": map[string]string{

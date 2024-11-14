@@ -17,4 +17,17 @@ locals {
     scale_factor       = 0.2
     scale_factor_limit = 100
   }
+
+  runner_metrics_port = 9252
+  node_expoter_port   = 9100
+
+  subnetworks_base = {
+    runner-manager    = "10.0.0.0/29"
+    ephemeral-runners = "10.1.0.0/21"
+  }
+
+  subnetworks = merge(
+    local.subnetworks_base,
+    var.prometheus.enabled ? { prometheus : "10.0.0.8/29" } : {},
+  )
 }

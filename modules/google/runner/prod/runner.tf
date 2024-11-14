@@ -29,6 +29,8 @@ module "runner" {
   google_project = var.google_project
   google_zone    = var.google_zone
 
+  node_exporter = var.node_exporter
+
   service_account_email = var.service_account_email
   machine_type          = var.machine_type
   disk_type             = var.disk_type
@@ -38,7 +40,9 @@ module "runner" {
   concurrent     = var.concurrent
   check_interval = var.check_interval
   log_level      = var.log_level
-  listen_address = var.listen_address
+
+  runner_metrics_listener = var.runner_metrics_listener
+  listen_address          = var.listen_address
 
   gitlab_url          = var.gitlab_url
   runner_token        = var.runner_token
@@ -59,5 +63,6 @@ module "runner" {
   max_instances         = var.max_instances
   autoscaling_policies  = var.autoscaling_policies
 
-  vpc = var.vpc
+  runner_manager_additional_firewall_rules = var.runner_manager_additional_firewall_rules
+  vpc                                      = var.vpc
 }

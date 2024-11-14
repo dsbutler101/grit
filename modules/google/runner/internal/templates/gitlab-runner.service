@@ -4,14 +4,12 @@ After=docker.service docker.socket
 Wants=docker.service docker.socket
 
 [Service]
-Type=oneshot
-RemainAfterExit=true
-
 Environment="HOME=/home/cloudservice"
 
 ExecStart=/usr/bin/docker run \
             --rm \
             --name=gitlab-runner \
+            -p ${runner_metrics_port}:${runner_metrics_port} \
             -v /etc/gitlab-runner:/etc/gitlab-runner/ \
             -v /var/run/docker.sock:/var/run/docker.sock \
             --entrypoint /etc/gitlab-runner/entrypoint.sh \
@@ -19,6 +17,10 @@ ExecStart=/usr/bin/docker run \
             run \
             --user=gitlab-runner \
             --working-directory=/home/gitlab-runner
+
+%{ if runner_metrics_port != 0 }
+ExecStartPost=/sbin/iptables -A INPUT -p tcp -m tcp --dport ${runner_metrics_port} -j ACCEPT
+%{ endif }
 
 ExecStop=/usr/bin/docker stop gitlab-runner
 ExecStopPost=/usr/bin/docker rm gitlab-runner

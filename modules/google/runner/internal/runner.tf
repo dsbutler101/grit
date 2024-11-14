@@ -27,6 +27,13 @@ locals {
       var.concurrent < 900 ? local.runner_manager_machine_types_map.600 : local.runner_manager_machine_types_map.900
     )
   )
+
+  // These few lines are added to handle listen_address deprecation and backward compatibility
+  //
+  // DEPRECATED: we should switch to use runner_metrics_listener variable instead of listen_address
+  metrics_listen_address_and_port = split(":", var.listen_address)
+  metrics_listener_address        = var.listen_address != "" ? local.metrics_listen_address_and_port[0] : var.runner_metrics_listener.address
+  metrics_listener_port           = var.listen_address != "" ? local.metrics_listen_address_and_port[1] : var.runner_metrics_listener.port
 }
 
 data "cloudinit_config" "config" {
@@ -65,7 +72,7 @@ data "cloudinit_config" "config" {
             check_interval = var.check_interval
             log_level      = var.log_level
             log_format     = "text"
-            listen_address = var.listen_address
+            listen_address = "${local.metrics_listener_address}:${local.metrics_listener_port}"
           })
         },
         {
@@ -103,12 +110,25 @@ data "cloudinit_config" "config" {
           permissions = "0644"
           content = templatefile("${path.module}/templates/gitlab-runner.service", {
             gitlab_runner_image = "registry.gitlab.com/gitlab-org/gitlab-runner:alpine-${var.runner_version}"
+            runner_metrics_port = local.metrics_listener_port
+          })
+        },
+        {
+          path        = "/etc/systemd/system/node-exporter.service"
+          owner       = "root:root"
+          permissions = "0644"
+          content = templatefile("${path.module}/templates/node-exporter.service", {
+            node_exporter_image = "prom/node-exporter:${var.node_exporter.version}"
+            node_exporter_port  = var.node_exporter.port
           })
         },
       ]
 
       runcmd = [
         "systemctl daemon-reload",
+        "systemctl enable node-exporter.service",
+        "systemctl start node-exporter.service",
+        "systemctl enable gitlab-runner.service",
         "systemctl start gitlab-runner.service",
       ]
     })
@@ -125,8 +145,11 @@ resource "google_compute_instance" "runner-manager" {
     cos-update-strategy = "update_disabled"
   }
 
-  labels = var.labels
-  zone   = var.google_zone
+  labels = merge(var.labels, {
+    purpose = local.runner_manager_tag
+  })
+
+  zone = var.google_zone
 
   tags = [
     local.runner_manager_tag

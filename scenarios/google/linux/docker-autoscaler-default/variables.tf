@@ -104,3 +104,30 @@ variable "ephemeral_runner" {
     source_image = "projects/cos-cloud/global/images/family/cos-stable"
   }
 }
+
+variable "prometheus" {
+  type = object({
+    enabled = bool
+
+    mimir = optional(object({
+      url    = string
+      tenant = optional(string, "")
+    }))
+
+    external_labels = optional(map(string))
+
+    custom_relabel_configs = optional(list(object({
+      target_label  = string
+      source_labels = list(string)
+      regex         = optional(string, "(.*)")
+      replacement   = optional(string, "$1")
+      action        = optional(string, "replace")
+    })))
+
+    instance_labels_to_include = optional(list(string), [])
+  })
+
+  default = {
+    enabled = false
+  }
+}

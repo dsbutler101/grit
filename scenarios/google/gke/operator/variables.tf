@@ -1,6 +1,23 @@
+variable "name" {
+  description = "The name for the cluster, the runner and other created infra"
+  type        = string
+}
+
+variable "gitlab_project_id" {
+  description = "The GitLab project to register the runner for"
+  type        = string
+}
+
+variable "runner_description" {
+  description = "The description for the GitLab runner"
+  type        = string
+  default     = "default GitLab Runner"
+}
+
 variable "deletion_protection" {
   description = "Set deletion protection for the cluster"
   type        = bool
+  default     = true
 }
 
 variable "google_region" {
@@ -38,26 +55,19 @@ variable "autoscaling" {
       maximum       = number
     }))
   })
+
+  default = {
+    enabled                     = false
+    auto_provisioning_locations = []
+    autoscaling_profile         = ""
+    resource_limits             = []
+  }
 }
 
 variable "node_pools" {
   type = map(any)
-}
 
-variable "name" {
-  description = "The name for the cluster, the runner and other created infra"
-  type        = string
-}
-
-variable "gitlab_project_id" {
-  description = "The GitLab project to register the runner for"
-  type        = string
-}
-
-variable "runner_description" {
-  description = "The description for the GitLab runner"
-  type        = string
-  default     = "default GitLab Runner"
+  default = {}
 }
 
 ################################
@@ -130,6 +140,31 @@ variable "pod_spec_patches" {
   default     = []
 }
 
+variable "operator_version" {
+  type        = string
+  description = <<-EOF
+    The operator version to deploy. This should be specified in semantic version format
+    (e.g. 'v1.2.3') or set to 'latest' to use the most recent release.
+  EOF
+  default     = "latest"
+}
+
+variable "override_operator_manifests" {
+  type        = string
+  description = <<-EOT
+    Optional path to custom operator manifests. Supports the following formats:
+      - HTTP(S) URL (e.g., "https://example.com/custom-operator.yaml")
+      - Local file path with "file://" prefix (e.g., "file:///path/to/operator.yaml")
+      - If empty, uses the official GitLab Runner Operator manifest
+  EOT
+  default     = ""
+
+  validation {
+    condition     = var.override_operator_manifests == "" || can(regex("^(https?://|file://)", var.override_operator_manifests))
+    error_message = "override_manifests must be empty or start with 'http://', 'https://', or 'file://'"
+  }
+}
+
 variable "runner_opts" {
   type    = map(any)
   default = {}
@@ -145,9 +180,4 @@ variable "listen_address" {
   type        = string
   description = "The address to listen on for the GitLab Runner manager"
   default     = "[::]:9252"
-}
-
-variable "override_operator_manifests" {
-  type    = string
-  default = ""
 }

@@ -65,6 +65,7 @@ The outputs of each optional module are exactly what is required as input to the
 
 - [Shell runner on EC2](examples/test-shell-runner-only-ec2/main.tf)
 - [Docker Autoscaler configuration on EC2](examples/docker-autoscaler-ec2-deployed-with-gitlab-ci/main.tf)
+- [Operator on GKE](examples/test-runner-gke-google/main.tf)
 
 ## Value of GRIT
 

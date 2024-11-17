@@ -1,9 +1,18 @@
-variable "name" {
-  type = string
-}
+############
+# METADATA #
+############
 
-variable "labels" {
-  type = map(string)
+variable "metadata" {
+  type = object({
+    # Unique name used for identification and partitioning resources
+    name = string
+
+    # Labels to apply to supported resources
+    labels = map(string)
+
+    # Minimum required feature support. See https://docs.gitlab.com/ee/policy/experiment-beta-support.html
+    min_support = string
+  })
 
   validation {
     # Response from the google API:
@@ -12,7 +21,7 @@ variable "labels" {
     # with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_),
     # dots (.), and alphanumerics between.
     condition = alltrue([
-      for v in values(var.labels) : can(regex("^\\w+[\\w\\-\\_\\.]*\\w+$", v))
+      for v in values(var.metadata.labels) : can(regex("^\\w+[\\w\\-\\_\\.]*\\w+$", v))
     ])
     error_message = "Label values must begin and end with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_) dots (.), and alphanumerics between."
   }
@@ -25,14 +34,40 @@ variable "labels" {
     # 'my.name',  or '123-abc', regex used for validation is
     # '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]').
     condition = alltrue([
-      for k in keys(var.labels) : can(regex("([A-Za-z0-9][-A-Za-z0-9_\\.]*)?[A-Za-z0-9]", k))
+      for k in keys(var.metadata.labels) : can(regex("([A-Za-z0-9][-A-Za-z0-9_\\.]*)?[A-Za-z0-9]", k))
     ])
     error_message = "Label keys must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character"
   }
 }
 
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "gke"
+  use_case_support = tomap({
+    "gke" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
+variable "name" {
+  description = "The cluster name"
+  type        = string
+  default     = ""
+}
+
+##############
+# GKE CONFIG #
+##############
+
 variable "google_zone" {
-  type = string
+  type        = string
+  description = "The Google Cloud zone in which to create your cluster"
+}
+
+variable "deletion_protection" {
+  type        = bool
+  description = "Set deletion protection for the cluster"
+  default     = true
 }
 
 variable "autoscaling" {
@@ -46,6 +81,13 @@ variable "autoscaling" {
       maximum       = number
     }))
   })
+
+  default = {
+    enabled                     = false
+    auto_provisioning_locations = []
+    autoscaling_profile         = ""
+    resource_limits             = []
+  }
 }
 
 ###########################
@@ -53,6 +95,7 @@ variable "autoscaling" {
 ###########################
 
 variable "node_pools" {
+  description = "The configuration required for each node pool added to the GKE cluster"
   type = map(object({
     node_count = optional(number, 1)
     autoscaling = optional(object({
@@ -88,7 +131,7 @@ variable "node_pools" {
 }
 
 module "validate-image-type" {
-  source = "../../../internal/validation/is_one_of"
+  source = "../../internal/validation/is_one_of"
 
   for_each = var.node_pools
 
@@ -102,8 +145,10 @@ variable "vpc" {
     id        = string
     subnet_id = string
   })
-}
+  description = "VPC and subnet to use. If ID is not provided, GRIT will create that resource for the cluster"
 
-variable "deletion_protection" {
-  type = bool
+  default = {
+    id        = ""
+    subnet_id = ""
+  }
 }

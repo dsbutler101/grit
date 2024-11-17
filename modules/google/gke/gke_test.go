@@ -13,9 +13,12 @@ func defaultModuleVars(t *testing.T) moduleVars {
 	return moduleVars{
 		"name":        test_tools.JobName(t),
 		"google_zone": "us-east1-b",
-		"labels": map[string]string{
-			"some": "label",
+		"metadata": map[string]any{
+			"labels": map[string]string{
+				"some": "label",
+			},
 		},
+		"deletion_protection": "false",
 		"node_pools": map[string]any{
 			"default": map[string]any{
 				"node_count": 1,
@@ -30,26 +33,25 @@ func defaultModuleVars(t *testing.T) moduleVars {
 					},
 				},
 			},
-		},
-		"vpc": map[string]string{
-			"id":        "",
-			"subnet_id": "",
-		},
-		"deletion_protection": "false",
-		"autoscaling": map[string]any{
-			"enabled":                     false,
-			"autoscaling_profile":         "",
-			"auto_provisioning_locations": []string{},
-			"resource_limits": []map[string]any{
-				{
-					"resource_type": "cpu",
-					"minimum":       1,
-					"maximum":       10,
-				},
-				{
-					"resource_type": "memory",
-					"minimum":       1,
-					"maximum":       10,
+			"vpc": map[string]string{
+				"id":        "",
+				"subnet_id": "",
+			},
+			"autoscaling": map[string]any{
+				"enabled":                     false,
+				"autoscaling_profile":         "",
+				"auto_provisioning_locations": []string{},
+				"resource_limits": []map[string]any{
+					{
+						"resource_type": "cpu",
+						"minimum":       1,
+						"maximum":       10,
+					},
+					{
+						"resource_type": "memory",
+						"minimum":       1,
+						"maximum":       10,
+					},
 				},
 			},
 		},
@@ -60,6 +62,8 @@ func TestGKE(t *testing.T) {
 	expectedModules := []string{
 		"google_container_cluster.primary",
 		`google_container_node_pool.linux_node_pool["default"]`,
+		`google_container_node_pool.linux_node_pool["autoscaling"]`,
+		`google_container_node_pool.linux_node_pool["vpc"]`,
 	}
 
 	testCases := map[string]struct {
@@ -68,8 +72,12 @@ func TestGKE(t *testing.T) {
 	}{
 		"create-gke-happy": {
 			moduleVars: moduleVars{
-				"labels": map[string]string{"env": "another-place"},
-				"vpc": map[string]interface{}{
+				"metadata": map[string]any{
+					"labels":      map[string]string{"env": "another-place"},
+					"min_support": "experimental",
+					"name":        "gke",
+				},
+				"vpc": map[string]any{
 					"id":        "my-vpc",
 					"subnet_id": "my-subnet",
 				},
@@ -96,17 +104,25 @@ func TestGKEPlanErrors(t *testing.T) {
 	}{
 		"invalid-label-value": {
 			moduleVars: map[string]interface{}{
-				"labels": map[string]string{
-					"label1": "google does not like this because it has spaces",
-					"label2": "this-is-fine",
+				"metadata": map[string]any{
+					"labels": map[string]string{
+						"label1": "google does not like this because it has spaces",
+						"label2": "this-is-fine",
+					},
+					"min_support": "experimental",
+					"name":        "gke",
 				},
 			},
 		},
 		"valid-label-value": {
 			moduleVars: moduleVars{
-				"labels": map[string]string{
-					"label1": "this-is-fine",
-					"label2": "this.is_fine-too",
+				"metadata": map[string]any{
+					"labels": map[string]string{
+						"label1": "this-is-fine",
+						"label2": "this.is_fine-too",
+					},
+					"min_support": "experimental",
+					"name":        "gke",
 				},
 			},
 			shouldNotError: true,

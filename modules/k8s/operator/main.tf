@@ -1,3 +1,12 @@
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "k8s-operator"
+  use_case_support = tomap({
+    "k8s-operator" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
 locals {
   operator_project_id = "22848448"
 
@@ -16,7 +25,7 @@ data "http" "manifest" {
 }
 
 module "latest_operator_version" {
-  source = "../../../../modules/internal/gitlab_tags"
+  source = "../../../modules/internal/gitlab_tags"
 
   project_id = local.operator_project_id
 }
@@ -34,5 +43,5 @@ resource "kubectl_manifest" "operator_resources" {
   wait             = true
   apply_only       = true
   force_new        = true
-  wait_for_rollout = false
+  wait_for_rollout = true
 }

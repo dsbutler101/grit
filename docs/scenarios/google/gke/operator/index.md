@@ -1078,20 +1078,9 @@ terraform {
   }
 }
 
-# input variables
-variable "gitlab_pat" {
-  description = "The personal access token for GitLab instance, to create the runner registration token"
-  type        = string
-  sensitive   = true
-}
-
 # provider setup
 provider "google" {
   project = "my-google-project"
-}
-
-provider "gitlab" {
-  token = var.gitlab_pat
 }
 
 provider "kubectl" {
@@ -1187,9 +1176,7 @@ These providers are implicitly inherited by the scenario and its
 modules.
 
 The GitLab provider uses a personal access token (PAT) for authentication.
-Pass this token using the Terraform variable `gitlab_pat`. Because it is a
-sensitive value, it is marked `sensitive` in the `variable` block, and stored
-outside the Terraform configuration.
+Set it in the `GITLAB_TOKEN` env variable.
 
 The `kubectl` provider requires authentication to interact with a
 Kubernetes cluster. In this scenario, we use a Google Kubernetes Engine (GKE)
@@ -1258,7 +1245,7 @@ variable "config_template" {
 
 # Added available customisation
 module "gke_runner_deployment" {
-  source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/google/gke/default"
+  source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/google/gke/operator"
 
   name = "gke-gitlab-runner-auth-token"
 
@@ -1324,7 +1311,7 @@ output "supported_operator_versions" {
 
 This object configures the node group. It creates and adds each node to the GKE cluster.
 
-For the current supported configuration, see [gke module's variable declaration](../../../../modules/google/gke/internal/variables.tf).
+For the current supported configuration, see [gke module's variable declaration](../../../../modules/google/gke/operator/variables.tf).
 For more details, see [container_cluster node_config documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster#nested_node_config).
 
 Notes:

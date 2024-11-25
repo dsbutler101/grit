@@ -40,6 +40,12 @@ variable "runner_machine_type" {
   default = ""
 }
 
+variable "runner_disk_type" {
+  type = string
+
+  default = ""
+}
+
 variable "concurrent" {
   type = number
 

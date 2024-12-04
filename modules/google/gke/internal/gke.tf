@@ -8,6 +8,12 @@ data "google_container_engine_versions" "gke_version" {
   location = var.google_zone
 }
 
+locals {
+  windows_images     = ["windows_sac", "windows_ltsc", "windows_ltsc_containerd"]
+  linux_node_pools   = { for key, value in var.node_pools : key => value if !contains(local.windows_images, lower(value.node_config.image_type)) }
+  windows_node_pools = { for key, value in var.node_pools : key => value if contains(local.windows_images, lower(value.node_config.image_type)) }
+}
+
 resource "google_container_cluster" "primary" {
   name     = var.name
   location = var.google_zone
@@ -25,8 +31,8 @@ resource "google_container_cluster" "primary" {
   }
 }
 
-resource "google_container_node_pool" "node_pool" {
-  for_each = var.node_pools
+resource "google_container_node_pool" "linux_node_pool" {
+  for_each = local.linux_node_pools
 
   name     = format("%s-%s", var.name, each.key)
   location = var.google_zone
@@ -51,6 +57,38 @@ resource "google_container_node_pool" "node_pool" {
     auto_repair  = true
     auto_upgrade = true
   }
+}
+
+resource "google_container_node_pool" "windows_node_pool" {
+  for_each = local.windows_node_pools
+
+  name     = format("%s-%s", var.name, each.key)
+  location = var.google_zone
+
+  cluster = google_container_cluster.primary.id
+  version = data.google_container_engine_versions.gke_version.release_channel_default_version[local.release_channel]
+
+  node_count = each.value.node_count
+
+  node_config {
+    labels       = merge(var.labels, each.value.node_config.labels)
+    tags         = concat(local.node_tags, each.value.node_config.tags)
+    machine_type = each.value.node_config.machine_type
+    image_type   = each.value.node_config.image_type
+    disk_size_gb = each.value.node_config.disk_size_gb
+    disk_type    = each.value.node_config.disk_type
+    oauth_scopes = each.value.node_config.oauth_scopes
+    metadata     = each.value.node_config.metadata
+  }
+
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
+
+  depends_on = [
+    google_container_node_pool.linux_node_pool
+  ]
 }
 
 # Needed to provide access token in the outputs

@@ -35,7 +35,7 @@ var defaultModuleVars = moduleVars{
 func TestGKE(t *testing.T) {
 	expectedModules := []string{
 		"google_container_cluster.primary",
-		`google_container_node_pool.node_pool["default"]`,
+		`google_container_node_pool.linux_node_pool["default"]`,
 	}
 
 	testCases := map[string]struct {

@@ -74,7 +74,7 @@ module "validate-image-type" {
 
   for_each = var.node_pools
 
-  value   = each.value.node_config.image_type
+  value   = lower(each.value.node_config.image_type)
   allowed = ["cos_containerd", "cos", "ubuntu_containerd", "ubuntu", "windows_ltsc_containerd", "windows_ltsc", "windows_sac_containerd", "windows_sac"]
   prefix  = "Image type for node pool ${each.key}"
 }

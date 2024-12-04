@@ -65,6 +65,7 @@ module "runner" {
   concurrent       = var.concurrent
   check_interval   = var.check_interval
   config_template  = var.config_template
+  envvars          = var.envvars
   pod_spec_patches = var.pod_spec_patches
   runner_image     = var.runner_image
   helper_image     = var.helper_image

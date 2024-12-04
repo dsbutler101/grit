@@ -84,3 +84,12 @@ resource "gitlab_project_variable" "gandalf_gitlab_token" {
   raw         = true
   description = "Project access token for gitlab-org/ci-cd/runner-tools/grit with API scope, used by Gandalf InfraSec tool to comment on MRs. Terraform managed (ci/cloud/gitlab_variables.tf). Expires on ${gitlab_project_access_token.gandalf-security-scanning-tool.expires_at}"
 }
+
+resource "gitlab_project_variable" "gitlab_token_terraform" {
+  project     = data.gitlab_project.grit.id
+  key         = "GITLAB_TOKEN_TERRAFORM"
+  value       = gitlab_project_access_token.e2e-tests-terraform.token
+  masked      = true
+  raw         = true
+  description = "Project access token for gitlab-org/ci-cd/runner-tools/grit with API scope, used to store terraform state. Terraform managed (ci/cloud/gitlab_variables.tf). Expires on ${gitlab_project_access_token.e2e-tests-trigger.expires_at}"
+}

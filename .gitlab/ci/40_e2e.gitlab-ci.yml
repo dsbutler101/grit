@@ -2,7 +2,7 @@ e2e:prod:aws:
   stage: e2e
   needs: []
   extends:
-    - .rules:merge_request_pipelines:code
+    - .rules:merge_request_pipelines:e2e
     - .go-cache
   resource_group: e2e-prod
   script:
@@ -12,7 +12,7 @@ e2e:prod:google:
   stage: e2e
   needs: []
   extends:
-    - .rules:merge_request_pipelines:code
+    - .rules:merge_request_pipelines:e2e
     - .go-cache
   resource_group: e2e-prod
   variables:

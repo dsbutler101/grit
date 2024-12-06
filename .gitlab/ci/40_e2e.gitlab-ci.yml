@@ -22,3 +22,18 @@ e2e:prod:google:
   script:
     - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
     - go test ./e2e/google -tags e2e -timeout 1h
+
+e2e:prod:gke:windows:
+  stage: e2e
+  timeout: 90m
+  needs: []
+  extends:
+    - .rules:merge_request_pipelines:code
+    - .go-cache
+  resource_group: e2e-prod
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+    FF_TIMESTAMPS: true
+  script:
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+    - go test ./e2e/google/steps/gke-windows -tags e2e -timeout ${CI_JOB_TIMEOUT}s

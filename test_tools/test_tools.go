@@ -22,6 +22,7 @@ const (
 	GritEndToEndTestProjectID = 52010278
 	Region                    = "us-east-1"
 	RunnerTokenVar            = "RUNNER_TOKEN"
+	RunnerTokenPowerShellVar  = "RUNNER_TOKEN_POWERSHELL"
 )
 
 func JobName(_ *testing.T) string {

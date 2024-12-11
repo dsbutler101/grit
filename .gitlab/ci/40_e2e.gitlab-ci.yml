@@ -30,6 +30,7 @@ e2e:prod:gke:windows:apply:
     - build CI image
   extends:
     - .rules:merge_request_pipelines:e2e
+    - .rules:only_upstream
     - .go-cache
     - .e2e:prod:gcloud:init
     - .e2e:prod:terraform:apply

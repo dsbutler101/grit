@@ -4,6 +4,8 @@ terraform {
       source = "alekc/kubectl"
     }
   }
+
+  backend "http" {}
 }
 
 variable "gitlab_runner_token" {}

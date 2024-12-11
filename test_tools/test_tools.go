@@ -23,6 +23,12 @@ const (
 	Region                    = "us-east-1"
 	RunnerTokenVar            = "RUNNER_TOKEN"
 	RunnerTokenPowerShellVar  = "RUNNER_TOKEN_POWERSHELL"
+
+	TerraformHTTPAddress       = "TF_HTTP_ADDRESS"
+	TerraformHTTPUsername      = "TF_HTTP_USERNAME"
+	TerraformHTTPPassword      = "TF_HTTP_PASSWORD"
+	TerraformHTTPLockAddress   = "TF_HTTP_LOCK_ADDRESS"
+	TerraformHTTPUnlockAddress = "TF_HTTP_UNLOCK_ADDRESS"
 )
 
 func JobName(_ *testing.T) string {

@@ -22,7 +22,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	terratest_gcp "github.com/gruntwork-io/terratest/modules/gcp"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 	"github.com/xanzy/go-gitlab"
@@ -42,41 +41,38 @@ type k8sCredentials struct {
 }
 
 func TestEndToEnd(t *testing.T) {
-	name := test_tools.JobName(t)
+	name := os.Getenv("JOB_NAME")
+	require.NotEmpty(t, name)
+
 	gitlabToken := os.Getenv(test_tools.GitlabTokenVar)
 	require.NotEmpty(t, gitlabToken)
 	client, err := gitlab.NewClient(gitlabToken)
 	require.NoError(t, err)
 
-	runnerToken := os.Getenv(test_tools.RunnerTokenPowerShellVar)
-	require.NotEmpty(t, runnerToken)
+	tfHTTPAddress := os.Getenv(test_tools.TerraformHTTPAddress)
+	require.NotEmpty(t, tfHTTPAddress)
+	tfUsername := os.Getenv(test_tools.TerraformHTTPUsername)
+	require.NotEmpty(t, tfUsername)
+	tfPassword := os.Getenv(test_tools.TerraformHTTPPassword)
+	require.NotEmpty(t, tfPassword)
+	tfLockAddress := os.Getenv(test_tools.TerraformHTTPLockAddress)
+	require.NotEmpty(t, tfLockAddress)
+	tfUnlockAddress := os.Getenv(test_tools.TerraformHTTPUnlockAddress)
+	require.NotEmpty(t, tfUnlockAddress)
 
-	projectID := terratest_gcp.GetGoogleProjectIDFromEnvVar(t)
-	require.NotEmpty(t, projectID)
-
-	region := terratest_gcp.GetGoogleRegionFromEnvVar(t)
-	require.NotEmpty(t, region)
-
-	zone := os.Getenv("GOOGLE_ZONE")
-	require.NotEmpty(t, zone)
-
-	// Create runner stack
-	options := &terraform.Options{
+	opts := &terraform.Options{
 		TerraformBinary: "terraform",
 		TerraformDir:    ".",
-		Vars: map[string]interface{}{
-			"gitlab_runner_token": runnerToken,
-			"name":                name,
-			"google_region":       region,
-			"google_zone":         zone,
-			"google_project":      projectID,
+		BackendConfig: map[string]interface{}{
+			"address":        tfHTTPAddress,
+			"username":       tfUsername,
+			"password":       tfPassword,
+			"lock_address":   tfLockAddress,
+			"unlock_address": tfUnlockAddress,
 		},
 	}
-	_, err = terraform.InitAndApplyE(t, options)
-	defer terraform.Destroy(t, options)
-	require.NoError(t, err)
-
-	output, err := terraform.OutputAllE(t, options)
+	terraform.Init(t, opts)
+	output, err := terraform.OutputAllE(t, opts)
 	require.NoError(t, err)
 
 	cred := k8sCredentials{

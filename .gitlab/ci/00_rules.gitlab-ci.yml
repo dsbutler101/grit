@@ -74,3 +74,7 @@
   rules:
     - <<: *if-merge-request-pipeline
       changes: *ci-image-patterns
+
+.rules:only_upstream:
+  rules:
+    - if: $CI_PROJECT_PATH == "gitlab-org/ci-cd/runner-tools/grit"

@@ -5,7 +5,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -36,6 +38,7 @@ type JobEnv struct {
 	ProjectID   string
 	Region      string
 	Zone        string
+	JobTimeout  time.Duration
 }
 
 func getJobEnv() (*JobEnv, error) {
@@ -77,7 +80,23 @@ func getJobEnv() (*JobEnv, error) {
 		return nil, fmt.Errorf("failed to retried GCP Zone. GCP Zone is empty")
 	}
 
+	je.JobTimeout = getJobTimeout(os.Getenv(CIJobTimeout))
+
 	return je, nil
+}
+
+func getJobTimeout(timeout string) time.Duration {
+	duration, err := time.ParseDuration(timeout)
+	if err == nil {
+		return duration
+	}
+
+	seconds, err := strconv.Atoi(timeout)
+	if err != nil {
+		return 1 * time.Hour
+	}
+
+	return time.Duration(seconds) * time.Second
 }
 
 func getAbsPathOfExec(executable string) (string, error) {

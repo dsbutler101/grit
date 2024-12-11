@@ -3,7 +3,6 @@ package common
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
 )
@@ -28,13 +27,13 @@ func initTerraform() (*tfexec.Terraform, *JobEnv, error) {
 }
 
 func TerraformInitAndApply() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
-	defer cancel()
-
 	tf, je, err := initTerraform()
 	if err != nil {
 		return err
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), je.JobTimeout)
+	defer cancel()
 
 	if err := tf.Init(
 		ctx,
@@ -57,13 +56,13 @@ func TerraformInitAndApply() error {
 }
 
 func TerraformInitAndDestroy() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
-	defer cancel()
-
 	tf, je, err := initTerraform()
 	if err != nil {
 		return err
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), je.JobTimeout)
+	defer cancel()
 
 	if err := tf.Init(
 		ctx,
@@ -86,15 +85,15 @@ func TerraformInitAndDestroy() error {
 }
 
 func TerraformOutput() (map[string]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
-	defer cancel()
-
-	state := make(map[string]string)
-
-	tf, _, err := initTerraform()
+	tf, je, err := initTerraform()
 	if err != nil {
 		return nil, err
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), je.JobTimeout)
+	defer cancel()
+
+	state := make(map[string]string)
 
 	tfState, err := tf.Output(ctx)
 	if err != nil {

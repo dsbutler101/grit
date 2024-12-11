@@ -1,5 +1,3 @@
-//go:build e2e
-
 package e2e
 
 import (
@@ -26,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xanzy/go-gitlab"
 
-	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/common"
 )
 
 const (
@@ -44,20 +42,20 @@ func TestEndToEnd(t *testing.T) {
 	name := os.Getenv("JOB_NAME")
 	require.NotEmpty(t, name)
 
-	gitlabToken := os.Getenv(test_tools.GitlabTokenVar)
+	gitlabToken := os.Getenv(common.GitlabTokenVar)
 	require.NotEmpty(t, gitlabToken)
 	client, err := gitlab.NewClient(gitlabToken)
 	require.NoError(t, err)
 
-	tfHTTPAddress := os.Getenv(test_tools.TerraformHTTPAddress)
+	tfHTTPAddress := os.Getenv(common.TerraformHTTPAddress)
 	require.NotEmpty(t, tfHTTPAddress)
-	tfUsername := os.Getenv(test_tools.TerraformHTTPUsername)
+	tfUsername := os.Getenv(common.TerraformHTTPUsername)
 	require.NotEmpty(t, tfUsername)
-	tfPassword := os.Getenv(test_tools.TerraformHTTPPassword)
+	tfPassword := os.Getenv(common.TerraformHTTPPassword)
 	require.NotEmpty(t, tfPassword)
-	tfLockAddress := os.Getenv(test_tools.TerraformHTTPLockAddress)
+	tfLockAddress := os.Getenv(common.TerraformHTTPLockAddress)
 	require.NotEmpty(t, tfLockAddress)
-	tfUnlockAddress := os.Getenv(test_tools.TerraformHTTPUnlockAddress)
+	tfUnlockAddress := os.Getenv(common.TerraformHTTPUnlockAddress)
 	require.NotEmpty(t, tfUnlockAddress)
 
 	opts := &terraform.Options{
@@ -88,7 +86,7 @@ func TestEndToEnd(t *testing.T) {
 	main := "main"
 	key := testKey
 	uniqueValue := strconv.Itoa(int(rand.Uint32()))
-	pipeline, _, err := client.Pipelines.CreatePipeline(test_tools.GritEndToEndTestProjectID, &gitlab.CreatePipelineOptions{
+	pipeline, _, err := client.Pipelines.CreatePipeline(common.GritEndToEndTestProjectID, &gitlab.CreatePipelineOptions{
 		Ref: &main,
 		Variables: &[]*gitlab.PipelineVariableOptions{{
 			Key:   &key,
@@ -98,13 +96,13 @@ func TestEndToEnd(t *testing.T) {
 	require.NoError(t, err)
 
 	var job *gitlab.Job
-	jobs, _, err := client.Jobs.ListPipelineJobs(test_tools.GritEndToEndTestProjectID, pipeline.ID, &gitlab.ListJobsOptions{})
+	jobs, _, err := client.Jobs.ListPipelineJobs(common.GritEndToEndTestProjectID, pipeline.ID, &gitlab.ListJobsOptions{})
 	require.NoError(t, err, fmt.Sprintf("failed to list jobs in the pipeline %d", pipeline.ID))
 	require.Len(t, jobs, 1, fmt.Sprintf("More than one job found in the pipeline %d", pipeline.ID))
 
 	jobID := jobs[0].ID
 	for {
-		job, _, err = client.Jobs.GetJob(test_tools.GritEndToEndTestProjectID, jobID)
+		job, _, err = client.Jobs.GetJob(common.GritEndToEndTestProjectID, jobID)
 		require.NoError(t, err, fmt.Sprintf("failed to get job %d in the pipeline %d", jobID, pipeline.ID))
 
 		if job.Status != "created" && job.Status != "pending" && job.Status != "running" {
@@ -116,7 +114,7 @@ func TestEndToEnd(t *testing.T) {
 	}
 
 	require.Equal(t, "success", job.Status)
-	logReader, _, err := client.Jobs.GetTraceFile(test_tools.GritEndToEndTestProjectID, job.ID)
+	logReader, _, err := client.Jobs.GetTraceFile(common.GritEndToEndTestProjectID, job.ID)
 	require.NoError(t, err)
 	logBytes, err := io.ReadAll(logReader)
 	require.NoError(t, err)

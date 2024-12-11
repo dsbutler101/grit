@@ -13,27 +13,13 @@ import (
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
-)
 
-const (
-	JobIdVar                  = "CI_JOB_ID"
-	CommitSHAVar              = "CI_COMMIT_SHA"
-	GitlabTokenVar            = "GITLAB_TOKEN"
-	GritEndToEndTestProjectID = 52010278
-	Region                    = "us-east-1"
-	RunnerTokenVar            = "RUNNER_TOKEN"
-	RunnerTokenPowerShellVar  = "RUNNER_TOKEN_POWERSHELL"
-
-	TerraformHTTPAddress       = "TF_HTTP_ADDRESS"
-	TerraformHTTPUsername      = "TF_HTTP_USERNAME"
-	TerraformHTTPPassword      = "TF_HTTP_PASSWORD"
-	TerraformHTTPLockAddress   = "TF_HTTP_LOCK_ADDRESS"
-	TerraformHTTPUnlockAddress = "TF_HTTP_UNLOCK_ADDRESS"
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/common"
 )
 
 func JobName(_ *testing.T) string {
-	jobId := os.Getenv(JobIdVar)
-	sha := os.Getenv(CommitSHAVar)
+	jobId := os.Getenv(common.JobIdVar)
+	sha := os.Getenv(common.CommitSHAVar)
 
 	id := fmt.Sprintf("%s:%s:%d", jobId, sha, time.Now().Unix())
 	hash := sha1.Sum([]byte(id))

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/magefile/mage/mg"
-	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/magefiles/common"
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/common"
 )
 
 type Terraform mg.Namespace

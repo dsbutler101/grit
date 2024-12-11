@@ -6,11 +6,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
 const (
+	JobIdVar                  = "CI_JOB_ID"
+	CommitSHAVar              = "CI_COMMIT_SHA"
 	JobName                   = "JOB_NAME"
 	GitlabTokenVar            = "GITLAB_TOKEN"
 	GritE2eDirectory          = "E2E_DIR"
@@ -18,6 +18,14 @@ const (
 	Region                    = "us-east-1"
 	RunnerTokenVar            = "RUNNER_TOKEN"
 	RunnerTokenPowerShellVar  = "RUNNER_TOKEN_POWERSHELL"
+
+	TerraformHTTPAddress       = "TF_HTTP_ADDRESS"
+	TerraformHTTPUsername      = "TF_HTTP_USERNAME"
+	TerraformHTTPPassword      = "TF_HTTP_PASSWORD"
+	TerraformHTTPLockAddress   = "TF_HTTP_LOCK_ADDRESS"
+	TerraformHTTPUnlockAddress = "TF_HTTP_UNLOCK_ADDRESS"
+
+	CIJobTimeout = "CI_JOB_TIMEOUT"
 )
 
 type JobEnv struct {
@@ -49,9 +57,9 @@ func getJobEnv() (*JobEnv, error) {
 		return nil, fmt.Errorf("gitlab token is empty")
 	}
 
-	je.RunnerToken = os.Getenv(test_tools.RunnerTokenPowerShellVar)
+	je.RunnerToken = os.Getenv(RunnerTokenPowerShellVar)
 	if strings.Trim(je.RunnerToken, " ") == "" {
-		return nil, fmt.Errorf("failed to retried runner token. Runner token %s is empty", test_tools.RunnerTokenPowerShellVar)
+		return nil, fmt.Errorf("failed to retried runner token. Runner token %s is empty", RunnerTokenPowerShellVar)
 	}
 
 	je.ProjectID, err = getGoogleProjectIDFromEnvVar()

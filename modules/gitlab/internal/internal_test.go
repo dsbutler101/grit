@@ -3,6 +3,7 @@ package gitlab_internal
 import (
 	"testing"
 
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/common"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
@@ -18,7 +19,7 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 				"url":                "https://gitlab.com",
 				"name":               name + "-new-runner",
 				"runner_description": "my new GRIT runner",
-				"project_id":         test_tools.GritEndToEndTestProjectID,
+				"project_id":         common.GritEndToEndTestProjectID,
 				"runner_tags":        []string{"job-tag"},
 			},
 			expectedModules: []string{"gitlab_user_runner.primary"},

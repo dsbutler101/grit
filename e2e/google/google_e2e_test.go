@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xanzy/go-gitlab"
 
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/common"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
@@ -27,14 +28,14 @@ const (
 func TestEndToEnd(t *testing.T) {
 	name := test_tools.JobName(t)
 
-	jobId := os.Getenv(test_tools.JobIdVar)
+	jobId := os.Getenv(common.JobIdVar)
 	require.NotEmpty(t, jobId)
-	gitlabToken := os.Getenv(test_tools.GitlabTokenVar)
+	gitlabToken := os.Getenv(common.GitlabTokenVar)
 	require.NotEmpty(t, gitlabToken)
 	client, err := gitlab.NewClient(gitlabToken)
 	require.NoError(t, err)
 
-	runnerToken := os.Getenv(test_tools.RunnerTokenVar)
+	runnerToken := os.Getenv(common.RunnerTokenVar)
 	require.NotEmpty(t, runnerToken)
 
 	projectID := terratest_gcp.GetGoogleProjectIDFromEnvVar(t)
@@ -76,7 +77,7 @@ func TestEndToEnd(t *testing.T) {
 	main := "main"
 	key := testKey
 	uniqueValue := strconv.Itoa(int(rand.Uint32()))
-	pipeline, _, err := client.Pipelines.CreatePipeline(test_tools.GritEndToEndTestProjectID, &gitlab.CreatePipelineOptions{
+	pipeline, _, err := client.Pipelines.CreatePipeline(common.GritEndToEndTestProjectID, &gitlab.CreatePipelineOptions{
 		Ref: &main,
 		Variables: &[]*gitlab.PipelineVariableOptions{{
 			Key:   &key,
@@ -87,14 +88,14 @@ func TestEndToEnd(t *testing.T) {
 	pipelineID := pipeline.ID
 
 	var job *gitlab.Job
-	jobs, _, err := client.Jobs.ListPipelineJobs(test_tools.GritEndToEndTestProjectID, pipelineID, &gitlab.ListJobsOptions{})
+	jobs, _, err := client.Jobs.ListPipelineJobs(common.GritEndToEndTestProjectID, pipelineID, &gitlab.ListJobsOptions{})
 	require.NoError(t, err)
 	require.Len(t, jobs, 1)
 	jobID := jobs[0].ID
 
 	// poll every second for 15 minutes for job completion
 	for i := 0; i < 60*15; i++ {
-		job, _, err = client.Jobs.GetJob(test_tools.GritEndToEndTestProjectID, jobID)
+		job, _, err = client.Jobs.GetJob(common.GritEndToEndTestProjectID, jobID)
 		require.NoError(t, err)
 
 		if job.Status != "created" && job.Status != "pending" && job.Status != "running" {
@@ -106,7 +107,7 @@ func TestEndToEnd(t *testing.T) {
 	}
 
 	require.Equal(t, "success", job.Status)
-	logReader, _, err := client.Jobs.GetTraceFile(test_tools.GritEndToEndTestProjectID, job.ID)
+	logReader, _, err := client.Jobs.GetTraceFile(common.GritEndToEndTestProjectID, job.ID)
 	require.NoError(t, err)
 	logBytes, err := io.ReadAll(logReader)
 	require.NoError(t, err)

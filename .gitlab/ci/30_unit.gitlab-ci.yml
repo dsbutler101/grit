@@ -3,6 +3,7 @@ unit tests:
   needs: []
   extends:
     - .rules:merge_request_pipelines:code
+    - .rules:only_upstream
     - .go-cache
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded

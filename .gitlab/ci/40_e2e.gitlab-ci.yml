@@ -3,6 +3,7 @@ e2e:prod:aws:
   needs: []
   extends:
     - .rules:merge_request_pipelines:e2e
+    - .rules:only_upstream
     - .go-cache
   resource_group: e2e-prod
   script:
@@ -13,6 +14,7 @@ e2e:prod:google:
   needs: []
   extends:
     - .rules:merge_request_pipelines:e2e
+    - .rules:only_upstream
     - .go-cache
   resource_group: e2e-prod
   variables:

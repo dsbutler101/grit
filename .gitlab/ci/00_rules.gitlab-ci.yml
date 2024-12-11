@@ -24,6 +24,9 @@
   - Makefile.ci-image.mk
   - .gitlab/ci/11_build_ci_image.gitlab-ci.yml
 
+.ci-cloud-patterns: &ci-cloud-patterns
+  - ci/cloud/**/*
+
 ##############
 # Conditions #
 ##############
@@ -45,6 +48,16 @@
 
 .rules:merge_request_pipelines:code:
   rules:
+    - <<: *if-merge-request-pipeline
+      changes: *code-backstage-patterns
+    - <<: *if-default-branch
+      changes: *code-backstage-patterns
+
+.rules:merge_request_pipelines:e2e:
+  rules:
+    - <<: *if-merge-request-pipeline
+      changes: *ci-cloud-patterns
+      when: never
     - <<: *if-merge-request-pipeline
       changes: *code-backstage-patterns
     - <<: *if-default-branch

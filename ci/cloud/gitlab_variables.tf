@@ -93,3 +93,12 @@ resource "gitlab_project_variable" "gitlab_token_terraform" {
   raw         = true
   description = "Project access token for gitlab-org/ci-cd/runner-tools/grit with API scope, used to store terraform state. Terraform managed (ci/cloud/gitlab_variables.tf). Expires on ${gitlab_project_access_token.e2e-tests-trigger.expires_at}"
 }
+
+resource "gitlab_project_variable" "runner_token_powershell" {
+  project     = data.gitlab_project.grit.id
+  key         = "RUNNER_TOKEN_POWERSHELL"
+  value       = gitlab_user_runner.grit-e2e-powershell.token
+  masked      = true
+  raw         = true
+  description = "Authentication token for a runner registered in gitlab-org/ci-cd/runner-tools/grit-e2e with PowerShell. Terraform managed (ci/cloud/gitlab_variables.tf)"
+}

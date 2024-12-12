@@ -62,7 +62,8 @@ e2e:prod:gke:windows:destroy:
   stage: e2e
   timeout: 30m
   needs:
-    - e2e:prod:gke:windows:test
+    - job: e2e:prod:gke:windows:test
+  when: always
   extends:
     - .rules:merge_request_pipelines:e2e
     - .go-cache

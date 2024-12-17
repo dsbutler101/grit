@@ -36,10 +36,9 @@ e2e:prod:gke:windows:apply:
     - .e2e:prod:terraform:apply
   resource_group: e2e-prod
   variables:
-    PROVIDER: gke
+    PROVIDER: google
     E2E_DIR: e2e/google/gke-windows
     FF_TIMESTAMPS: true
-    TF_LOG: debug
 
 e2e:prod:gke:windows:test:
   stage: e2e
@@ -52,7 +51,7 @@ e2e:prod:gke:windows:test:
     - .e2e:prod:gcloud:init
   resource_group: e2e-prod
   variables:
-    PROVIDER: gke
+    PROVIDER: google
     E2E_DIR: e2e/google/gke-windows
     FF_TIMESTAMPS: true
   script:
@@ -71,6 +70,6 @@ e2e:prod:gke:windows:destroy:
     - .e2e:prod:terraform:destroy
   resource_group: e2e-prod
   variables:
-    PROVIDER: gke
+    PROVIDER: google
     E2E_DIR: e2e/google/gke-windows
     FF_TIMESTAMPS: true

@@ -41,43 +41,55 @@ type JobEnv struct {
 	JobTimeout  time.Duration
 }
 
+func envVar(name string) (string, error) {
+	raw, ok := os.LookupEnv(name)
+	if !ok {
+		return "", fmt.Errorf("env var %s not set", name)
+	}
+	cleaned := strings.Trim(raw, " ")
+	if cleaned == "" {
+		return "", fmt.Errorf("env var %s is empty", name)
+	}
+	return cleaned, nil
+}
+
 func getJobEnv() (*JobEnv, error) {
 	var err error
 	je := &JobEnv{}
 
-	je.Name = os.Getenv(JobName)
-	if strings.Trim(je.Name, " ") == "" {
-		return nil, fmt.Errorf("job name is empty")
+	je.Name, err = envVar(JobName)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
-	je.GritE2EDir = os.Getenv(GritE2eDirectory)
-	if strings.Trim(je.GritE2EDir, " ") == "" {
-		return nil, fmt.Errorf("directory containing the main.tf is empty")
+	je.GritE2EDir, err = envVar(GritE2eDirectory)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
-	je.GitlabToken = os.Getenv(GitlabTokenVar)
-	if strings.Trim(je.GitlabToken, " ") == "" {
-		return nil, fmt.Errorf("gitlab token is empty")
+	je.GitlabToken, err = envVar(GitlabTokenVar)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
-	je.RunnerToken = os.Getenv(RunnerTokenPowerShellVar)
-	if strings.Trim(je.RunnerToken, " ") == "" {
-		return nil, fmt.Errorf("failed to retried runner token. Runner token %s is empty", RunnerTokenPowerShellVar)
+	je.RunnerToken, err = envVar(RunnerTokenPowerShellVar)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
 	je.ProjectID, err = getGoogleProjectIDFromEnvVar()
-	if strings.Trim(je.ProjectID, " ") == "" {
-		return nil, fmt.Errorf("failed to retried GCP Project ID. GCP Project ID is empty: %w", err)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
 	je.Region, err = getGoogleRegionFromEnvVar()
 	if strings.Trim(je.Region, " ") == "" {
-		return nil, fmt.Errorf("failed to retried GCP Region. GCP Region is empty: %w", err)
+		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
-	je.Zone = os.Getenv("GOOGLE_ZONE")
-	if strings.Trim(je.Zone, " ") == "" {
-		return nil, fmt.Errorf("failed to retried GCP Zone. GCP Zone is empty")
+	je.Zone, err = envVar("GOOGLE_ZONE")
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
 	je.JobTimeout = getJobTimeout(os.Getenv(CIJobTimeout))

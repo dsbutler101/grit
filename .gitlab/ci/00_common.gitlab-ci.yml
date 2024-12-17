@@ -71,8 +71,8 @@ variables:
 
 .e2e:prod:terraform:apply:
   script:
-    - mage terraform:terraformInitAndApply
+    - mage terraform:initAndApply
 
 .e2e:prod:terraform:destroy:
   script:
-    - mage terraform:terraformInitAndDestroy
+    - mage terraform:initAndDestroy

@@ -9,3 +9,6 @@ kics-iac-sast:
   variables:
     GANDALF_IMAGE_LINK: registry.gitlab.com/gitlab-com/gl-security/security-operations/infrastructure-security-public/gandalf:latest
     GITLAB_TOKEN: $GANDALF_GITLAB_TOKEN
+  # We are temporarily allowing this job failure until the following issue is resolved on the Gandalf project side
+  # gitlab-com/gl-security/security-operations/infrastructure-security/gandalf#12
+  allow_failure: true

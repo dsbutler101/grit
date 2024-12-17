@@ -9,8 +9,7 @@ RUN curl -sL "https://golang.org/dl/${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go
     tar -C /usr/local -xzf /tmp/go.tar.gz && \
     go version
 
-RUN go install github.com/magefile/mage@latest && \
-    mv $HOME/go/bin/mage /usr/local/go/bin
+RUN GOBIN="/usr/local/go/bin" go install github.com/magefile/mage@latest
 
 # Clean up the image
 RUN rm -rf /tmp/* ${HOME}/go

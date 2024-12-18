@@ -3,6 +3,8 @@ package common
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
 )
@@ -81,7 +83,35 @@ func TerraformInitAndDestroy() error {
 		return fmt.Errorf("failed to destroy terraform infra: %w", err)
 	}
 
+	// Delete the GitLab State
+	if _, err := deleteGitLabRemoteState(je); err != nil {
+		return fmt.Errorf("failed to delete GitLab remote state: %w", err)
+	}
+
 	return nil
+}
+
+func deleteGitLabRemoteState(je *JobEnv) ([]byte, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", je.TerraformHTTPAddress, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Private-Token", je.TerraformHTTPPassword)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
 
 func TerraformOutput() (map[string]string, error) {

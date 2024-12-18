@@ -39,6 +39,10 @@ type JobEnv struct {
 	Region      string
 	Zone        string
 	JobTimeout  time.Duration
+
+	TerraformHTTPAddress  string
+	TerraformHTTPUsername string
+	TerraformHTTPPassword string
 }
 
 func envVar(name string) (string, error) {
@@ -93,6 +97,21 @@ func getJobEnv() (*JobEnv, error) {
 	}
 
 	je.JobTimeout = getJobTimeout(os.Getenv(CIJobTimeout))
+
+	je.TerraformHTTPAddress, err = envVar(TerraformHTTPAddress)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
+	}
+
+	je.TerraformHTTPUsername, err = envVar(TerraformHTTPUsername)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
+	}
+
+	je.TerraformHTTPPassword, err = envVar(TerraformHTTPPassword)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
+	}
 
 	return je, nil
 }

@@ -107,6 +107,22 @@ variable "scale_max" {
   default     = 10
 }
 
+variable "ebs_encryption" {
+  description = <<-EOD
+  Enable EBS encryption on the volumes. Set it to true to enable encryption.
+  EOD
+  type        = bool
+  default     = false
+}
+
+variable "kms_key_arn" {
+  description = <<-EOD
+  The ARN of the AWS Key Management Service (AWS KMS) customer master key (CMK) to use when creating the encrypted volume.
+  EOD
+  type        = string
+  default     = null
+}
+
 #######
 # VPC #
 #######

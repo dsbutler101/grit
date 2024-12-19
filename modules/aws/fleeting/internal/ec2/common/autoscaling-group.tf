@@ -11,6 +11,11 @@ resource "aws_launch_template" "fleeting-asg-template" {
 
   user_data = var.install_cloudwatch_agent ? data.cloudinit_config.fleeting_config.rendered : null
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
   dynamic "license_specification" {
     for_each = var.license_arn != "" ? [1] : []
 

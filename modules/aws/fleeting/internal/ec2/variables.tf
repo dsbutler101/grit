@@ -68,3 +68,11 @@ variable "install_cloudwatch_agent" {
 variable "cloudwatch_agent_json" {
   type = string
 }
+
+variable "ebs_encryption" {
+  type = bool
+}
+
+variable "kms_key_arn" {
+  type = string
+}

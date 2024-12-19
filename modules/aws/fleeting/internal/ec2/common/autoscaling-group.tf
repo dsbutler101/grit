@@ -44,6 +44,8 @@ resource "aws_launch_template" "fleeting-asg-template" {
       volume_size           = var.storage_size
       volume_type           = var.storage_type
       throughput            = var.storage_throughput
+      encrypted             = var.ebs_encryption
+      kms_key_id            = var.kms_key_arn
     }
   }
 

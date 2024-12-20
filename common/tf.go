@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
 )
@@ -49,11 +50,13 @@ func TerraformInitAndApply() error {
 
 	if err := tf.Apply(
 		ctx,
-		tfexec.Var(fmt.Sprintf("gitlab_runner_token=%s", je.RunnerToken)),
-		tfexec.Var(fmt.Sprintf("name=%s", je.Name)),
+		tfexec.Var(fmt.Sprintf("google_project=%s", je.ProjectID)),
 		tfexec.Var(fmt.Sprintf("google_region=%s", je.Region)),
 		tfexec.Var(fmt.Sprintf("google_zone=%s", je.Zone)),
-		tfexec.Var(fmt.Sprintf("google_project=%s", je.ProjectID)),
+		tfexec.Var(fmt.Sprintf("name=%s", je.Name)),
+		tfexec.Var(fmt.Sprintf("gitlab_project_id=%s", je.GitLabProjectID)),
+		tfexec.Var(fmt.Sprintf("gitlab_pat=%s", je.GitlabToken)),
+		tfexec.Var(fmt.Sprintf("runner_tags=%s", fmtTFListVariable(je.RunnerTags))),
 	); err != nil {
 		return fmt.Errorf("failed to apply terraform: %w", err)
 	}
@@ -78,11 +81,13 @@ func TerraformInitAndDestroy() error {
 
 	if err := tf.Destroy(
 		ctx,
-		tfexec.Var(fmt.Sprintf("gitlab_runner_token=%s", je.RunnerToken)),
-		tfexec.Var(fmt.Sprintf("name=%s", je.Name)),
+		tfexec.Var(fmt.Sprintf("google_project=%s", je.ProjectID)),
 		tfexec.Var(fmt.Sprintf("google_region=%s", je.Region)),
 		tfexec.Var(fmt.Sprintf("google_zone=%s", je.Zone)),
-		tfexec.Var(fmt.Sprintf("google_project=%s", je.ProjectID)),
+		tfexec.Var(fmt.Sprintf("name=%s", je.Name)),
+		tfexec.Var(fmt.Sprintf("gitlab_project_id=%s", je.GitLabProjectID)),
+		tfexec.Var(fmt.Sprintf("gitlab_pat=%s", je.GitlabToken)),
+		tfexec.Var(fmt.Sprintf("runner_tags=%s", fmtTFListVariable(je.RunnerTags))),
 	); err != nil {
 		return fmt.Errorf("failed to destroy terraform infra: %w", err)
 	}
@@ -93,6 +98,15 @@ func TerraformInitAndDestroy() error {
 	}
 
 	return nil
+}
+
+// value is a comma separated list of strings
+func fmtTFListVariable(value string) string {
+	l := strings.Split(value, ",")
+	for i := range l {
+		l[i] = `"` + strings.TrimSpace(l[i]) + `"`
+	}
+	return "[" + strings.Join(l, ",") + "]"
 }
 
 func deleteGitLabRemoteState(je *JobEnv) ([]byte, error) {

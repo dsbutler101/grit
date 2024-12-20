@@ -17,9 +17,11 @@ const (
 	GitlabTokenVar            = "GITLAB_TOKEN"
 	GritE2eDirectory          = "E2E_DIR"
 	GritEndToEndTestProjectID = 52010278
+	GitLabProjectID           = "CI_PROJECT_ID"
 	Region                    = "us-east-1"
 	RunnerTokenVar            = "RUNNER_TOKEN"
 	RunnerTokenPowerShellVar  = "RUNNER_TOKEN_POWERSHELL"
+	RunnerTags                = "RUNNER_TAGS"
 
 	TerraformHTTPAddress       = "TF_HTTP_ADDRESS"
 	TerraformHTTPUsername      = "TF_HTTP_USERNAME"
@@ -31,14 +33,16 @@ const (
 )
 
 type JobEnv struct {
-	Name        string
-	GritE2EDir  string
-	GitlabToken string
-	RunnerToken string
-	ProjectID   string
-	Region      string
-	Zone        string
-	JobTimeout  time.Duration
+	Name            string
+	GritE2EDir      string
+	GitlabToken     string
+	GitLabProjectID string
+	RunnerToken     string
+	RunnerTags      string
+	ProjectID       string
+	Region          string
+	Zone            string
+	JobTimeout      time.Duration
 
 	TerraformHTTPAddress  string
 	TerraformHTTPUsername string
@@ -76,7 +80,17 @@ func getJobEnv() (*JobEnv, error) {
 		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
+	je.GitLabProjectID, err = envVar(GitLabProjectID)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
+	}
+
 	je.RunnerToken, err = envVar(RunnerTokenPowerShellVar)
+	if err != nil {
+		return nil, fmt.Errorf("setting up job: %w", err)
+	}
+
+	je.RunnerTags, err = envVar(RunnerTags)
 	if err != nil {
 		return nil, fmt.Errorf("setting up job: %w", err)
 	}

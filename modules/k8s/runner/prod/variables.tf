@@ -91,7 +91,7 @@ variable "config_template" {
 
 variable "envvars" {
   type        = map(string)
-  description = "Map of environment variables to set for the runner"
+  description = "The environment variables to configure for the runner"
   default     = {}
 }
 

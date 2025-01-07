@@ -63,16 +63,16 @@ variables:
   tags:
     - gitlab-org-docker
 
-.e2e:prod:gcloud:init:
+.e2e:gcloud:init:
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   before_script:
     - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
 
-.e2e:prod:terraform:apply:
+.e2e:terraform:apply:
   script:
     - mage terraform:initAndApply
 
-.e2e:prod:terraform:destroy:
+.e2e:terraform:destroy:
   script:
     - mage terraform:initAndDestroy

@@ -3,7 +3,6 @@ e2e:prod:aws:
   needs: []
   extends:
     - .rules:merge_request_pipelines:e2e
-    - .rules:only_upstream
     - .go-cache
   resource_group: e2e-prod
   script:
@@ -14,7 +13,6 @@ e2e:prod:google:
   needs: []
   extends:
     - .rules:merge_request_pipelines:e2e
-    - .rules:only_upstream
     - .go-cache
   resource_group: e2e-prod
   variables:
@@ -27,10 +25,10 @@ e2e:prod:gke:windows:apply:
   stage: e2e
   timeout: 60m
   needs:
-    - build CI image
+    - job: "build CI image"
+      optional: true
   extends:
     - .rules:merge_request_pipelines:e2e
-    - .rules:only_upstream
     - .go-cache
     - .e2e:prod:gcloud:init
     - .e2e:prod:terraform:apply

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
 )
@@ -24,6 +25,9 @@ func initTerraform() (*tfexec.Terraform, *JobEnv, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create terraform exec instance: %w", err)
 	}
+
+	tf.SetStdout(os.Stdout)
+	tf.SetStderr(os.Stderr)
 
 	return tf, je, err
 }

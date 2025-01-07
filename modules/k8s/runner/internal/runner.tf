@@ -1,5 +1,6 @@
 locals {
   config_template_name = format("%s-%s", var.name, "config-template")
+  envvars_name         = format("%s-%s", var.name, "envvars")
   manifest = yamlencode({
     apiVersion = "apps.gitlab.com/v1beta2"
     kind       = "Runner"
@@ -17,6 +18,7 @@ locals {
       interval    = var.check_interval
       concurrent  = var.concurrent
       config      = var.config_template == "" ? null : local.config_template_name
+      env         = length(var.envvars) == 0 ? null : local.envvars_name
       podSpec     = var.pod_spec_patches
       runnerImage = var.runner_image
       helperImage = var.helper_image
@@ -44,6 +46,15 @@ locals {
       "config.toml" = var.config_template
     }
   })
+  envvars = yamlencode({
+    apiVersion = "v1"
+    kind       = "ConfigMap"
+    metadata = {
+      name      = local.envvars_name
+      namespace = var.namespace
+    }
+    data = var.envvars
+  })
 
   config_template_check = length(var.config_template) == 0 || (length(var.config_template) > 0 && strcontains(var.config_template, "[[runners]]"))
 }
@@ -62,10 +73,16 @@ resource "kubectl_manifest" "config_template" {
   yaml_body = local.config_template
 }
 
+resource "kubectl_manifest" "envvars" {
+  count     = length(var.envvars) == 0 ? 0 : 1
+  yaml_body = local.envvars
+}
+
 resource "kubectl_manifest" "manifest" {
   yaml_body = local.manifest
   depends_on = [
     kubectl_manifest.token_secret,
-    kubectl_manifest.config_template
+    kubectl_manifest.config_template,
+    kubectl_manifest.envvars,
   ]
 }

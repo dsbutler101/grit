@@ -22,3 +22,54 @@ e2e:prod:google:
   script:
     - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
     - go test ./e2e/google -tags e2e -timeout 1h
+
+e2e:prod:gke:windows:apply:
+  stage: e2e
+  timeout: 60m
+  needs:
+    - build CI image
+  extends:
+    - .rules:merge_request_pipelines:e2e
+    - .rules:only_upstream
+    - .go-cache
+    - .e2e:prod:gcloud:init
+    - .e2e:prod:terraform:apply
+  resource_group: e2e-prod
+  variables:
+    PROVIDER: google
+    E2E_DIR: e2e/google/gke-windows
+    FF_TIMESTAMPS: true
+
+e2e:prod:gke:windows:test:
+  stage: e2e
+  timeout: 90m
+  needs:
+    - e2e:prod:gke:windows:apply
+  extends:
+    - .rules:merge_request_pipelines:e2e
+    - .go-cache
+    - .e2e:prod:gcloud:init
+  resource_group: e2e-prod
+  variables:
+    PROVIDER: google
+    E2E_DIR: e2e/google/gke-windows
+    FF_TIMESTAMPS: true
+  script:
+    - go test ./e2e/google/gke-windows -tags e2e -timeout ${CI_JOB_TIMEOUT}s
+
+e2e:prod:gke:windows:destroy:
+  stage: e2e
+  timeout: 30m
+  needs:
+    - job: e2e:prod:gke:windows:test
+  when: always
+  extends:
+    - .rules:merge_request_pipelines:e2e
+    - .go-cache
+    - .e2e:prod:gcloud:init
+    - .e2e:prod:terraform:destroy
+  resource_group: e2e-prod
+  variables:
+    PROVIDER: google
+    E2E_DIR: e2e/google/gke-windows
+    FF_TIMESTAMPS: true

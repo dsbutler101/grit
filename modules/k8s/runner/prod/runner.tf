@@ -29,6 +29,7 @@ module "runner" {
   run_untagged     = var.run_untagged
   runner_tags      = var.runner_tags
   config_template  = var.config_template
+  envvars          = var.envvars
   pod_spec_patches = var.pod_spec_patches
   runner_image     = var.runner_image
   helper_image     = var.helper_image

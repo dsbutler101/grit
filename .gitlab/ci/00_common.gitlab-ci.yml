@@ -7,6 +7,20 @@ variables:
   GO_VERSION: "go1.22.5"
   DOCKER_VERSION: "24.0.9"
 
+  PROVIDER: aws
+  OS: linux
+  ARCH: amd64
+  JOB_NAME: "u-${CI_COMMIT_SHORT_SHA}-${PROVIDER}"
+
+  # Terraform backend config
+  TF_HTTP_ADDRESS: "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/terraform/state/${JOB_NAME}"
+  TF_HTTP_LOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
+  TF_HTTP_UNLOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
+  TF_HTTP_USERNAME: ${GITLAB_USER_LOGIN}
+  TF_HTTP_PASSWORD: ${GITLAB_TOKEN_TERRAFORM}
+  TF_HTTP_LOCK_METHOD: POST
+  TF_HTTP_UNLOCK_METHOD: DELETE
+
 .no_cache:
   cache: {}
 
@@ -48,3 +62,17 @@ variables:
     DOCKER_TLS_CERTDIR: "/certs"
   tags:
     - gitlab-org-docker
+
+.e2e:prod:gcloud:init:
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+  before_script:
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+
+.e2e:prod:terraform:apply:
+  script:
+    - mage terraform:initAndApply
+
+.e2e:prod:terraform:destroy:
+  script:
+    - mage terraform:initAndDestroy

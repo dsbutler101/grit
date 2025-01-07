@@ -62,6 +62,12 @@ variable "config_template" {
   default     = ""
 }
 
+variable "envvars" {
+  type        = map(string)
+  description = "The environment variables to configure for the runner"
+  default     = {}
+}
+
 variable "runner_image" {
   type        = string
   description = "The container image for the GitLab Runner manager"

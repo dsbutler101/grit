@@ -49,6 +49,12 @@ variable "max_instances" {
   }
 }
 
+variable "max_use_count" {
+  type = number
+
+  default = 1
+}
+
 variable "concurrent" {
   type = number
 

@@ -86,6 +86,7 @@ module "runner" {
   scale_max             = var.max_instances
   idle_percentage       = var.autoscaling_policy.scale_factor
   capacity_per_instance = var.capacity_per_instance
+  max_use_count         = var.max_use_count
 
   security_group_ids = [module.security_groups.runner_manager.id]
 }

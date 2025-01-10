@@ -32,6 +32,7 @@ locals {
           idle_count              = var.scale_min * var.capacity_per_instance
           scale_max               = var.scale_max
           max_use_count           = var.max_use_count
+          idle_percentage         = var.idle_percentage
           privileged              = var.privileged
           region                  = var.region
           enable_metrics_export   = var.enable_metrics_export

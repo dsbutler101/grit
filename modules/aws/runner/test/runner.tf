@@ -26,6 +26,7 @@ module "ec2" {
   scale_min                  = var.scale_min
   scale_max                  = var.scale_max
   max_use_count              = var.max_use_count
+  idle_percentage            = var.idle_percentage
   security_group_ids         = var.security_group_ids
   privileged                 = var.privileged
   region                     = var.region

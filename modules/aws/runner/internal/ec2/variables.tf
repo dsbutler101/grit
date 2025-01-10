@@ -56,6 +56,11 @@ variable "max_use_count" {
   type = number
 }
 
+variable "idle_percentage" {
+  description = "The number of idle instances to maintain as a percentage of the current number of busy instances"
+  type        = number
+}
+
 variable "executor" {
   type = string
 }

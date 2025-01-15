@@ -159,5 +159,5 @@ func requireRunnerManagerRunning(t *testing.T, instanceName string) {
 	require.NotNil(t, result)
 	require.Len(t, result.Reservations, 1)
 	require.Len(t, result.Reservations[0].Instances, 1)
-	require.Equal(t, "running", result.Reservations[0].Instances[0].State.Name)
+	require.Equal(t, types.InstanceStateNameRunning, result.Reservations[0].Instances[0].State.Name)
 }

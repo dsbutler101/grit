@@ -3,6 +3,7 @@
 package e2e
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"math/rand"
@@ -12,14 +13,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	terratest_aws "github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
-	"github.com/xanzy/go-gitlab"
+	gitlab "gitlab.com/gitlab-org/api/client-go"
 
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/common"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
@@ -111,8 +113,8 @@ func TestEndToEnd(t *testing.T) {
 	require.NoError(t, err)
 	autoscalingClient, err := terratest_aws.NewAsgClientE(t, common.Region)
 	require.NoError(t, err)
-	groups, err := autoscalingClient.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
-		AutoScalingGroupNames: []*string{&asg},
+	groups, err := autoscalingClient.DescribeAutoScalingGroups(context.TODO(), &autoscaling.DescribeAutoScalingGroupsInput{
+		AutoScalingGroupNames: []string{asg},
 	})
 	require.NoError(t, err)
 	if len(groups.AutoScalingGroups) != 1 {
@@ -132,22 +134,23 @@ func TestEndToEnd(t *testing.T) {
 }
 
 func requireRunnerManagerRunning(t *testing.T, instanceName string) {
-	sess, _ := session.NewSession(&aws.Config{
-		Region: aws.String("us-east-1")},
-	)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("us-east-1"))
+	require.NoError(t, err)
 
-	svc := ec2.New(sess)
+	svc := ec2.NewFromConfig(cfg)
 
 	input := &ec2.DescribeInstancesInput{
-		Filters: []*ec2.Filter{
+		Filters: []types.Filter{
 			{
 				Name:   aws.String("tag:Name"),
-				Values: []*string{aws.String(instanceName)},
+				Values: []string{instanceName},
 			},
 		},
 	}
 
-	result, err := svc.DescribeInstances(input)
+	result, err := svc.DescribeInstances(ctx, input)
 	if err != nil {
 		fmt.Println("Error", err)
 		return
@@ -156,5 +159,5 @@ func requireRunnerManagerRunning(t *testing.T, instanceName string) {
 	require.NotNil(t, result)
 	require.Len(t, result.Reservations, 1)
 	require.Len(t, result.Reservations[0].Instances, 1)
-	require.Equal(t, "running", *result.Reservations[0].Instances[0].State.Name)
+	require.Equal(t, types.InstanceStateNameRunning, result.Reservations[0].Instances[0].State.Name)
 }

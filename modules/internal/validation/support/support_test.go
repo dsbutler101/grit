@@ -26,6 +26,72 @@ func TestSupport(t *testing.T) {
 				},
 			},
 		},
+		"none support okay for none requirements": {
+			vars: map[string]any{
+				"min_support": "none",
+				"use_case":    "instance",
+				"use_case_support": map[string]any{
+					"instance": "unsupported",
+				},
+			},
+		},
+		"experimental support okay for none requirements": {
+			vars: map[string]any{
+				"min_support": "none",
+				"use_case":    "instance",
+				"use_case_support": map[string]any{
+					"instance": "experimental",
+				},
+			},
+		},
+		"beta support okay for none requirements": {
+			vars: map[string]any{
+				"min_support": "none",
+				"use_case":    "instance",
+				"use_case_support": map[string]any{
+					"instance": "beta",
+				},
+			},
+		},
+		"ga support okay for none requirements": {
+			vars: map[string]any{
+				"min_support": "none",
+				"use_case":    "instance",
+				"use_case_support": map[string]any{
+					"instance": "ga",
+				},
+			},
+		},
+		"none support not okay for experimental requirements": {
+			vars: map[string]any{
+				"min_support": "experimental",
+				"use_case":    "instance",
+				"use_case_support": map[string]any{
+					"instance": "unsupported",
+				},
+			},
+			wantErr: true,
+		},
+		"none support not okay for beta requirements": {
+			vars: map[string]any{
+				"min_support": "beta",
+				"use_case":    "instance",
+				"use_case_support": map[string]any{
+					"instance": "unsupported",
+				},
+			},
+			wantErr: true,
+		},
+		"none support not okay for ga requirements": {
+			vars: map[string]any{
+				"min_support": "ga",
+				"use_case":    "instance",
+				"use_case_support": map[string]any{
+					"instance": "unsupported",
+				},
+			},
+			wantErr: true,
+		},
 		"experimental support not okay for beta requirements": {
 			vars: map[string]any{
 				"min_support": "beta",

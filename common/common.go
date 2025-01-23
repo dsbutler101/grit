@@ -14,7 +14,7 @@ const (
 	JobIdVar                  = "CI_JOB_ID"
 	CommitSHAVar              = "CI_COMMIT_SHA"
 	JobName                   = "JOB_NAME"
-	GitlabTokenVar            = "GITLAB_TOKEN"
+	GitlabTokenVar            = "GITLAB_TOKEN_E2E"
 	GritE2eDirectory          = "E2E_DIR"
 	GritEndToEndTestProjectID = 52010278
 	GitLabProjectID           = "CI_PROJECT_ID"

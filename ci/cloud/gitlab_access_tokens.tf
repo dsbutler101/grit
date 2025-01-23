@@ -36,3 +36,16 @@ resource "gitlab_project_access_token" "e2e-tests-terraform" {
     rotate_before_days = 30
   }
 }
+
+resource "gitlab_project_access_token" "e2e-tests-jobs" {
+  project      = data.gitlab_project.grit.id
+  name         = "e2e-tests-jobs"
+  access_level = "maintainer"
+
+  scopes = ["api", "create_runner", "manage_runner"]
+
+  rotation_configuration = {
+    expiration_days    = 365
+    rotate_before_days = 30
+  }
+}

@@ -50,7 +50,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"scale_min":                  1,
 				"scale_max":                  1,
 				"max_use_count":              10,
-				"idle_percentage": 0.0,
+				"idle_percentage":            0.0,
 				"name":                       name,
 				"labels":                     map[string]string{"env": "another place"},
 				"security_group_ids":         []string{"123456"},
@@ -64,6 +64,13 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"enable_metrics_export":      false,
 				"metrics_export_endpoint":    "0.0.0.0:9402",
 				"default_docker_image":       "ubuntu:latest",
+				"usage_logger": map[string]interface{}{
+					"enabled": true,
+					"log_dir": "/var/log/usage",
+					"custom_labels": map[string]interface{}{
+						"stack_os": "os-name",
+					},
+				},
 			},
 			expectedModules: expectedModules,
 		},

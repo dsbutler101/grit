@@ -118,3 +118,11 @@ variable "metrics_export_endpoint" {
 variable "default_docker_image" {
   type = string
 }
+
+variable "usage_logger" {
+  type = object({
+    enabled       = bool
+    log_dir       = string
+    custom_labels = map(string)
+  })
+}

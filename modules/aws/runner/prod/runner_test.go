@@ -54,6 +54,13 @@ func TestRunner(t *testing.T) {
 				"capacity_per_instance": 1,
 				"security_group_ids":    []string{"123456"},
 				"default_docker_image":  "ubuntu:latest",
+				"usage_logger": map[string]interface{}{
+					"enabled": true,
+					"log_dir": "/var/log/usage",
+					"custom_labels": map[string]interface{}{
+						"stack_os": "os-name",
+					},
+				},
 			},
 			expectedModules: []string{
 				"module.ec2[0].aws_instance.runner-manager",

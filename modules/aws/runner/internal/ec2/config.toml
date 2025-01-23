@@ -4,7 +4,7 @@ listen_address = "${metrics_export_endpoint}"
 %{ endif }
 
 [[runners]]
-    name = "grit-instance"
+    name = "${runner_name}"
     url = "${gitlab_url}"
     token = "${runner_token}"
     executor = "${executor}"
@@ -62,4 +62,16 @@ listen_address = "${metrics_export_endpoint}"
             AccessKey = "${s3_cache.access_key_id}"
             SecretKey = "${s3_cache.secret_access_key}"
             Insecure = false
+%{ endif }
+
+%{ if usage_logger.enabled == true }
+[experimental]
+  [experimental.usage_logger]
+    enabled = true
+    log_dir = "${usage_logger.log_dir}"
+
+    [experimental.usage_logger.labels]
+    %{ for key, value in usage_logger.custom_labels }
+        ${key} = "${value}"
+    %{ endfor }
 %{ endif }

@@ -207,3 +207,18 @@ variable "s3_cache" {
     secret_access_key = ""
   }
 }
+
+################
+# Usage Logger #
+################
+variable "usage_logger" {
+  description = "Enable GitLab Runner usage logging"
+  type = object({
+    enabled       = bool
+    log_dir       = optional(string, "/var/log/usage")
+    custom_labels = optional(map(string), {})
+  })
+  default = {
+    enabled = false
+  }
+}

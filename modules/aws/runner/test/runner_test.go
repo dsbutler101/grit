@@ -47,6 +47,13 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 				},
 				"service":            "ec2",
 				"security_group_ids": []string{"123456"},
+				"usage_logger": map[string]interface{}{
+					"enabled": true,
+					"log_dir": "/var/log/usage",
+					"custom_labels": map[string]interface{}{
+						"stack_os": "os-name",
+					},
+				},
 			},
 			expectedModules: []string{
 				"module.ec2[0].aws_instance.runner-manager",

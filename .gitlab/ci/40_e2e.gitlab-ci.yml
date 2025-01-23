@@ -44,6 +44,7 @@ e2e:dev:gke:windows:apply:
 e2e:dev:gke:windows:test:
   stage: e2e
   timeout: 90m
+  image: mcr.microsoft.com/powershell:lts-windowsservercore-1809
   needs:
     - e2e:dev:gke:windows:apply
   extends:

@@ -63,9 +63,6 @@
     - <<: *if-not-canonical-namespace
       when: never
     - <<: *if-merge-request-pipeline
-      changes: *ci-cloud-patterns
-      when: never
-    - <<: *if-merge-request-pipeline
       changes: *code-backstage-patterns
     - <<: *if-default-branch
       changes: *code-backstage-patterns

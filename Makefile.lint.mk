@@ -6,10 +6,6 @@ lint-docs:
 terraform-fmt-check:
 	terraform fmt -check -recursive
 
-.PHONY: lint-terraform
-lint-terraform:
-	go test -count=1 -tags lint .
-
 .PHONY: lint-go
 lint-go:
 	golangci-lint run

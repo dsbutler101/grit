@@ -81,6 +81,10 @@ variable "region" {
   type = string
 }
 
+variable "runner_repository" {
+  type = string
+}
+
 variable "runner_version" {
   type = string
 }

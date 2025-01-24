@@ -56,6 +56,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"security_group_ids":         []string{"123456"},
 				"install_cloudwatch_agent":   false,
 				"region":                     "us-east-1",
+				"runner_repository":          "gitlab-runner",
 				"runner_version":             "16.11.1-1",
 				"aws_plugin_version":         "0.5.0",
 				"privileged":                 false,

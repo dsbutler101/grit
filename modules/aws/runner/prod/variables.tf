@@ -88,6 +88,12 @@ variable "region" {
   default     = "us-east-1"
 }
 
+variable "runner_repository" {
+  description = "The repository of gitlab-runner packages"
+  type        = string
+  default     = "gitlab-runner"
+}
+
 variable "runner_version" {
   description = "The version of gitlab-runner"
   type        = string

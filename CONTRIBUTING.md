@@ -124,8 +124,7 @@ Run the tests with `make e2e-test`.
 We check the Terraform style with `terraform fmt` and validate `variables.tf`
 files with a `go` test to ensure variable definitions are in the correct place.
 
-Run `make terraform-fmt-check` to check Terraform formatting and
-`make lint-terraform` to lint variables.
+Run `make terraform-fmt-check` to check Terraform formatting.
 
 #### Go
 

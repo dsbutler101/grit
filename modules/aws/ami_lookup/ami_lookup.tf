@@ -3,7 +3,7 @@
 #######################
 
 module "validate-support" {
-  source   = "../../../internal/validation/support"
+  source   = "../../internal/validation/support"
   use_case = local.use_case
   use_case_support = tomap({
     "linux-amd64-ephemeral" = "experimental"

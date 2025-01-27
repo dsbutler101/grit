@@ -1,4 +1,4 @@
-package manager
+package cache
 
 import (
 	"testing"
@@ -20,8 +20,11 @@ func TestCache(t *testing.T) {
 	}{
 		"create cache": {
 			moduleVars: map[string]interface{}{
-				"name":                  name,
-				"labels":                map[string]string{"env": "another place"},
+				"metadata": map[string]interface{}{
+					"name":        name,
+					"labels":      map[string]string{"env": "another place"},
+					"min_support": "experimental",
+				},
 				"cache_object_lifetime": 10,
 				"bucket_name":           "optional-explicit-bucket-name",
 				"bucket_location":       "us-east1",

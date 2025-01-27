@@ -4,7 +4,11 @@ variable "runner_token" {
 
 locals {
   metadata = {
-    name = "littlerunner"
+    name        = "littlerunner"
+    min_support = "none"
+    labels = {
+      "env" = "test"
+    }
   }
 }
 
@@ -26,7 +30,7 @@ module "runner" {
 }
 
 module "security_groups" {
-  source = "../../modules/aws/security_groups/test"
+  source = "../../modules/aws/security_groups"
 
   metadata = local.metadata
 

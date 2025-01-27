@@ -1,4 +1,4 @@
-package securitygroups
+package security_groups
 
 import (
 	"testing"
@@ -28,9 +28,12 @@ func TestAWSSecurityGroups(t *testing.T) {
 	}{
 		"common fleet": {
 			moduleVars: map[string]interface{}{
-				"labels": map[string]string{"env": "another place"},
+				"metadata": map[string]interface{}{
+					"name":        name,
+					"labels":      map[string]string{"env": "another place"},
+					"min_support": "experimental",
+				},
 				"vpc_id": "1234",
-				"name":   name,
 				"manager_outbound_sg_rules": map[string]interface{}{
 					"outbound_all": map[string]interface{}{
 						"from_port":   0,

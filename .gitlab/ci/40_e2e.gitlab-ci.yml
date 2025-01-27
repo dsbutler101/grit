@@ -1,3 +1,15 @@
+.e2e:gcloud:init:
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+  before_script:
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+
+.e2e:terraform:apply: &e2e_terraform_apply
+  - mage terraform:initAndApply
+
+.e2e:terraform:destroy: &e2e_terraform_destroy
+  - mage terraform:initAndDestroy
+
 e2e:prod:aws:
   stage: e2e
   needs: []
@@ -38,8 +50,10 @@ e2e:dev:gke:windows:apply:
     - .rules:merge_request_pipelines:e2e
     - .go-cache
     - .e2e:gcloud:init
-    - .e2e:terraform:apply
     - .e2e:dev:gke:windows:variables
+  script:
+    - *e2e_terraform_apply
+    - mage runner:waitForRunners 20
 
 e2e:dev:gke:windows:test:
   stage: e2e
@@ -69,5 +83,6 @@ e2e:dev:gke:windows:destroy:
     - .rules:merge_request_pipelines:e2e
     - .go-cache
     - .e2e:gcloud:init
-    - .e2e:terraform:destroy
     - .e2e:dev:gke:windows:variables
+  script:
+    - *e2e_terraform_destroy

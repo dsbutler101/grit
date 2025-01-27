@@ -92,7 +92,7 @@ module "runner" {
 }
 
 module "security_groups" {
-  source   = "../../../../modules/aws/security_groups/prod"
+  source   = "../../../../modules/aws/security_groups"
   metadata = local.metadata
 
   vpc_id = module.vpc.id

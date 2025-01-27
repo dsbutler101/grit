@@ -1,9 +1,9 @@
-resource "aws_security_group" "manager_sg" {
-  name   = "${var.name} manager"
+resource "aws_security_group" "jobs_security_group" {
+  name   = "${var.metadata.name} fleet"
   vpc_id = var.vpc_id
 
   dynamic "ingress" {
-    for_each = var.manager_inbound_sg_rules
+    for_each = var.fleeting_inbound_sg_rules
     content {
       from_port   = ingress.value.from_port
       to_port     = ingress.value.to_port
@@ -14,7 +14,7 @@ resource "aws_security_group" "manager_sg" {
   }
 
   dynamic "egress" {
-    for_each = var.manager_outbound_sg_rules
+    for_each = var.fleeting_outbound_sg_rules
     content {
       from_port   = egress.value.from_port
       to_port     = egress.value.to_port
@@ -24,7 +24,7 @@ resource "aws_security_group" "manager_sg" {
     }
   }
 
-  tags = merge(var.labels, {
-    Name = "${var.name} manager"
+  tags = merge(var.metadata.labels, {
+    Name = "${var.metadata.name} fleet"
   })
 }

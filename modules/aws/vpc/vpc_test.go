@@ -1,4 +1,4 @@
-package manager
+package vpc
 
 import (
 	"testing"
@@ -24,11 +24,14 @@ func TestVPC(t *testing.T) {
 	}{
 		"create vpc": {
 			moduleVars: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"name":        name,
+					"labels":      map[string]string{"env": "another place"},
+					"min_support": "experimental",
+				},
 				"cidr":        "10.0.0.0/16",
 				"subnet_cidr": "10.0.0.0/24",
 				"zone":        "us-east-1a",
-				"labels":      map[string]string{"env": "another place"},
-				"name":        name,
 			},
 			expectedModules: expectedModules,
 		},

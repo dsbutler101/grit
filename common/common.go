@@ -14,7 +14,8 @@ const (
 	JobIdVar                  = "CI_JOB_ID"
 	CommitSHAVar              = "CI_COMMIT_SHA"
 	JobName                   = "JOB_NAME"
-	GitlabTokenVar            = "GITLAB_TOKEN_E2E"
+	GitlabTokenVar            = "GITLAB_TOKEN"
+	GitlabTokenVarE2E         = "GITLAB_TOKEN_E2E"
 	GritE2eDirectory          = "E2E_DIR"
 	GritEndToEndTestProjectID = 52010278
 	GitLabProjectID           = "CI_PROJECT_ID"
@@ -75,7 +76,7 @@ func getJobEnv() (*JobEnv, error) {
 		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
-	je.GitlabToken, err = envVar(GitlabTokenVar)
+	je.GitlabToken, err = envVar(GitlabTokenVarE2E)
 	if err != nil {
 		return nil, fmt.Errorf("setting up job: %w", err)
 	}

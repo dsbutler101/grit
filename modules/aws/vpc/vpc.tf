@@ -1,18 +1,40 @@
+#######################
+# METADATA VALIDATION #
+#######################
+
+module "validate-name" {
+  source = "../../internal/validation/name"
+  name   = var.metadata.name
+}
+
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "any"
+  use_case_support = tomap({
+    "any" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
+###################
+# VPC PROD MODULE #
+###################
+
 resource "aws_vpc" "vpc" {
   cidr_block           = var.cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = merge(var.labels, {
-    Name = var.name
+  tags = merge(var.metadata.labels, {
+    Name = var.metadata.name
   })
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
-  tags = merge(var.labels, {
-    Name = var.name
+  tags = merge(var.metadata.labels, {
+    Name = var.metadata.name
   })
 }
 
@@ -24,8 +46,8 @@ resource "aws_subnet" "jobs-vpc-subnet" {
 
   map_public_ip_on_launch = true
 
-  tags = merge(var.labels, {
-    Name = var.name
+  tags = merge(var.metadata.labels, {
+    Name = var.metadata.name
   })
 }
 
@@ -45,3 +67,4 @@ resource "aws_route" "internet-route" {
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.igw.id
 }
+

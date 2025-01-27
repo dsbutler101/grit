@@ -1,5 +1,5 @@
 module "vpc" {
-  source   = "../../../../modules/aws/vpc/prod"
+  source   = "../../../../modules/aws/vpc"
   metadata = local.metadata
 
   zone = var.aws_zone

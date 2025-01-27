@@ -23,7 +23,7 @@ module "iam" {
 }
 
 module "vpc" {
-  source   = "../../modules/aws/vpc/prod"
+  source   = "../../modules/aws/vpc"
   metadata = local.metadata
 
   zone        = "us-east-1b"

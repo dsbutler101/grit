@@ -15,7 +15,7 @@ module "iam" {
 }
 
 module "ami_lookup" {
-  source   = "../../../../modules/aws/ami_lookup/prod"
+  source   = "../../../../modules/aws/ami_lookup"
   use_case = "aws-linux-ephemeral"
   region   = var.aws_region
   metadata = local.metadata

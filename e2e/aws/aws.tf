@@ -56,7 +56,7 @@ module "fleeting" {
 }
 
 module "ami_lookup" {
-  source   = "../../modules/aws/ami_lookup/prod"
+  source   = "../../modules/aws/ami_lookup"
   use_case = "aws-linux-ephemeral"
   region   = "us-east-1"
   metadata = local.metadata

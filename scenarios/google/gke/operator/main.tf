@@ -50,12 +50,13 @@ module "operator" {
 }
 
 module "gitlab" {
-  source = "../../../../modules/gitlab/test/"
+  source = "../../../../modules/gitlab"
 
   metadata           = local.metadata
   project_id         = var.gitlab_project_id
   runner_description = var.runner_description
   runner_tags        = var.runner_tags
+  url                = "https://gitlab.com"
 }
 
 module "runner" {

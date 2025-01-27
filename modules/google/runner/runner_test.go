@@ -1,4 +1,4 @@
-package manager
+package runner
 
 import (
 	"testing"
@@ -30,8 +30,11 @@ func TestRunner(t *testing.T) {
 	}{
 		"create runner": {
 			moduleVars: map[string]interface{}{
-				"name":                  name,
-				"labels":                map[string]string{"env": "another place"},
+				"metadata": map[string]interface{}{
+					"name":        name,
+					"labels":      map[string]string{"env": "another place"},
+					"min_support": "experimental",
+				},
 				"google_project":        "example-project-a1b2c3",
 				"google_zone":           "us-east1-b",
 				"runner_version":        "v16.8.0",

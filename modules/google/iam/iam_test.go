@@ -1,4 +1,4 @@
-package manager
+package iam
 
 import (
 	"testing"
@@ -19,7 +19,11 @@ func TestIAM(t *testing.T) {
 	}{
 		"create iam": {
 			moduleVars: map[string]interface{}{
-				"name": name,
+				"metadata": map[string]interface{}{
+					"name":        name,
+					"labels":      map[string]string{},
+					"min_support": "experimental",
+				},
 			},
 			expectedModules: expectedModules,
 		},

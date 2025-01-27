@@ -9,7 +9,7 @@ module "vpc" {
 }
 
 module "iam" {
-  source = "../../../../modules/google/iam/prod"
+  source = "../../../../modules/google/iam"
 
   metadata = local.metadata
 }
@@ -122,7 +122,7 @@ module "runner" {
 }
 
 module "prometheus-iam" {
-  source = "../../../../modules/google/iam/prod"
+  source = "../../../../modules/google/iam"
 
   metadata = merge(local.metadata, {
     name = "${local.metadata.name}-prom"

@@ -1,10 +1,10 @@
 locals {
-  name_underscore = replace(var.name, "-", "_")
+  name_underscore = replace(var.metadata.name, "-", "_")
 }
 
 resource "google_project_iam_custom_role" "prometheus-server" {
   role_id = "${local.name_underscore}_prometheusServer"
-  title   = "Role for ${var.name} runner manager"
+  title   = "Role for ${var.metadata.name} runner manager"
 
   permissions = [
     "compute.instances.list"

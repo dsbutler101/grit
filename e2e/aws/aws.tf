@@ -18,7 +18,7 @@ locals {
 }
 
 module "iam" {
-  source   = "../../modules/aws/iam/prod"
+  source   = "../../modules/aws/iam"
   metadata = local.metadata
 }
 

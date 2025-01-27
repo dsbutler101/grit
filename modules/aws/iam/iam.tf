@@ -1,8 +1,30 @@
-resource "aws_iam_user" "fleeting-service-account" {
-  name = var.name
+#######################
+# METADATA VALIDATION #
+#######################
 
-  tags = merge(var.labels, {
-    Name = var.name
+module "validate-name" {
+  source = "../../internal/validation/name"
+  name   = var.metadata.name
+}
+
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "any"
+  use_case_support = tomap({
+    "any" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
+###################
+# IAM PROD MODULE #
+###################
+
+resource "aws_iam_user" "fleeting-service-account" {
+  name = var.metadata.name
+
+  tags = merge(var.metadata.labels, {
+    Name = var.metadata.name
   })
 }
 
@@ -41,12 +63,12 @@ data "aws_iam_policy_document" "fleeting-service-account-policy-document" {
 }
 
 resource "aws_iam_policy" "fleeting-service-account-policy" {
-  name        = var.name
+  name        = var.metadata.name
   description = "A policy for accessing autoscaling groups"
   policy      = data.aws_iam_policy_document.fleeting-service-account-policy-document.json
 
-  tags = merge(var.labels, {
-    Name = var.name
+  tags = merge(var.metadata.labels, {
+    Name = var.metadata.name
   })
 }
 
@@ -60,3 +82,4 @@ resource "aws_iam_user_policy_attachment" "fleeting-service-account-attach" {
 resource "aws_iam_access_key" "fleeting-service-account-key" {
   user = aws_iam_user.fleeting-service-account.name
 }
+

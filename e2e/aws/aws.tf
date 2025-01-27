@@ -39,7 +39,7 @@ module "security_groups" {
 }
 
 module "fleeting" {
-  source   = "../../modules/aws/fleeting/prod"
+  source   = "../../modules/aws/fleeting"
   metadata = local.metadata
   vpc      = local.vpc
 

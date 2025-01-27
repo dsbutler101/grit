@@ -21,7 +21,7 @@ locals {
 }
 
 module "iam" {
-  source   = "../../modules/google/iam/prod"
+  source   = "../../modules/google/iam"
   metadata = local.metadata
 }
 

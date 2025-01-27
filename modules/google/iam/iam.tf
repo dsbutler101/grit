@@ -3,12 +3,12 @@
 #######################
 
 module "validate-name" {
-  source = "../../../internal/validation/name"
+  source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
 module "validate-support" {
-  source   = "../../../internal/validation/support"
+  source   = "../../internal/validation/support"
   use_case = "iam"
   use_case_support = tomap({
     "iam" = "experimental"
@@ -20,8 +20,8 @@ module "validate-support" {
 # IAM PROD MODULE #
 ###################
 
-module "iam" {
-  source = "../internal"
-
-  name = var.metadata.name
+resource "google_service_account" "default" {
+  account_id   = var.metadata.name
+  display_name = "Service account for ${var.metadata.name}"
 }
+

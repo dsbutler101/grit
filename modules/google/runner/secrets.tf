@@ -1,10 +1,10 @@
 resource "google_kms_key_ring" "default" {
-  name     = var.name
+  name     = var.metadata.name
   location = "global"
 }
 
 resource "google_kms_crypto_key" "default" {
-  name            = var.name
+  name            = var.metadata.name
   key_ring        = google_kms_key_ring.default.id
   rotation_period = "604800s"
 }

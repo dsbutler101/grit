@@ -55,7 +55,7 @@ module "fleeting" {
 }
 
 module "runner" {
-  source   = "../../modules/google/runner/prod"
+  source   = "../../modules/google/runner"
   metadata = local.metadata
 
   google_project = var.google_project

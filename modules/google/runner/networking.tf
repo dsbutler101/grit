@@ -1,5 +1,5 @@
 resource "google_compute_firewall" "runner-manager-ssh-access" {
-  name    = "${var.name}-runner-manager-ssh-access"
+  name    = "${var.metadata.name}-runner-manager-ssh-access"
   network = var.vpc.id
 
   direction = "INGRESS"
@@ -18,7 +18,7 @@ resource "google_compute_firewall" "runner-manager-ssh-access" {
 resource "google_compute_firewall" "additional-rules" {
   for_each = var.runner_manager_additional_firewall_rules
 
-  name    = "${var.name}-runner-${each.key}-access"
+  name    = "${var.metadata.name}-runner-${each.key}-access"
   network = var.vpc.id
 
   direction = each.value.direction

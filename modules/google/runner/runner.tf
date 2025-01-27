@@ -1,3 +1,25 @@
+#######################
+# METADATA VALIDATION #
+#######################
+
+module "validate-name" {
+  source = "../../internal/validation/name"
+  name   = var.metadata.name
+}
+
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "runner"
+  use_case_support = tomap({
+    "runner" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
+######################
+# RUNNER PROD CONFIG #
+######################
+
 locals {
   runner_manager_tag = "gitlab-runner-manager"
 
@@ -53,7 +75,7 @@ data "cloudinit_config" "config" {
           content = templatefile("${path.module}/templates/entrypoint.sh", {
             kms_key = google_kms_crypto_key.default.id
 
-            name       = var.name
+            name       = var.metadata.name
             gitlab_url = var.gitlab_url
 
             runner_token   = google_kms_secret_ciphertext.runner-token.ciphertext
@@ -136,7 +158,7 @@ data "cloudinit_config" "config" {
 }
 
 resource "google_compute_instance" "runner-manager" {
-  name         = "${var.name}-runner-manager"
+  name         = "${var.metadata.name}-runner-manager"
   machine_type = var.machine_type != "" ? var.machine_type : local.runner_manager_machine_type
 
   metadata = {
@@ -145,7 +167,7 @@ resource "google_compute_instance" "runner-manager" {
     cos-update-strategy = "update_disabled"
   }
 
-  labels = merge(var.labels, {
+  labels = merge(var.metadata.labels, {
     purpose = local.runner_manager_tag
   })
 
@@ -193,3 +215,4 @@ resource "google_compute_instance" "runner-manager" {
     ]
   }
 }
+

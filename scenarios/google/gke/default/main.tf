@@ -21,7 +21,7 @@ locals {
 }
 
 module "vpc" {
-  source = "../../../../modules/google/vpc/prod/"
+  source = "../../../../modules/google/vpc"
 
   metadata = local.metadata
 

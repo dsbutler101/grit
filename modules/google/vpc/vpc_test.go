@@ -1,4 +1,4 @@
-package manager
+package vpc
 
 import (
 	"testing"
@@ -23,7 +23,11 @@ func TestVPC(t *testing.T) {
 	}{
 		"create vpc": {
 			moduleVars: map[string]interface{}{
-				"name":          name,
+				"metadata": map[string]interface{}{
+					"name":        name,
+					"labels":      map[string]string{"env": "another-place"},
+					"min_support": "experimental",
+				},
 				"google_region": "us-east1",
 				"subnetworks": map[string]string{
 					"subnet-1": "10.0.0.0/24",

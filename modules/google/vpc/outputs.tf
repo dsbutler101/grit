@@ -1,14 +1,17 @@
 output "id" {
-  value = google_compute_network.default.id
+  description = "ID of the created VPC"
+  value       = google_compute_network.default.id
 }
 
 output "subnetwork_ids" {
+  description = "Map of created subnetwork IDs"
   value = tomap({
     for name, subnet in google_compute_subnetwork.subnetwork : name => subnet.id
   })
 }
 
 output "subnetwork_cidrs" {
+  description = "Map of created subnetwork CIDRs"
   value = tomap({
     for name, subnet in google_compute_subnetwork.subnetwork : name => subnet.ip_cidr_range
   })

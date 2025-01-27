@@ -1,8 +1,8 @@
 resource "aws_iam_user" "cache" {
-  name = "${var.name}-cache"
+  name = "${var.metadata.name}-cache"
 
-  tags = merge(var.labels, {
-    Name = var.name
+  tags = merge(var.metadata.labels, {
+    Name = var.metadata.name
   })
 }
 
@@ -26,12 +26,12 @@ data "aws_iam_policy_document" "cache-bucket-access-policy-document" {
 }
 
 resource "aws_iam_policy" "cache-bucket-access-policy" {
-  name        = "${var.name}-cache"
+  name        = "${var.metadata.name}-cache"
   description = "A policy for accessing S3 cache bucket"
   policy      = data.aws_iam_policy_document.cache-bucket-access-policy-document.json
 
-  tags = merge(var.labels, {
-    Name = var.name
+  tags = merge(var.metadata.labels, {
+    Name = var.metadata.name
   })
 }
 

@@ -15,7 +15,7 @@ module "iam" {
 }
 
 module "cache" {
-  source = "../../../../modules/google/cache/prod"
+  source = "../../../../modules/google/cache"
 
   metadata = local.metadata
 

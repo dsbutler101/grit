@@ -43,7 +43,7 @@ locals {
 }
 
 module "vpc" {
-  source        = "../../../modules/google/vpc/prod/"
+  source        = "../../../modules/google/vpc"
   metadata      = local.metadata
   google_region = var.google_region
   subnetworks = zipmap(

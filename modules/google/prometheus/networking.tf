@@ -1,5 +1,5 @@
 resource "google_compute_firewall" "prometheus-ssh-access" {
-  name    = "${var.name}-prometheus-ssh-access"
+  name    = "${var.metadata.name}-prometheus-ssh-access"
   network = var.vpc.id
 
   direction = "INGRESS"

@@ -1,3 +1,25 @@
+#######################
+# METADATA VALIDATION #
+#######################
+
+module "validate-name" {
+  source = "../../internal/validation/name"
+  name   = var.metadata.name
+}
+
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "prometheus"
+  use_case_support = tomap({
+    "prometheus" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
+##########################
+# PROMETHEUS PROD CONFIG #
+##########################
+
 locals {
   prometheus_server_tag = "prometheus-server"
 
@@ -74,8 +96,8 @@ resource "terraform_data" "prometheus-server-replacement" {
 }
 
 resource "google_compute_disk" "prometheus-data" {
-  name   = "${var.name}-prometheus-data"
-  labels = var.labels
+  name   = "${var.metadata.name}-prometheus-data"
+  labels = var.metadata.labels
 
   zone = var.google_zone
 
@@ -85,7 +107,7 @@ resource "google_compute_disk" "prometheus-data" {
 }
 
 resource "google_compute_instance" "prometheus-server" {
-  name         = "${var.name}-prometheus-${terraform_data.prometheus-server-replacement.output}"
+  name         = "${var.metadata.name}-prometheus-${terraform_data.prometheus-server-replacement.output}"
   machine_type = var.machine_type
 
   lifecycle {
@@ -108,7 +130,7 @@ resource "google_compute_instance" "prometheus-server" {
     block-project-ssh-keys = true
   }
 
-  labels = merge(var.labels, {
+  labels = merge(var.metadata.labels, {
     purpose : local.prometheus_server_tag,
   })
 
@@ -158,3 +180,4 @@ resource "google_compute_instance" "prometheus-server" {
     ]
   }
 }
+

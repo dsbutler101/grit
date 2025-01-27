@@ -132,7 +132,7 @@ module "prometheus-iam" {
 module "prometheus" {
   count = var.prometheus.enabled ? 1 : 0
 
-  source = "../../../../modules/google/prometheus/prod"
+  source = "../../../../modules/google/prometheus"
 
   metadata = local.metadata
 

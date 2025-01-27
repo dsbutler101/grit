@@ -63,7 +63,7 @@ module "ami_lookup" {
 }
 
 module "s3_cache" {
-  source                = "../../modules/aws/cache/prod"
+  source                = "../../modules/aws/cache"
   metadata              = local.metadata
   cache_object_lifetime = 2
 }

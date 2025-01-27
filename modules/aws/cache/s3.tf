@@ -1,5 +1,5 @@
 locals {
-  bucket_name = var.bucket_name != "" ? var.bucket_name : "${var.name}-runner-cache"
+  bucket_name = var.bucket_name != "" ? var.bucket_name : "${var.metadata.name}-runner-cache"
 }
 
 resource "aws_s3_bucket" "cache-bucket-server-logs" {
@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "cache-bucket-server-logs" {
 
   force_destroy = true
 
-  tags = merge(var.labels, {
+  tags = merge(var.metadata.labels, {
     Name = local.bucket_name
   })
 }
@@ -34,7 +34,7 @@ resource "aws_s3_bucket" "cache" {
 
   force_destroy = true
 
-  tags = merge(var.labels, {
+  tags = merge(var.metadata.labels, {
     Name = local.bucket_name
   })
 }

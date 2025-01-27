@@ -1,29 +1,29 @@
 output "enabled" {
-  value = module.cache.enabled
+  value = true
 }
 
 output "server_address" {
   description = "Address of the S3 bucket server"
-  value       = module.cache.server_address
+  value       = "s3.amazonaws.com"
 }
 
 output "bucket_name" {
   description = "Name of the created bucket"
-  value       = module.cache.bucket_name
+  value       = aws_s3_bucket.cache.id
 }
 
 output "bucket_location" {
   description = "AWS region of the cache bucket"
-  value       = module.cache.bucket_location
+  value       = aws_s3_bucket.cache.region
 }
 
 output "access_key_id" {
   description = "Access key ID for the user with access to the cache bucket"
-  value       = module.cache.access_key_id
+  value       = aws_iam_access_key.cache-bucket-user-key.id
 }
 
 output "secret_access_key" {
   description = "Secret access key for the user with access to the cache bucket"
-  value       = module.cache.secret_access_key
+  value       = aws_iam_access_key.cache-bucket-user-key.secret
   sensitive   = true
 }

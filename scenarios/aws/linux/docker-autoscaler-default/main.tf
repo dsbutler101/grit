@@ -44,7 +44,7 @@ module "fleeting" {
 }
 
 module "cache" {
-  source = "../../../../modules/aws/cache/prod"
+  source = "../../../../modules/aws/cache"
 
   metadata = local.metadata
 }

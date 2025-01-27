@@ -3,18 +3,27 @@
 #######################
 
 module "validate-name" {
-  source = "../../../internal/validation/name"
+  source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "gce"
+  use_case_support = tomap({
+    "gce" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
 ########################
-# FLEETING TEST MODULE #
+# FLEETING PROD MODULE #
 ########################
 
 module "gce" {
   count = var.fleeting_service == "gce" ? 1 : 0
 
-  source = "../internal/gce"
+  source = "./gce"
 
   name   = var.metadata.name
   labels = var.metadata.labels

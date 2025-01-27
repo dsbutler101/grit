@@ -27,7 +27,7 @@ module "cache" {
 }
 
 module "fleeting" {
-  source = "../../../../modules/google/fleeting/prod"
+  source = "../../../../modules/google/fleeting"
 
   metadata = local.metadata
 

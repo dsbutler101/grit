@@ -38,7 +38,7 @@ module "vpc" {
 }
 
 module "fleeting" {
-  source   = "../../modules/google/fleeting/prod"
+  source   = "../../modules/google/fleeting"
   metadata = local.metadata
   vpc = {
     id        = module.vpc.id

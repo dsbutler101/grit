@@ -1,4 +1,4 @@
-package gitlab_internal
+package gitlab
 
 import (
 	"testing"
@@ -16,8 +16,12 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 	}{
 		"gitlab project runner": {
 			moduleVars: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"name":        name,
+					"labels":      map[string]string{},
+					"min_support": "experimental",
+				},
 				"url":                "https://gitlab.com",
-				"name":               name + "-new-runner",
 				"runner_description": "my new GRIT runner",
 				"project_id":         common.GritEndToEndTestProjectID,
 				"runner_tags":        []string{"job-tag"},

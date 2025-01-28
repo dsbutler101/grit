@@ -14,7 +14,7 @@ import (
 func initTerraform() (*tfexec.Terraform, *JobEnv, error) {
 	je, err := getJobEnv()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to retrieved some environment variables: %w", err)
+		return nil, nil, fmt.Errorf("failed to retrieve some environment variables: %w", err)
 	}
 
 	tfPath, err := getAbsPathOfExec("terraform")

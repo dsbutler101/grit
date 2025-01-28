@@ -17,7 +17,7 @@ func WaitForRunners(maxRetries uint) error {
 
 	je, err := getJobEnv()
 	if err != nil {
-		return fmt.Errorf("failed to retrieved some environment variables: %w", err)
+		return fmt.Errorf("failed to retrieve some environment variables: %w", err)
 	}
 
 	ctx := context.Background()

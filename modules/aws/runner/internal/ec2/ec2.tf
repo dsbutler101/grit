@@ -75,7 +75,8 @@ locals {
   install_runner_cmd = [
     "export PATH=\"/etc/gitlab-runner:$PATH\"",
     "curl -L \"https://packages.gitlab.com/install/repositories/runner/${var.runner_repository}/script.deb.sh\" | sudo bash",
-    "sudo apt-get install gitlab-runner=${var.runner_version}",
+    "sudo apt-get install -ym gitlab-runner-helper-images=${var.runner_version}",
+    "sudo apt-get install -y gitlab-runner=${var.runner_version}",
   ]
 
   install_fleeting_plugin_cmd = [

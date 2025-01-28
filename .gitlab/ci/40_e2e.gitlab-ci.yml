@@ -1,3 +1,15 @@
+.e2e:gcloud:init:
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+  before_script:
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+
+.e2e:terraform:apply: &e2e_terraform_apply
+  - mage terraform:initAndApply
+
+.e2e:terraform:destroy: &e2e_terraform_destroy
+  - mage terraform:initAndDestroy
+
 e2e:prod:aws:
   stage: e2e
   needs: []
@@ -21,7 +33,14 @@ e2e:prod:google:
     - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
     - go test ./e2e/google -tags e2e -timeout 1h
 
-e2e:prod:gke:windows:apply:
+.e2e:dev:gke:windows:variables:
+  variables:
+    PROVIDER: google
+    E2E_DIR: e2e/google/gke-windows
+    RUNNER_TAGS: job-${PROVIDER}-${CI_PIPELINE_IID},e2e-gke-windows
+    FF_TIMESTAMPS: true
+
+e2e:dev:gke:windows:apply:
   stage: e2e
   timeout: 60m
   needs:
@@ -30,44 +49,40 @@ e2e:prod:gke:windows:apply:
   extends:
     - .rules:merge_request_pipelines:e2e
     - .go-cache
-    - .e2e:prod:gcloud:init
-    - .e2e:prod:terraform:apply
-  resource_group: e2e-prod
-  variables:
-    PROVIDER: google
-    E2E_DIR: e2e/google/gke-windows
-    FF_TIMESTAMPS: true
+    - .e2e:gcloud:init
+    - .e2e:dev:gke:windows:variables
+  script:
+    - *e2e_terraform_apply
+    - mage runner:waitForRunners 20
 
-e2e:prod:gke:windows:test:
+e2e:dev:gke:windows:test:
   stage: e2e
   timeout: 90m
+  image: mcr.microsoft.com/powershell:lts-windowsservercore-1809
   needs:
-    - e2e:prod:gke:windows:apply
+    - e2e:dev:gke:windows:apply
   extends:
     - .rules:merge_request_pipelines:e2e
-    - .go-cache
-    - .e2e:prod:gcloud:init
-  resource_group: e2e-prod
-  variables:
-    PROVIDER: google
-    E2E_DIR: e2e/google/gke-windows
-    FF_TIMESTAMPS: true
+    - .e2e:dev:gke:windows:variables
   script:
-    - go test ./e2e/google/gke-windows -tags e2e -timeout ${CI_JOB_TIMEOUT}s
+    - echo "Runner tags ${RUNNER_TAGS}"
+    - $metadata = (Invoke-WebRequest -Uri "http://169.254.169.254/computeMetadata/v1/instance/name" -Headers @{"Metadata-Flavor"="Google"} -UseBasicParsing).Content
+    - $metadataString = [System.Text.Encoding]::UTF8.GetString($metadata)
+    - $metadataString
+  tags:
+    - job-${PROVIDER}-${CI_PIPELINE_IID}
+    - e2e-gke-windows
 
-e2e:prod:gke:windows:destroy:
+e2e:dev:gke:windows:destroy:
   stage: e2e
   timeout: 30m
   needs:
-    - job: e2e:prod:gke:windows:test
+    - job: e2e:dev:gke:windows:test
   when: always
   extends:
     - .rules:merge_request_pipelines:e2e
     - .go-cache
-    - .e2e:prod:gcloud:init
-    - .e2e:prod:terraform:destroy
-  resource_group: e2e-prod
-  variables:
-    PROVIDER: google
-    E2E_DIR: e2e/google/gke-windows
-    FF_TIMESTAMPS: true
+    - .e2e:gcloud:init
+    - .e2e:dev:gke:windows:variables
+  script:
+    - *e2e_terraform_destroy

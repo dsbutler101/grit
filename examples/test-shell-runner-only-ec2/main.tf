@@ -13,13 +13,14 @@ locals {
 }
 
 module "runner" {
-  source = "../../modules/aws/runner/test"
+  source = "../../modules/aws/runner"
 
   metadata = local.metadata
 
   service = "ec2"
   gitlab = {
     runner_token = var.runner_token
+    url          = "https://gitlab.com"
   }
   vpc = {
     id        = "vpc-0d119da238d878eef"
@@ -27,6 +28,8 @@ module "runner" {
   }
 
   security_group_ids = [module.security_groups.runner_manager.id]
+
+  executor = "shell"
 }
 
 module "security_groups" {

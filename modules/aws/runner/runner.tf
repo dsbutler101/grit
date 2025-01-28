@@ -3,17 +3,35 @@
 #######################
 
 module "validate-name" {
-  source = "../../../internal/validation/name"
+  source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "${var.service}-${var.executor}"
+  use_case_support = tomap({
+    "ec2-docker-autoscaler" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
 ######################
-# RUNNER TEST MODULE #
+# RUNNER PROD MODULE #
 ######################
+
+module "validate-scale-parameters" {
+  source                = "../../internal/validation/scale_parameters"
+  executor              = var.executor
+  capacity_per_instance = var.capacity_per_instance
+  scale_min             = var.scale_min
+  scale_max             = var.scale_max
+  idle_percentage       = var.idle_percentage
+}
 
 module "ec2" {
   count  = var.service == "ec2" ? 1 : 0
-  source = "../internal/ec2"
+  source = "./ec2"
 
   gitlab   = var.gitlab
   fleeting = var.fleeting
@@ -25,8 +43,8 @@ module "ec2" {
   capacity_per_instance      = var.capacity_per_instance
   scale_min                  = var.scale_min
   scale_max                  = var.scale_max
-  max_use_count              = var.max_use_count
   idle_percentage            = var.idle_percentage
+  max_use_count              = var.max_use_count
   security_group_ids         = var.security_group_ids
   privileged                 = var.privileged
   region                     = var.region
@@ -40,6 +58,7 @@ module "ec2" {
   metrics_export_endpoint    = var.metrics_export_endpoint
   default_docker_image       = var.default_docker_image
   usage_logger               = var.usage_logger
+
 
   name   = var.metadata.name
   labels = var.metadata.labels

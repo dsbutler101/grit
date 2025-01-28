@@ -12,7 +12,6 @@
 
 e2e:prod:aws:
   stage: e2e
-  needs: []
   extends:
     - .rules:merge_request_pipelines:e2e
     - .go-cache
@@ -22,7 +21,6 @@ e2e:prod:aws:
 
 e2e:prod:google:
   stage: e2e
-  needs: []
   extends:
     - .rules:merge_request_pipelines:e2e
     - .go-cache
@@ -43,9 +41,6 @@ e2e:prod:google:
 e2e:dev:gke:windows:apply:
   stage: e2e
   timeout: 60m
-  needs:
-    - job: "build CI image"
-      optional: true
   extends:
     - .rules:merge_request_pipelines:e2e
     - .go-cache

@@ -69,7 +69,7 @@ module "s3_cache" {
 }
 
 module "runner" {
-  source   = "../../modules/aws/runner/prod"
+  source   = "../../modules/aws/runner"
   metadata = local.metadata
   vpc      = local.vpc
   iam      = local.iam

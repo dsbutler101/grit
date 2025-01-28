@@ -44,7 +44,7 @@ Example module source path:
 
 ```hcl
 module "my-runner" {
-  source = "grit/modules/aws/runner/prod"
+  source = "grit/modules/aws/runner"
   ...
 }
 ```
@@ -57,9 +57,9 @@ directly reference any modules within "internal" folders.
 The primary module is `runner`, which can be used by itself
 ([example main.tf](examples/test-shell-runner-only-ec2/main.tf)).
 Required and optional inputs are documented in the `variables.tf` file
-([example prod variables.tf](modules/aws/runner/prod/variables.tf)).
+([example prod variables.tf](modules/aws/runner/variables.tf)).
 Outputs are documented in the `outputs.tf` file
-([example prod outputs.tf](modules/aws/runner/prod/outputs.tf)).
+([example prod outputs.tf](modules/aws/runner/outputs.tf)).
 
 Optional modules are available to set up additional configuration for
 runner which can be fed into the `runner` module. For example, the

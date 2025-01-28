@@ -9,7 +9,7 @@ variable "metadata" {
     name = string
 
     # Labels to apply to supported resources
-    labels = map(any)
+    labels = optional(map(any), {})
 
     # Minimum required feature support. See https://docs.gitlab.com/ee/policy/experiment-beta-support.html
     min_support = string
@@ -170,11 +170,13 @@ variable "vpc" {
 variable "fleeting" {
   description = "Outputs from the fleeting module. Or your own"
   type = object({
-    autoscaling_group_name = string
-    ssh_key_pem_name       = string
-    ssh_key_pem            = string
+    autoscaling_group_name = optional(string, "")
+    ssh_key_pem_name       = optional(string, "")
+    ssh_key_pem            = optional(string, "")
     username               = optional(string, "ubuntu")
   })
+
+  default = {}
 }
 
 #######
@@ -184,9 +186,11 @@ variable "fleeting" {
 variable "iam" {
   description = "Outputs from the iam module. Or your own"
   type = object({
-    fleeting_access_key_id     = string
-    fleeting_secret_access_key = string
+    fleeting_access_key_id     = optional(string, "")
+    fleeting_secret_access_key = optional(string, "")
   })
+
+  default = {}
 }
 
 #########

@@ -3,7 +3,7 @@ FROM golang:${GO_VERSION}-alpine
 
 RUN go install github.com/magefile/mage@latest
 
-RUN apk add --update --no-cache curl tar bash make
+RUN apk add --update --no-cache curl tar bash make git
 
 # terraform 1.5.6 is the last version to be MPLv2 licensed
 ENV TF_ZIP=terraform_1.5.6_linux_amd64.zip

@@ -39,6 +39,7 @@ func TestRunner(t *testing.T) {
 				"google_zone":           "us-east1-b",
 				"runner_version":        "v16.8.0",
 				"machine_type":          "e2-micro",
+				"disk_image":            "image",
 				"disk_size_gb":          25,
 				"disk_type":             "pd-standard",
 				"service_account_email": "service-account@example.com",

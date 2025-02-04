@@ -180,7 +180,7 @@ resource "google_compute_instance" "runner-manager" {
   boot_disk {
     initialize_params {
       type  = var.disk_type
-      image = "projects/cos-cloud/global/images/family/cos-stable"
+      image = var.disk_image
       size  = var.disk_size_gb
     }
   }

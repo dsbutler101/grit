@@ -47,6 +47,13 @@ variable "machine_type" {
   default = ""
 }
 
+variable "disk_image" {
+  type        = string
+  description = "Disk image to use by runner manager instance"
+
+  default = "projects/cos-cloud/global/images/family/cos-stable"
+}
+
 variable "disk_type" {
   type        = string
   description = "Disk type to use by runner manager instance"

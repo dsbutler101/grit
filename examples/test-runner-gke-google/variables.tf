@@ -39,12 +39,6 @@ variable "subnet_cidr" {
   default     = "10.0.0.0/10"
 }
 
-variable "gitlab_pat" {
-  description = "The personal access token for GitLab instance, to create the runner registration token"
-  type        = string
-  sensitive   = true
-}
-
 variable "gitlab_project_id" {
   description = "The GitLab project to register the runner for"
   type        = string

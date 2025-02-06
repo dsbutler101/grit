@@ -78,7 +78,6 @@ module "gke_runner" {
   }
   name = var.name
 
-  gitlab_pat         = var.gitlab_pat
   gitlab_project_id  = var.gitlab_project_id
   runner_description = var.name
 

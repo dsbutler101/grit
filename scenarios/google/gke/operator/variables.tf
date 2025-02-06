@@ -29,12 +29,6 @@ variable "name" {
   type        = string
 }
 
-variable "gitlab_pat" {
-  description = "The personal access token for GitLab instance, to create the runner registration token"
-  type        = string
-  sensitive   = true
-}
-
 variable "gitlab_project_id" {
   description = "The GitLab project to register the runner for"
   type        = string
@@ -115,4 +109,3 @@ variable "pod_spec_patches" {
   description = "A JSON or YAML format string that describes the changes which must be applied to the final PodSpec object before it is generated."
   default     = []
 }
-

@@ -1024,7 +1024,6 @@ See the [provider default configurations](https://registry.terraform.io/provider
 | `labels`                 | `map(string)`                                            | no        |                         | Arbitrary list of `key=value` pairs added as labels to the resources created by GRIT.      |
 | `google_region`          | `string`                                                 | yes       |                         | Google Cloud region chosen for the deployment.                                             |
 | `google_zone`            | `string`                                                 | yes       |                         | Google Cloud zone chosen for the deployment.                                               |
-| `gitlab_pat`             | `string`                                                 | yes       |                         | GitLab personal access token, which allows creating a runner token.                        |
 | `gitlab_project_id`      | `string`                                                 | yes       |                         | The GitLab project ID to register the runner with.                                         |
 | `runner_image`           | `string`                                                 | no        |                         | The container image for the GitLab Runner manager.                                         |
 | `helper_image`           | `string`                                                 | no        |                         | The container image for the GitLab Runner helper.                                          |
@@ -1046,9 +1045,9 @@ modules) and it can make use of them:
 - [`gitlab`](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs)
 - [`kubectl`](https://registry.terraform.io/providers/alekc/kubectl/latest/docs)
 
-The `gitlab` provider is authenticated by a Personal Access
-Token (PAT), which we pass in with the terraform variable `gitlab_pat`. This is
-a sensitive value, is marked as such in the `variable` block, and externalized.
+You can authenticate the `gitlab` provider by using a personal access token (PAT).
+Set this token as an environment variable `GITLAB_TOKEN` or directly through the
+provider variable `token`.
 
 The `kubectl` provider needs to authenticate against a
 Kubernetes cluster, in our case the GKE cluster set up by the scenario. We only
@@ -1138,7 +1137,6 @@ EOT
   google_region      = "europe-north1"
   google_zone        = "europe-north1-c"
   subnet_cidr        = "10.0.0.0/16"
-  gitlab_pat         = var.gitlab_pat
   gitlab_project_id  = "123121213"
   runner_description = "my new GRIT runner"
 

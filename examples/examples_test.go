@@ -29,7 +29,6 @@ func TestExamples(t *testing.T) {
 					"TF_VAR_google_project":    mustFromEmv(t, "GOOGLE_PROJECT"),
 					"TF_VAR_google_region":     mustFromEmv(t, "GOOGLE_REGION"),
 					"TF_VAR_google_zone":       mustFromEmv(t, "GOOGLE_ZONE"),
-					"TF_VAR_gitlab_pat":        mustFromEmv(t, "GITLAB_TOKEN"),
 					"TF_VAR_gitlab_project_id": "39258790",
 				},
 			}

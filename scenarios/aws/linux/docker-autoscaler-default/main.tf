@@ -87,6 +87,7 @@ module "runner" {
   idle_percentage       = var.autoscaling_policy.scale_factor
   capacity_per_instance = var.capacity_per_instance
   max_use_count         = var.max_use_count
+  region                = var.aws_region
 
   security_group_ids = [module.security_groups.runner_manager.id]
 }

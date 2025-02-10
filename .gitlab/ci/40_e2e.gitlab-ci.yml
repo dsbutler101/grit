@@ -1,29 +1,100 @@
+.e2e:base:
+  stage: e2e
+  extends:
+    - .rules:merge_request_pipelines:e2e
+  variables:
+    # Used to tag created runners, name resources and state
+    # E2E_TEST_NAME is set in each e2e test scenario
+    # `tags` has limited variables but CI_PIPELINE_IID works
+    RUNNER_NAME: &runner_name "u${CI_PIPELINE_IID}-${E2E_TEST_NAME}"
+    JOB_NAME: ${RUNNER_NAME}
+
+.e2e:terraform:base:
+  extends:
+    - .e2e:base
+    - .go-cache
+  variables:
+    # common E2E tf vars
+    TF_VAR_runner_tag: ${RUNNER_NAME}
+    TF_VAR_name: ${RUNNER_NAME}
+    TF_VAR_gitlab_project_id: ${CI_PROJECT_ID}
+
+    # Terraform backend config
+    TF_HTTP_ADDRESS: "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/terraform/state/${RUNNER_NAME}"
+    TF_HTTP_LOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
+    TF_HTTP_UNLOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
+    TF_HTTP_USERNAME: ${GITLAB_USER_LOGIN}
+    TF_HTTP_PASSWORD: ${GITLAB_TOKEN_TERRAFORM}
+    TF_HTTP_LOCK_METHOD: POST
+    TF_HTTP_UNLOCK_METHOD: DELETE
+
+    FF_TIMESTAMPS: true
+
+  before_script:
+    # TODO: replace GITLAB_TOKEN in CI/CD settings once
+    # all the E2E tests are migrated to inline jobs
+    - export GITLAB_TOKEN="${GITLAB_TOKEN_E2E}"
+
 .e2e:gcloud:init:
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   before_script:
+    - export GITLAB_TOKEN="${GITLAB_TOKEN_E2E}"
     - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
 
 .e2e:terraform:apply: &e2e_terraform_apply
-  - mage terraform:initAndApply
+  - mage terraform:initAndApply "${E2E_DIR}" "${CI_JOB_TIMEOUT}s"
 
 .e2e:terraform:destroy: &e2e_terraform_destroy
-  - mage terraform:initAndDestroy
+  - mage terraform:initAndDestroy "${E2E_DIR}" "${CI_JOB_TIMEOUT}s"
 
-e2e:prod:aws:
-  stage: e2e
+.e2e:dev:aws:variables:
+  variables:
+    E2E_TEST_NAME: aws
+    E2E_DIR: e2e/aws
+
+e2e:dev:aws:apply:
+  timeout: 30m
   extends:
-    - .rules:merge_request_pipelines:e2e
-    - .go-cache
-  resource_group: e2e-prod
+    - .e2e:terraform:base
+    - .e2e:dev:aws:variables
   script:
-    - go test ./e2e/aws -tags e2e -timeout 30m
+    - *e2e_terraform_apply
+    - mage runner:waitForRunners "${RUNNER_NAME}" 20
+
+e2e:dev:aws:test:
+  timeout: 10m
+  image: alpine:latest
+  needs:
+    - e2e:dev:aws:apply
+  extends:
+    - .e2e:base
+    - .e2e:dev:aws:variables
+  script:
+    - echo "Runner name ${RUNNER_NAME}"
+    - apk add curl
+    - curl http://169.254.169.254/latest/meta-data/instance-id
+  tags:
+    - *runner_name
+
+e2e:dev:aws:destroy:
+  timeout: 30m
+  needs:
+    - job: e2e:dev:aws:test
+  when: always
+  extends:
+    - .e2e:terraform:base
+    - .e2e:dev:aws:variables
+  script:
+    - *e2e_terraform_destroy
 
 e2e:prod:google:
   stage: e2e
   extends:
-    - .rules:merge_request_pipelines:e2e
-    - .go-cache
+    - .e2e:terraform:base
+  # TODO: remove before_script once the E2E tests are migrated to inline jobs
+  # The two tokens in use will eventually become a single one for this project.
+  before_script: []
   resource_group: e2e-prod
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
@@ -33,50 +104,45 @@ e2e:prod:google:
 
 .e2e:dev:gke:windows:variables:
   variables:
-    PROVIDER: google
+    E2E_TEST_NAME: gke-win
     E2E_DIR: e2e/google/gke-windows
-    RUNNER_TAGS: job-${PROVIDER}-${CI_PIPELINE_IID},e2e-gke-windows
-    FF_TIMESTAMPS: true
+    TF_VAR_google_project: ${GOOGLE_PROJECT}
+    TF_VAR_google_region: ${GOOGLE_REGION}
+    TF_VAR_google_zone: ${GOOGLE_ZONE}
 
 e2e:dev:gke:windows:apply:
-  stage: e2e
   timeout: 60m
   extends:
-    - .rules:merge_request_pipelines:e2e
-    - .go-cache
+    - .e2e:terraform:base
     - .e2e:gcloud:init
     - .e2e:dev:gke:windows:variables
   script:
     - *e2e_terraform_apply
-    - mage runner:waitForRunners 20
+    - mage runner:waitForRunners "${RUNNER_NAME}" 20
 
 e2e:dev:gke:windows:test:
-  stage: e2e
   timeout: 90m
   image: mcr.microsoft.com/powershell:lts-windowsservercore-1809
   needs:
     - e2e:dev:gke:windows:apply
   extends:
-    - .rules:merge_request_pipelines:e2e
+    - .e2e:base
     - .e2e:dev:gke:windows:variables
   script:
-    - echo "Runner tags ${RUNNER_TAGS}"
+    - echo "Runner name ${RUNNER_NAME}"
     - $metadata = (Invoke-WebRequest -Uri "http://169.254.169.254/computeMetadata/v1/instance/name" -Headers @{"Metadata-Flavor"="Google"} -UseBasicParsing).Content
     - $metadataString = [System.Text.Encoding]::UTF8.GetString($metadata)
     - $metadataString
   tags:
-    - job-${PROVIDER}-${CI_PIPELINE_IID}
-    - e2e-gke-windows
+    - *runner_name
 
 e2e:dev:gke:windows:destroy:
-  stage: e2e
   timeout: 30m
   needs:
     - job: e2e:dev:gke:windows:test
   when: always
   extends:
-    - .rules:merge_request_pipelines:e2e
-    - .go-cache
+    - .e2e:terraform:base
     - .e2e:gcloud:init
     - .e2e:dev:gke:windows:variables
   script:

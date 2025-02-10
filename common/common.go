@@ -5,9 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"time"
 )
 
 const (
@@ -16,35 +14,26 @@ const (
 	JobName                   = "JOB_NAME"
 	GitlabTokenVar            = "GITLAB_TOKEN"
 	GitlabTokenVarE2E         = "GITLAB_TOKEN_E2E"
-	GritE2eDirectory          = "E2E_DIR"
 	GritEndToEndTestProjectID = 52010278
 	GitLabProjectID           = "CI_PROJECT_ID"
-	Region                    = "us-east-1"
 	RunnerTokenVar            = "RUNNER_TOKEN"
-	RunnerTokenPowerShellVar  = "RUNNER_TOKEN_POWERSHELL"
-	RunnerTags                = "RUNNER_TAGS"
 
-	TerraformHTTPAddress       = "TF_HTTP_ADDRESS"
-	TerraformHTTPUsername      = "TF_HTTP_USERNAME"
-	TerraformHTTPPassword      = "TF_HTTP_PASSWORD"
-	TerraformHTTPLockAddress   = "TF_HTTP_LOCK_ADDRESS"
-	TerraformHTTPUnlockAddress = "TF_HTTP_UNLOCK_ADDRESS"
-
-	CIJobTimeout = "CI_JOB_TIMEOUT"
+	TerraformHTTPAddress  = "TF_HTTP_ADDRESS"
+	TerraformHTTPUsername = "TF_HTTP_USERNAME"
+	TerraformHTTPPassword = "TF_HTTP_PASSWORD"
 )
 
-type JobEnv struct {
+// E2ETestEnv is the environment for the end-to-end tests
+// variables shared between tests for Go automation.
+// Terraform variables are set with TF_VAR_ prefix.
+type E2ETestEnv struct {
 	Name            string
-	GritE2EDir      string
 	GitlabToken     string
 	GitLabProjectID string
-	RunnerToken     string
-	RunnerTags      string
 	ProjectID       string
-	Region          string
-	Zone            string
-	JobTimeout      time.Duration
 
+	// HTTP state variables used to delete remote
+	// state after destroy is run.
 	TerraformHTTPAddress  string
 	TerraformHTTPUsername string
 	TerraformHTTPPassword string
@@ -62,16 +51,11 @@ func envVar(name string) (string, error) {
 	return cleaned, nil
 }
 
-func getJobEnv() (*JobEnv, error) {
+func getE2ETestEnv() (*E2ETestEnv, error) {
 	var err error
-	je := &JobEnv{}
+	je := &E2ETestEnv{}
 
 	je.Name, err = envVar(JobName)
-	if err != nil {
-		return nil, fmt.Errorf("setting up job: %w", err)
-	}
-
-	je.GritE2EDir, err = envVar(GritE2eDirectory)
 	if err != nil {
 		return nil, fmt.Errorf("setting up job: %w", err)
 	}
@@ -86,32 +70,10 @@ func getJobEnv() (*JobEnv, error) {
 		return nil, fmt.Errorf("setting up job: %w", err)
 	}
 
-	je.RunnerToken, err = envVar(RunnerTokenPowerShellVar)
-	if err != nil {
-		return nil, fmt.Errorf("setting up job: %w", err)
-	}
-
-	je.RunnerTags, err = envVar(RunnerTags)
-	if err != nil {
-		return nil, fmt.Errorf("setting up job: %w", err)
-	}
-
 	je.ProjectID, err = getGoogleProjectIDFromEnvVar()
 	if err != nil {
 		return nil, fmt.Errorf("setting up job: %w", err)
 	}
-
-	je.Region, err = getGoogleRegionFromEnvVar()
-	if strings.Trim(je.Region, " ") == "" {
-		return nil, fmt.Errorf("setting up job: %w", err)
-	}
-
-	je.Zone, err = envVar("GOOGLE_ZONE")
-	if err != nil {
-		return nil, fmt.Errorf("setting up job: %w", err)
-	}
-
-	je.JobTimeout = getJobTimeout(os.Getenv(CIJobTimeout))
 
 	je.TerraformHTTPAddress, err = envVar(TerraformHTTPAddress)
 	if err != nil {
@@ -129,20 +91,6 @@ func getJobEnv() (*JobEnv, error) {
 	}
 
 	return je, nil
-}
-
-func getJobTimeout(timeout string) time.Duration {
-	duration, err := time.ParseDuration(timeout)
-	if err == nil {
-		return duration
-	}
-
-	seconds, err := strconv.Atoi(timeout)
-	if err != nil {
-		return 1 * time.Hour
-	}
-
-	return time.Duration(seconds) * time.Second
 }
 
 func getAbsPathOfExec(executable string) (string, error) {

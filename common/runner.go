@@ -5,24 +5,23 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	backoff "github.com/cenkalti/backoff/v5"
 	gitlab "gitlab.com/gitlab-org/api/client-go"
 )
 
-func WaitForRunners(maxRetries uint) error {
+func WaitForRunners(runnerTag string, maxRetries uint) error {
 	log.SetOutput(os.Stdout)
-	log.Println("Waiting for runners to be ready ...")
+	log.Println("Waiting for runner tagged '" + runnerTag + "' to be ready ...")
 
-	je, err := getJobEnv()
+	env, err := getE2ETestEnv()
 	if err != nil {
 		return fmt.Errorf("failed to retrieve some environment variables: %w", err)
 	}
 
 	ctx := context.Background()
 	runnerStatusChecker := func() (bool, error) {
-		err := checkRunnersStatus(ctx, je)
+		err := checkRunnersStatus(ctx, runnerTag, env)
 		return err == nil, err
 	}
 
@@ -35,14 +34,10 @@ func WaitForRunners(maxRetries uint) error {
 	return err
 }
 
-func checkRunnersStatus(ctx context.Context, je *JobEnv) error {
-	tags := strings.Split(je.RunnerTags, ",")
-	for i, t := range tags {
-		tags[i] = strings.TrimSpace(t)
-	}
+func checkRunnersStatus(ctx context.Context, runnerTag string, env *E2ETestEnv) error {
 
 	runnerRetrieval := func() ([]*gitlab.Runner, error) {
-		return getProjectRunners(je.GitlabToken, je.GitLabProjectID, "online", strings.Split(je.RunnerTags, ","))
+		return getProjectRunners(env.GitlabToken, env.GitLabProjectID, "online", runnerTag)
 	}
 	runners, err := backoff.Retry(
 		ctx,
@@ -62,7 +57,7 @@ func checkRunnersStatus(ctx context.Context, je *JobEnv) error {
 	}
 }
 
-func getProjectRunners(gitlabToken, projectId string, status string, runnerTags []string) ([]*gitlab.Runner, error) {
+func getProjectRunners(gitlabToken, projectId string, status string, runnerTags ...string) ([]*gitlab.Runner, error) {
 	glab, err := gitlab.NewClient(gitlabToken)
 	if err != nil {
 		return nil, fmt.Errorf("initializing glab client: %w", err)

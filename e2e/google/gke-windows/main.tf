@@ -23,23 +23,14 @@ variable "google_zone" {}
 variable "gitlab_project_id" {}
 variable "name" {}
 
-variable "gitlab_pat" {
-  type      = string
-  sensitive = true
-}
-
-variable "runner_tags" {
-  type = list(string)
+variable "runner_tag" {
+  type = string
 }
 
 # provider setup
 provider "google" {
   project = var.google_project
   region  = var.google_region
-}
-
-provider "gitlab" {
-  token = var.gitlab_pat
 }
 
 provider "kubectl" {
@@ -81,7 +72,7 @@ module "gke_runner" {
   gitlab_project_id  = var.gitlab_project_id
   runner_description = var.name
 
-  runner_tags     = var.runner_tags
+  runner_tags     = [var.runner_tag]
   config_template = <<EOF
   [[runners]]
     name = ""

@@ -13,12 +13,6 @@ var projectEnvVars = []string{
 	"CLOUDSDK_CORE_PROJECT",
 }
 
-var regionEnvVars = []string{
-	"GOOGLE_REGION",
-	"GCLOUD_REGION",
-	"CLOUDSDK_COMPUTE_REGION",
-}
-
 func getFirstNonEmptyEnvVar(envVarNames []string) (string, error) {
 	value := getFirstNonEmptyEnvVarOrEmptyString(envVarNames)
 	if value == "" {
@@ -43,8 +37,4 @@ func getFirstNonEmptyEnvVarOrEmptyString(envVarNames []string) string {
 
 func getGoogleProjectIDFromEnvVar() (string, error) {
 	return getFirstNonEmptyEnvVar(projectEnvVars)
-}
-
-func getGoogleRegionFromEnvVar() (string, error) {
-	return getFirstNonEmptyEnvVar(regionEnvVars)
 }

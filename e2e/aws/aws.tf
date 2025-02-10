@@ -1,21 +1,56 @@
-variable "runner_token" {}
-variable "name" {}
-variable "job_id" {}
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.61.0"
+    }
+    gitlab = {
+      source  = "gitlabhq/gitlab"
+      version = ">= 17.0.0"
+    }
+  }
 
-output "autoscaling_group_name" {
-  value = module.fleeting.autoscaling_group_name
+  backend "http" {}
+}
+
+variable "name" {
+  type = string
+}
+
+variable "gitlab_project_id" {
+  type = string
+}
+
+variable "runner_tag" {
+  type = string
 }
 
 locals {
   metadata = {
     name = var.name
     labels = tomap({
-      job_id = var.job_id
-      env    = "grit-e2e"
+      gitlab_project_id = var.gitlab_project_id
+      env               = "grit-e2e"
     })
     min_support = "experimental"
   }
 }
+
+provider "gitlab" {}
+
+module "gitlab" {
+  source             = "../../modules/gitlab"
+  metadata           = local.metadata
+  url                = "https://gitlab.com"
+  project_id         = var.gitlab_project_id
+  runner_description = var.name
+  runner_tags        = [var.runner_tag]
+}
+
+provider "aws" {}
+
+// detect current configured region
+data "aws_region" "current" {}
 
 module "iam" {
   source   = "../../modules/aws/iam"
@@ -26,7 +61,8 @@ module "vpc" {
   source   = "../../modules/aws/vpc"
   metadata = local.metadata
 
-  zone        = "us-east-1b"
+  // assumes every region we support has a second zone
+  zone        = "${data.aws_region.current.name}b"
   cidr        = "10.0.0.0/16"
   subnet_cidr = "10.0.0.0/24"
 }
@@ -58,7 +94,7 @@ module "fleeting" {
 module "ami_lookup" {
   source   = "../../modules/aws/ami_lookup"
   use_case = "aws-linux-ephemeral"
-  region   = "us-east-1"
+  region   = data.aws_region.current.name
   metadata = local.metadata
 }
 
@@ -107,8 +143,8 @@ locals {
   }
 
   gitlab = {
-    runner_token = var.runner_token
-    url          = "https://gitlab.com"
+    url          = module.gitlab.url
+    runner_token = module.gitlab.runner_token
   }
 
   s3_cache = {
@@ -120,4 +156,3 @@ locals {
     secret_access_key = module.s3_cache.secret_access_key
   }
 }
-

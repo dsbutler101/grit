@@ -27,4 +27,3 @@ resource "gitlab_user_runner" "primary" {
   tag_list    = var.runner_tags
   untagged    = length(var.runner_tags) == 0 ? true : false
 }
-

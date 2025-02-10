@@ -11,6 +11,6 @@ import (
 type Runner mg.Namespace
 
 // WaitForRunners waits for the runners to be online and fails if Runner doesn't come online.
-func (Runner) WaitForRunners(tries int) error {
-	return common.WaitForRunners(uint(tries))
+func (Runner) WaitForRunners(runnerTag string, tries int) error {
+	return common.WaitForRunners(runnerTag, uint(tries))
 }

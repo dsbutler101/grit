@@ -17,21 +17,20 @@ terraform {
   backend "http" {}
 }
 
-variable "google_project" {}
-variable "google_region" {}
-variable "google_zone" {}
 variable "gitlab_project_id" {}
-variable "name" {}
+
+variable "name" {
+  type = string
+}
 
 variable "runner_tag" {
   type = string
 }
 
-# provider setup
-provider "google" {
-  project = var.google_project
-  region  = var.google_region
-}
+# provider defaults using env vars (GOOGLE_PROJECT etc)
+provider "google" {}
+
+data "google_client_config" "current" {}
 
 provider "kubectl" {
   host                   = module.gke_runner.cluster_host
@@ -43,8 +42,8 @@ provider "kubectl" {
 module "gke_runner" {
   source = "../../../scenarios/google/gke/operator"
 
-  google_region = var.google_region
-  google_zone   = var.google_zone
+  google_region = data.google_client_config.current.region
+  google_zone   = data.google_client_config.current.zone
   subnet_cidr   = "10.0.0.0/16"
 
   labels = {

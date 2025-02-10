@@ -88,27 +88,52 @@ e2e:dev:aws:destroy:
   script:
     - *e2e_terraform_destroy
 
-e2e:prod:google:
-  stage: e2e
+.e2e:dev:google:variables:
+  variables:
+    E2E_TEST_NAME: google
+    E2E_DIR: e2e/google
+
+e2e:dev:google:apply:
+  timeout: 30m
   extends:
     - .e2e:terraform:base
-  # TODO: remove before_script once the E2E tests are migrated to inline jobs
-  # The two tokens in use will eventually become a single one for this project.
-  before_script: []
-  resource_group: e2e-prod
-  variables:
-    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+    - .e2e:gcloud:init
+    - .e2e:dev:google:variables
   script:
-    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
-    - go test ./e2e/google -tags e2e -timeout 1h
+    - *e2e_terraform_apply
+    - mage runner:waitForRunners "${RUNNER_NAME}" 20
+
+e2e:dev:google:test:
+  timeout: 10m
+  image: alpine:latest
+  needs:
+    - job: e2e:dev:google:apply
+  extends:
+    - .e2e:base
+    - .e2e:dev:google:variables
+  script:
+    - echo "Runner name ${RUNNER_NAME}"
+    - apk add curl
+    - 'curl -s -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/name'
+  tags:
+    - *runner_name
+
+e2e:dev:google:destroy:
+  timeout: 30m
+  needs:
+    - job: e2e:dev:google:test
+  when: always
+  extends:
+    - .e2e:terraform:base
+    - .e2e:gcloud:init
+    - .e2e:dev:google:variables
+  script:
+    - *e2e_terraform_destroy
 
 .e2e:dev:gke:windows:variables:
   variables:
     E2E_TEST_NAME: gke-win
     E2E_DIR: e2e/google/gke-windows
-    TF_VAR_google_project: ${GOOGLE_PROJECT}
-    TF_VAR_google_region: ${GOOGLE_REGION}
-    TF_VAR_google_zone: ${GOOGLE_ZONE}
 
 e2e:dev:gke:windows:apply:
   timeout: 60m

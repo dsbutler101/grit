@@ -1,24 +1,56 @@
-variable "runner_token" {}
-variable "name" {}
-variable "job_id" {}
-variable "google_region" {}
-variable "google_zone" {}
-variable "google_project" {}
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 5.30.0"
+    }
+    gitlab = {
+      source  = "gitlabhq/gitlab"
+      version = ">= 17.0.0"
+    }
+  }
 
-output "instance_group_name" {
-  value = module.fleeting.instance_group_name
+  backend "http" {}
+}
+
+variable "name" {
+  type = string
+}
+
+variable "runner_tag" {
+  type = string
+}
+
+variable "gitlab_project_id" {
+  type = string
 }
 
 locals {
   metadata = {
     name = var.name
     labels = tomap({
-      job_id = var.job_id
-      env    = "grit-e2e"
+      gitlab_project_id = var.gitlab_project_id
+      env               = "grit-e2e"
     })
     min_support = "experimental"
   }
 }
+
+provider "gitlab" {}
+
+module "gitlab" {
+  source             = "../../modules/gitlab"
+  metadata           = local.metadata
+  url                = "https://gitlab.com"
+  project_id         = var.gitlab_project_id
+  runner_description = var.name
+  runner_tags        = [var.runner_tag]
+}
+
+# provider defaults using env vars (GOOGLE_PROJECT etc)
+provider "google" {}
+
+data "google_client_config" "current" {}
 
 module "iam" {
   source   = "../../modules/google/iam"
@@ -29,7 +61,7 @@ module "vpc" {
   source   = "../../modules/google/vpc"
   metadata = local.metadata
 
-  google_region = var.google_region
+  google_region = data.google_client_config.current.region
 
   subnetworks = {
     "${var.name}-runner-manager"    = "10.0.0.0/29"
@@ -46,20 +78,19 @@ module "fleeting" {
   }
 
   fleeting_service      = "gce"
-  google_project        = var.google_project
-  google_zone           = var.google_zone
+  google_project        = data.google_client_config.current.project
+  google_zone           = data.google_client_config.current.zone
   service_account_email = module.iam.service_account_email
   machine_type          = "n2d-standard-2"
   manager_subnet_cidr   = module.vpc.subnetwork_cidrs["${var.name}-runner-manager"]
-
 }
 
 module "runner" {
   source   = "../../modules/google/runner"
   metadata = local.metadata
 
-  google_project = var.google_project
-  google_zone    = var.google_zone
+  google_project = data.google_client_config.current.project
+  google_zone    = data.google_client_config.current.zone
 
   service_account_email = module.iam.service_account_email
 
@@ -68,19 +99,12 @@ module "runner" {
     subnet_id = module.vpc.subnetwork_ids["${var.name}-runner-manager"]
   }
 
-  gitlab_url   = local.gitlab.url
-  runner_token = local.gitlab.runner_token
+  gitlab_url   = module.gitlab.url
+  runner_token = module.gitlab.runner_token
 
   executor = "docker-autoscaler"
 
   fleeting_instance_group_name = module.fleeting.instance_group_name
 
   machine_type = "n2d-standard-2"
-}
-
-locals {
-  gitlab = {
-    runner_token = var.runner_token
-    url          = "https://gitlab.com"
-  }
 }

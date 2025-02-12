@@ -65,6 +65,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"enable_metrics_export":      false,
 				"metrics_export_endpoint":    "0.0.0.0:9402",
 				"default_docker_image":       "ubuntu:latest",
+				"ami":                        "ami-05012401516a40259",
 				"usage_logger": map[string]interface{}{
 					"enabled": true,
 					"log_dir": "/var/log/usage",

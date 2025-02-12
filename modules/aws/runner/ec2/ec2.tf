@@ -121,7 +121,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "runner-manager" {
-  ami                         = data.aws_ami.ubuntu.id
+  ami                         = var.ami != "" ? var.ami : data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
   subnet_id                   = var.vpc.subnet_id
   vpc_security_group_ids      = var.security_group_ids

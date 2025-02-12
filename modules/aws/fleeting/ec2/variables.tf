@@ -69,6 +69,10 @@ variable "cloudwatch_agent_json" {
   type = string
 }
 
+variable "mixed_instances_policy" {
+  type = any
+}
+
 variable "ebs_encryption" {
   type = bool
 }

@@ -84,9 +84,13 @@ resource "aws_launch_template" "fleeting-asg-template" {
 resource "aws_autoscaling_group" "fleeting-asg" {
   name = var.name
 
-  launch_template {
-    id      = aws_launch_template.fleeting-asg-template.id
-    version = aws_launch_template.fleeting-asg-template.latest_version
+  dynamic "launch_template" {
+    for_each = var.mixed_instances_policy != null ? [] : [1]
+
+    content {
+      id      = aws_launch_template.fleeting-asg-template.id
+      version = aws_launch_template.fleeting-asg-template.latest_version
+    }
   }
 
   min_size = 0
@@ -99,6 +103,26 @@ resource "aws_autoscaling_group" "fleeting-asg" {
   ]
 
   protect_from_scale_in = true
+
+  dynamic "mixed_instances_policy" {
+    for_each = var.mixed_instances_policy != null ? [var.mixed_instances_policy] : []
+
+    content {
+      launch_template {
+        launch_template_specification {
+          launch_template_id = aws_launch_template.fleeting-asg-template.id
+          version            = aws_launch_template.fleeting-asg-template.latest_version
+        }
+
+        dynamic "override" {
+          for_each = try(mixed_instances_policy.value.override, [])
+          content {
+            instance_type = try(override.value.instance_type, null)
+          }
+        }
+      }
+    }
+  }
 
   dynamic "tag" {
     for_each = var.labels

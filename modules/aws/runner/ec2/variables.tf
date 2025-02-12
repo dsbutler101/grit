@@ -123,6 +123,11 @@ variable "default_docker_image" {
   type = string
 }
 
+variable "ami" {
+  description = "The machine image to use on the runner manager"
+  type        = string
+}
+
 variable "usage_logger" {
   type = object({
     enabled       = bool

@@ -139,6 +139,12 @@ variable "metrics_export_endpoint" {
   default     = "0.0.0.0:9042"
 }
 
+variable "ami" {
+  description = "The machine image to use on the runner manager"
+  type        = string
+  default     = ""
+}
+
 ##########
 # GITLAB #
 ##########

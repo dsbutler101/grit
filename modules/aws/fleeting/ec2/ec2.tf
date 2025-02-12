@@ -22,6 +22,7 @@ module "common" {
   install_cloudwatch_agent   = var.install_cloudwatch_agent
   cloudwatch_agent_json      = var.cloudwatch_agent_json
   instance_role_profile_name = var.instance_role_profile_name
+  mixed_instances_policy     = var.mixed_instances_policy
   ebs_encryption             = var.ebs_encryption
   kms_key_arn                = var.kms_key_arn
 

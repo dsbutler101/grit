@@ -164,9 +164,14 @@ variable "gitlab" {
 variable "vpc" {
   description = "Outputs from the vpc module. Or your own"
   type = object({
-    id        = string
-    subnet_id = string
+    id         = string
+    subnet_id  = optional(string)
+    subnet_ids = optional(list(string))
   })
+  validation {
+    condition     = (var.vpc.subnet_id != null && try(length(var.vpc.subnet_ids), 0) == 0) || (var.vpc.subnet_id == null && try(length(var.vpc.subnet_ids), 0) > 0)
+    error_message = "You cannot specify both 'subnet_id' and 'subnet_ids' OR empty values for both. Only one can be provided."
+  }
 }
 
 ############

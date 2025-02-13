@@ -23,8 +23,8 @@ module "runner" {
     url          = "https://gitlab.com"
   }
   vpc = {
-    id        = "vpc-0d119da238d878eef"
-    subnet_id = "subnet-0bd3ab8c221e14bfc"
+    id         = "vpc-0d119da238d878eef"
+    subnet_ids = ["subnet-0bd3ab8c221e14bfc"]
   }
 
   security_group_ids = [module.security_groups.runner_manager.id]

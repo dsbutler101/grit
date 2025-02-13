@@ -30,8 +30,8 @@ module "fleeting" {
   os      = "linux"
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnet_id
+    id         = module.vpc.id
+    subnet_ids = module.vpc.subnet_ids
   }
 
   security_group_ids = [module.security_groups.fleeting.id]
@@ -55,8 +55,8 @@ module "runner" {
   metadata = local.metadata
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnet_id
+    id         = module.vpc.id
+    subnet_ids = module.vpc.subnet_ids
   }
   iam = {
     fleeting_access_key_id     = module.iam.fleeting_access_key_id

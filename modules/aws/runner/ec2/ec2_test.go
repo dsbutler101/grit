@@ -25,7 +25,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				},
 				"vpc": map[string]interface{}{
 					"id":        "12345",
-					"subnet_id": "12345",
+					"subnet_ids": []string{"12345"},
 				},
 				"fleeting": map[string]interface{}{
 					"autoscaling_group_name": "abcde",

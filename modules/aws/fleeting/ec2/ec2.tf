@@ -17,7 +17,7 @@ module "common" {
   ami_id                     = var.ami
   instance_type              = var.instance_type
   vpc_id                     = var.vpc.id
-  subnet_id                  = var.vpc.subnet_id
+  subnet_ids                 = try(length(var.vpc.subnet_ids), 0) > 0 ? var.vpc.subnet_ids : [var.vpc.subnet_id]
   security_group_ids         = var.security_group_ids
   install_cloudwatch_agent   = var.install_cloudwatch_agent
   cloudwatch_agent_json      = var.cloudwatch_agent_json

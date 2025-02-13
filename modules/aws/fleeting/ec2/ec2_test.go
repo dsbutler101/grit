@@ -29,7 +29,7 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 			moduleVars: map[string]interface{}{
 				"vpc": map[string]interface{}{
 					"id":        "12345",
-					"subnet_id": "12345",
+					"subnet_ids": []string{"12345"},
 				},
 				"os":                          "linux",
 				"ami":                         "ami-05012401516a40259",
@@ -57,7 +57,7 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 			moduleVars: map[string]interface{}{
 				"vpc": map[string]interface{}{
 					"id":        "12345",
-					"subnet_id": "12345",
+					"subnet_ids": []string{"12345"},
 				},
 				"os":                          "macos",
 				"ami":                         "ami-0fcd5ff1c92b00231",

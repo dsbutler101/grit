@@ -55,9 +55,8 @@ resource "aws_launch_template" "fleeting-asg-template" {
   }
 
   network_interfaces {
-    subnet_id = var.subnet_id
-
-    security_groups = var.security_group_ids
+    delete_on_termination = true
+    security_groups       = var.security_group_ids
   }
 
   tag_specifications {
@@ -98,9 +97,7 @@ resource "aws_autoscaling_group" "fleeting-asg" {
 
   health_check_grace_period = 600
 
-  vpc_zone_identifier = [
-    var.subnet_id
-  ]
+  vpc_zone_identifier = var.subnet_ids
 
   protect_from_scale_in = true
 

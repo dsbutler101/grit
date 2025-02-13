@@ -123,7 +123,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "runner-manager" {
   ami                         = var.ami != "" ? var.ami : data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
-  subnet_id                   = var.vpc.subnet_id
+  subnet_id                   = try(length(var.vpc.subnet_ids), 0) > 0 ? var.vpc.subnet_ids[0] : var.vpc.subnet_id
   vpc_security_group_ids      = var.security_group_ids
   associate_public_ip_address = true
   user_data                   = data.cloudinit_config.config.rendered

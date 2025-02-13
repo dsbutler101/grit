@@ -77,7 +77,8 @@ module "security_groups" {
 module "fleeting" {
   source   = "../../modules/aws/fleeting"
   metadata = local.metadata
-  vpc      = local.vpc
+
+  vpc = local.vpc
 
   service       = "ec2"
   os            = "linux"
@@ -132,8 +133,8 @@ locals {
   }
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnet_id
+    id         = module.vpc.id
+    subnet_ids = module.vpc.subnet_ids
   }
 
   fleeting = {

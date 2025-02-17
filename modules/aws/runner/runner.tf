@@ -61,6 +61,13 @@ module "ec2" {
   usage_logger               = var.usage_logger
 
 
-  name   = var.metadata.name
-  labels = var.metadata.labels
+  name                        = var.metadata.name
+  labels                      = var.metadata.labels
+  associate_public_ip_address = var.associate_public_ip_address
+  instance_type               = var.instance_type
+  encrypted                   = var.encrypted
+  kms_key_id                  = var.kms_key_id
+  volume_size                 = var.volume_size
+  volume_type                 = var.volume_type
+  throughput                  = var.throughput
 }

@@ -139,6 +139,47 @@ variable "metrics_export_endpoint" {
   default     = "0.0.0.0:9042"
 }
 
+variable "associate_public_ip_address" {
+  type        = bool
+  description = "Whether to associate a public IP address with an instance in a VPC."
+  default     = true
+}
+
+variable "instance_type" {
+  type        = string
+  description = "Instance type to use for the instance."
+  default     = "t2.micro"
+}
+
+variable "encrypted" {
+  description = "Enable EBS encryption on the volumes. Set it to true to enable encryption."
+  type        = bool
+  default     = false
+}
+
+variable "kms_key_id" {
+  description = "The ARN of the AWS Key Management Service (AWS KMS) customer master key (CMK) to use when creating the encrypted volume."
+  type        = string
+  default     = null
+}
+
+variable "volume_size" {
+  description = "The size of the EBS storage in GB"
+  type        = number
+  default     = null
+}
+
+variable "volume_type" {
+  description = "The type of the EBS storage"
+  type        = string
+  default     = null
+}
+
+variable "throughput" {
+  description = "The throughput of the EBS storage"
+  type        = number
+  default     = null
+}
 variable "ami" {
   description = "The machine image to use on the runner manager"
   type        = string

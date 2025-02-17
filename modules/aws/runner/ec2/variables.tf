@@ -140,3 +140,30 @@ variable "usage_logger" {
     custom_labels = map(string)
   })
 }
+variable "associate_public_ip_address" {
+  type = bool
+}
+
+variable "instance_type" {
+  type = string
+}
+
+variable "encrypted" {
+  type = bool
+}
+
+variable "kms_key_id" {
+  type = string
+}
+
+variable "volume_size" {
+  type = number
+}
+
+variable "volume_type" {
+  type = string
+}
+
+variable "throughput" {
+  type = number
+}

@@ -122,19 +122,32 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_instance" "runner-manager" {
   ami                         = var.ami != "" ? var.ami : data.aws_ami.ubuntu.id
-  instance_type               = "t2.micro"
+  instance_type               = var.instance_type
   subnet_id                   = try(length(var.vpc.subnet_ids), 0) > 0 ? var.vpc.subnet_ids[0] : var.vpc.subnet_id
   vpc_security_group_ids      = var.security_group_ids
-  associate_public_ip_address = true
+  associate_public_ip_address = var.associate_public_ip_address
   user_data                   = data.cloudinit_config.config.rendered
   iam_instance_profile        = var.instance_role_profile_name
   user_data_replace_on_change = true
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   tags = merge(var.labels, {
     Name = "${var.name}_runner-manager"
   })
 
   key_name = var.fleeting.ssh_key_pem_name
+
+  root_block_device {
+    delete_on_termination = true
+    throughput            = var.throughput
+    volume_size           = var.volume_size
+    volume_type           = var.volume_type
+    encrypted             = var.encrypted
+    kms_key_id            = var.kms_key_id
+  }
 }
 
 output "public_ip" {

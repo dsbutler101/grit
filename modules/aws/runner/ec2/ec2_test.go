@@ -65,6 +65,13 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"enable_metrics_export":      false,
 				"metrics_export_endpoint":    "0.0.0.0:9402",
 				"default_docker_image":       "ubuntu:latest",
+				"associate_public_ip_address": true,
+				"instance_type": "t2.micro",
+				"encrypted": false,
+				"kms_key_id": "",
+				"volume_size": 8,
+				"volume_type": "gp2",
+				"throughput": 0,
 				"ami":                        "ami-05012401516a40259",
 				"usage_logger": map[string]interface{}{
 					"enabled": true,

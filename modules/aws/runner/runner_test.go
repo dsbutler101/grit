@@ -54,6 +54,13 @@ func TestRunner(t *testing.T) {
 				"capacity_per_instance": 1,
 				"security_group_ids":    []string{"123456"},
 				"default_docker_image":  "ubuntu:latest",
+				"associate_public_ip_address": true,
+				"instance_type": "t2.micro",
+				"encrypted": false,
+				"kms_key_id": "",
+				"volume_size": 8,
+				"volume_type": "gp2",
+				"throughput": 0,
 				"usage_logger": map[string]interface{}{
 					"enabled": true,
 					"log_dir": "/var/log/usage",

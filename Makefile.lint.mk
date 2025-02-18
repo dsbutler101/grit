@@ -4,7 +4,7 @@ lint-docs:
 
 .PHONY: terraform-fmt-check
 terraform-fmt-check:
-	terraform fmt -check -recursive
+	terraform fmt -check -recursive -diff
 
 .PHONY: lint-go
 lint-go:

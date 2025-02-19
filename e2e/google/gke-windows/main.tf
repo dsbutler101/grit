@@ -59,7 +59,8 @@ module "gke_runner" {
       }
     }
     linux = {
-      node_count = 1
+      # 2 x e2-medium required to schedule runner + system pods
+      node_count = 2
       node_config = {
         image_type   = "cos_containerd"
         machine_type = "e2-medium"
@@ -80,7 +81,7 @@ module "gke_runner" {
     environment = [ "FF_USE_POWERSHELL_PATH_RESOLVER=true" ]
     shell = "powershell"
     [runners.kubernetes]
-      image = "mcr.microsoft.com/powershell:lts-windowsservercore-1809"
+      image = "gitlab/gitlab-runner-helper:x86_64-latest-servercore1809"
       pod_labels_overwrite_allowed = ""
       service_account_overwrite_allowed = ""
       pod_annotations_overwrite_allowed = ""

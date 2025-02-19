@@ -25,6 +25,11 @@ variable "runner_tag" {
   type = string
 }
 
+variable "ami_arch" {
+  type    = string
+  default = "amd64"
+}
+
 locals {
   metadata = {
     name = var.name
@@ -83,7 +88,7 @@ module "fleeting" {
   service       = "ec2"
   os            = "linux"
   ami           = module.ami_lookup.ami_id
-  instance_type = "t2.medium"
+  instance_type = var.ami_arch == "arm64" ? "t4g.medium" : "t2.medium"
   scale_min     = 1
   scale_max     = 10
 
@@ -94,9 +99,11 @@ module "fleeting" {
 
 module "ami_lookup" {
   source   = "../../modules/aws/ami_lookup"
-  use_case = "aws-linux-ephemeral"
   region   = data.aws_region.current.name
   metadata = local.metadata
+  arch     = var.ami_arch
+  os       = "linux"
+  role     = "ephemeral"
 }
 
 module "s3_cache" {

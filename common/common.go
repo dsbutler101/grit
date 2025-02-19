@@ -11,7 +11,6 @@ import (
 const (
 	JobIdVar                  = "CI_JOB_ID"
 	CommitSHAVar              = "CI_COMMIT_SHA"
-	JobName                   = "JOB_NAME"
 	GitlabTokenVar            = "GITLAB_TOKEN"
 	GitlabTokenVarE2E         = "GITLAB_TOKEN_E2E"
 	GritEndToEndTestProjectID = 52010278
@@ -27,7 +26,6 @@ const (
 // variables shared between tests for Go automation.
 // Terraform variables are set with TF_VAR_ prefix.
 type E2ETestEnv struct {
-	Name            string
 	GitlabToken     string
 	GitLabProjectID string
 	ProjectID       string
@@ -54,11 +52,6 @@ func envVar(name string) (string, error) {
 func getE2ETestEnv() (*E2ETestEnv, error) {
 	var err error
 	je := &E2ETestEnv{}
-
-	je.Name, err = envVar(JobName)
-	if err != nil {
-		return nil, fmt.Errorf("setting up job: %w", err)
-	}
 
 	je.GitlabToken, err = envVar(GitlabTokenVarE2E)
 	if err != nil {

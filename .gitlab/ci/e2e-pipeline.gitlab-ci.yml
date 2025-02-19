@@ -1,0 +1,97 @@
+workflow:
+  # set a useful name for the pipeline
+  name: "E2E ${E2E_TEST_NAME} (ID: ${E2E_TEST_ID})"
+
+stages:
+  - apply
+  - test
+  - destroy
+
+include:
+  - local: .gitlab/ci/00_common.gitlab-ci.yml
+
+.e2e:base:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+  variables:
+    # Used to tag created runners, name resources and state
+    # E2E_TEST_NAME is set in each e2e test scenario
+    # `tags` has limited variables but CI_PIPELINE_IID works
+    RUNNER_NAME: &runner_name "u${E2E_TEST_ID}-${E2E_TEST_NAME}"
+
+.e2e:terraform:base:
+  extends:
+    - .e2e:base
+    - .go-cache
+  variables:
+    # common E2E tf vars
+    TF_VAR_runner_tag: ${RUNNER_NAME}
+    TF_VAR_name: ${RUNNER_NAME}
+    TF_VAR_gitlab_project_id: ${CI_PROJECT_ID}
+
+    # Terraform backend config
+    TF_HTTP_ADDRESS: "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/terraform/state/${RUNNER_NAME}"
+    TF_HTTP_LOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
+    TF_HTTP_UNLOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
+    TF_HTTP_USERNAME: ${GITLAB_USER_LOGIN}
+    TF_HTTP_PASSWORD: ${GITLAB_TOKEN_TERRAFORM}
+    TF_HTTP_LOCK_METHOD: POST
+    TF_HTTP_UNLOCK_METHOD: DELETE
+
+    FF_TIMESTAMPS: true
+
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+
+  before_script:
+    # TODO: replace GITLAB_TOKEN in CI/CD settings once
+    # all the E2E tests are migrated to inline jobs
+    - export GITLAB_TOKEN="${GITLAB_TOKEN_E2E}"
+    # Google provider specific credentials file
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+
+e2e:apply:
+  stage: apply
+  timeout: 60m
+  extends:
+    - .e2e:terraform:base
+  script:
+    - mage terraform:initAndApply "${E2E_TEST_DIR}" "${CI_JOB_TIMEOUT}s"
+    - mage runner:waitForRunners "${RUNNER_NAME}" 20
+
+e2e:test:
+  stage: test
+  timeout: 60m
+  image: ${E2E_TEST_IMAGE}
+  extends:
+    - .e2e:base
+  script:
+    - echo "Runner name ${RUNNER_NAME}"
+    - eval "$E2E_TEST_SCRIPT"
+  tags:
+    - *runner_name
+  rules:
+    - if: $E2E_TEST_POWERSHELL == null
+
+# specific script handling required for powershell
+e2e:test:powershell:
+  stage: test
+  timeout: 60m
+  image: ${E2E_TEST_IMAGE}
+  extends:
+    - .e2e:base
+  script:
+    - echo "Runner name ${RUNNER_NAME}"
+    - Invoke-Expression $E2E_TEST_SCRIPT
+  tags:
+    - *runner_name
+  rules:
+    - if: $E2E_TEST_POWERSHELL
+
+e2e:destroy:
+  stage: destroy
+  timeout: 60m
+  extends:
+    - .e2e:terraform:base
+  when: always
+  script:
+    - mage terraform:initAndDestroy "${E2E_TEST_DIR}" "${CI_JOB_TIMEOUT}s"

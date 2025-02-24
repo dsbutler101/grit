@@ -1,6 +1,6 @@
 unit tests:
   stage: unit
-  needs: []
+  needs: [terraform formatting]
   extends:
     - .rules:merge_request_pipelines:code
     - .go-cache

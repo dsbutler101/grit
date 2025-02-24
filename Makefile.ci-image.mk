@@ -2,7 +2,7 @@
 # Version definitions #
 #######################
 
-GO_VERSION ?= go1.22.5
+GO_VERSION ?= 1.23.6
 
 #####################
 # CI Registry setup #
@@ -21,12 +21,12 @@ ifdef CI_REGISTRY_USER
 	@docker login --username $(CI_REGISTRY_USER) --password $(CI_REGISTRY_PASSWORD) $(CI_REGISTRY)
 	docker pull $(IMAGE) || echo "Remote image $(IMAGE) not available - will not use cache"
 endif
-	docker --debug build \
-			--cache-from $(IMAGE) \
-			--build-arg GO_VERSION=$(GO_VERSION) \
-			-t $(IMAGE) \
-			-f ./dockerfiles/ci/Dockerfile \
-			.
+	docker build \
+		--cache-from $(IMAGE) \
+		--build-arg GO_VERSION=$(GO_VERSION) \
+		-t $(IMAGE) \
+		-f ./dockerfiles/ci/Dockerfile \
+		.
 ifdef CI_REGISTRY_USER
 	# Pushing $(IMAGE)
 	@docker push $(IMAGE)

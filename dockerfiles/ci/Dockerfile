@@ -1,15 +1,12 @@
-FROM registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+ARG GO_VERSION
+FROM golang:${GO_VERSION}-alpine
 
-ENV PATH="${PATH}:/usr/local/go/bin"
+RUN go install github.com/magefile/mage@latest
 
 RUN apk add --update --no-cache curl tar bash make
 
-ARG GO_VERSION
-RUN curl -sL "https://golang.org/dl/${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tar.gz && \
-    tar -C /usr/local -xzf /tmp/go.tar.gz && \
-    go version
-
-RUN GOBIN="/usr/local/go/bin" go install github.com/magefile/mage@latest
-
-# Clean up the image
-RUN rm -rf /tmp/* ${HOME}/go
+# terraform 1.5.6 is the last version to be MPLv2 licensed
+ENV TF_ZIP=terraform_1.5.6_linux_amd64.zip
+RUN curl https://releases.hashicorp.com/terraform/1.5.6/${TF_ZIP} -o ${TF_ZIP} && \
+    unzip ${TF_ZIP} -d /usr/local/bin && \
+    rm ${TF_ZIP}

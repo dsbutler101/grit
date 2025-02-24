@@ -4,7 +4,6 @@ default:
     - gitlab-org
 
 variables:
-  GO_VERSION: "go1.23.4"
   DOCKER_VERSION: "24.0.9"
 
 .no_cache:

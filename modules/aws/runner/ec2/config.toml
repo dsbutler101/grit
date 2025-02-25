@@ -63,6 +63,15 @@ listen_address = "${metrics_export_endpoint}"
             SecretKey = "${s3_cache.secret_access_key}"
             Insecure = false
 %{ endif }
+%{if length(acceptable_durations) > 0 }
+    [runners.monitoring]
+%{for duration in acceptable_durations }
+        [[runners.monitoring.job_queuing_durations]]
+            periods = ${jsonencode(duration.periods)}
+            timezone = "${duration.timezone}"
+            threshold = "${duration.threshold}"
+%{ endfor }
+%{ endif }
 
 %{ if usage_logger.enabled == true }
 [experimental]

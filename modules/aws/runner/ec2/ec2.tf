@@ -43,6 +43,7 @@ locals {
           default_docker_image    = var.default_docker_image
           usage_logger            = var.usage_logger
           s3_cache                = var.s3_cache
+          acceptable_durations    = var.acceptable_durations
         })
       }
       ],

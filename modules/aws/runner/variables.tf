@@ -139,6 +139,15 @@ variable "metrics_export_endpoint" {
   default     = "0.0.0.0:9042"
 }
 
+variable "acceptable_durations" {
+  type = list(object({
+    periods   = optional(list(string), ["* * * * * * *"])
+    threshold = string
+    timezone  = optional(string, "UTC")
+  }))
+  default = []
+}
+
 variable "associate_public_ip_address" {
   type        = bool
   description = "Whether to associate a public IP address with an instance in a VPC."

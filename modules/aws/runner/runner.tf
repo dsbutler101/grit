@@ -59,6 +59,7 @@ module "ec2" {
   default_docker_image       = var.default_docker_image
   ami                        = var.ami
   usage_logger               = var.usage_logger
+  acceptable_durations       = var.acceptable_durations
 
 
   name                        = var.metadata.name

@@ -140,6 +140,16 @@ variable "usage_logger" {
     custom_labels = map(string)
   })
 }
+
+variable "acceptable_durations" {
+  type = list(object({
+    periods   = list(string)
+    threshold = string
+    timezone  = string
+  }))
+  default = []
+}
+
 variable "associate_public_ip_address" {
   type = bool
 }

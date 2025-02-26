@@ -17,28 +17,23 @@ Follow [the epic](https://gitlab.com/groups/gitlab-org/ci-cd/runner-tools/-/epic
 
 ## Usage
 
-Download the [latest release](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/releases)
-and reference the test or prod modules in your Terraform configuration.
+Download the [latest release](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/releases) and reference the appropriate modules in your Terraform configuration.
 
-### Test and Prod Modules
+### Module Structure
 
-GRIT provides two types of modules, test and prod. Test modules
-provide lots of defaults and have no support promises or
-restrictions. They are useful for local development and automated
-testing.
+GRIT provides modules organized by cloud provider and functionality. Each module is designed to be composable, allowing you to tailor configurations to your specific needs.
 
-Prod modules have associated support levels and promises around
+Modules have associated support levels and promises around
 backward compatibility. Support levels follow the
 [GitLab definition](https://docs.gitlab.com/ee/policy/experiment-beta-support.html)
-of experimental, beta and GA. See APIs and Guarantees below for more
+of `experimental`, `beta` and `GA`. See APIs and Guarantees below for more
 information.
 
-Consumable modules are organized as follows:
+Modules are organized as follows:
 
 1. `modules` directory
-1. provider (e.g. `aws`, `google`, `azure`)
-1. module (e.g. `vpc`, `iam`, `fleeting`, `runner`)
-1. type (e.g. `prod` or `test`)
+1. Provider (for example, `aws`, `google`, `azure`)
+1. Module (for example, `vpc`, `iam`, `fleeting`, `runner`)
 
 Example module source path:
 
@@ -48,9 +43,6 @@ module "my-runner" {
   ...
 }
 ```
-
-All consumable module paths end in either "test" or "prod". Do not
-directly reference any modules within "internal" folders.
 
 ### Composable Modules
 
@@ -65,14 +57,14 @@ Optional modules are available to set up additional configuration for
 runner which can be fed into the `runner` module. For example, the
 `gitlab`, `vpc`, `iam`, `fleeting` and `runner` modules can create a
 fully autoscaling runner on its own VPC and automatically register it
-to a GitLab project ([example main.tf](examples/prod-docker-autoscaler-ec2/main.tf)).
+to a GitLab project ([example main.tf](examples/docker-autoscaler-ec2-deployed-with-gitlab-ci/main.tf)).
 The outputs of each optional module are exactly what is required as input to the
 `runner` module, so they should fit together easily.
 
 ### Examples
 
-- [Test shell runner on EC2](examples/test-shell-runner-only-ec2/main.tf)
-- [Production `docker-autoscaler` configuration on EC2](examples/prod-docker-autoscaler-ec2/main.tf)
+- [Shell runner on EC2](examples/test-shell-runner-only-ec2/main.tf)
+- [Docker Autoscaler configuration on EC2](examples/docker-autoscaler-ec2-deployed-with-gitlab-ci/main.tf)
 
 ## Value of GRIT
 
@@ -105,32 +97,19 @@ many personas and use-cases.
 ### Wide Reach
 
 - With a regular cadence of release and upgrade, best practices and bug fixes can be adopted widely.
-- Easier to discuss and diagnose configuration issues. Users can say "I'm on GRIT 16.5 and I'm seeing this ..." and support will know exactly how they are setup.
+- Easier to discuss and diagnose configuration issues. Users can say "I'm on GRIT 16.5 and I'm seeing this ..." and support will know exactly how they are set up.
 
 ## API and Guarantees
 
-The GRIT API is defined by `variables.tf` and `output.tf` in the
-`test` and `prod` directories.
+The GRIT API is defined by `variables.tf` and `outputs.tf` in each module directory.
 
-The `test` type modules provide all the ways that GRIT can deploy
-runners with lots of convenient defaults so they can be setup will few
-required parameters.
+Modules are associated with a support designation of `none`, `experimental`, `beta`, or `GA`. The goal is for all 
+modules to reach the `GA` status.
 
-The `prod` type modules will each be associated with a support
-designation of `experimental`, `beta` or `ga`. The end-goal is to have
-all `prod` modules be `ga`. In general, experimental modules are new
-or just used in tests and development. Beta modules are at least
-dogfooded by GitLab internally. And GA modules are used by GitLab
-customers. Some modules like `runner` provide support levels on a
-per use case basis.
-
-The `ga` modules are the set of battle-hardened modules that GRIT
-authors have experience running. They will be backward compatible,
-meaning they will not be refactored in a way that causes unnecessary
-resource destruction. Especially since that would likely cause an
-outage! When backward incompatible changes are necessary advance
-warning will be given in manner compatible with existing GitLab
-deprecation policies.
+- **None**: Modules with no support guarantees, primarily for testing and development.
+- **Experimental**: New modules or those used mainly in tests and development.
+- **Beta**: Modules that are at least dogfooded by GitLab internally.
+- **GA (generally available)**: Modules used by GitLab customers. Maintain backward compatibility to prevent unnecessary resource destruction. Any necessary backward-incompatible changes will be communicated in advance, adhering to existing GitLab deprecation policies.
 
 ## Contributing
 

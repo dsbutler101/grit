@@ -132,6 +132,21 @@ outage! When backward incompatible changes are necessary advance
 warning will be given in manner compatible with existing GitLab
 deprecation policies.
 
+### Supported AMIs and AMI deprecation
+
+The `modules/aws/ami_lookup` module provides AMIs for GRIT configurations.
+AMIs remain publicly available for up to two years if they are either:
+
+- Listed in `modules/aws/ami_lookup/manifest.json` in a tagged release.
+- Created after the latest GRIT release.
+
+Public AMIs are removed if they are either created:
+
+- Before the latest GRIT release and have no association with a tagged GRIT version.
+- More than two years ago.
+
+If your GRIT version uses AMIs that are removed, upgrade to the latest version.
+
 ## Contributing
 
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.

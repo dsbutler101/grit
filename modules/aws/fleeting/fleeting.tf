@@ -45,4 +45,5 @@ module "ec2" {
   mixed_instances_policy      = var.mixed_instances_policy
   ebs_encryption              = var.ebs_encryption
   kms_key_arn                 = var.kms_key_arn
+  node_exporter               = var.node_exporter
 }

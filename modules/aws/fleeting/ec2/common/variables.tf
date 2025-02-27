@@ -81,3 +81,12 @@ variable "ebs_encryption" {
 variable "kms_key_arn" {
   type = string
 }
+
+variable "node_exporter" {
+  description = "Configuration for node_exporter"
+  type = object({
+    enabled = bool
+    port    = optional(number)
+    version = optional(string)
+  })
+}

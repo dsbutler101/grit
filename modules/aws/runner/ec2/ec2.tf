@@ -1,4 +1,8 @@
 locals {
+  # Note: Do not write files under /tmp during boot 
+  # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
+  cloudwatch_agent_json_path = "/var/tmp/amazon-cloudwatch-agent.json"
+
   cloud_config = {
     groups = [
       {
@@ -45,21 +49,22 @@ locals {
           s3_cache                = var.s3_cache
           acceptable_durations    = var.acceptable_durations
         })
-      }
+      },
       ],
+      var.node_exporter.enabled ? module.node_exporter[0].write_files_config : [],
       var.install_cloudwatch_agent ? [local.cloudwatch_config_file] : []
     )
 
-
     runcmd = concat(
       var.install_cloudwatch_agent ? local.install_cloudwatch_agent_cmd : [],
+      var.node_exporter.enabled ? module.node_exporter[0].commands : [],
       local.install_runner_cmd,
       var.executor == "docker-autoscaler" || var.executor == "instance" ? local.install_fleeting_plugin_cmd : [],
     )
   }
 
   cloudwatch_config_file = {
-    path        = "/tmp/amazon-cloudwatch-agent.json"
+    path        = local.cloudwatch_agent_json_path
     owner       = "root:root"
     permissions = "0644"
     content     = base64decode(var.cloudwatch_agent_json)
@@ -70,7 +75,7 @@ locals {
     "sudo apt-get -o DPkg::Lock::Timeout=300 install ./amazon-cloudwatch-agent.deb -y",
     "sudo usermod -aG adm cwagent",
     "sudo amazon-cloudwatch-agent-ctl -a start",
-    "sudo amazon-cloudwatch-agent-ctl -a fetch-config -c file:/tmp/amazon-cloudwatch-agent.json -s"
+    "sudo amazon-cloudwatch-agent-ctl -a fetch-config -c file:${local.cloudwatch_agent_json_path} -s"
   ]
 
   install_runner_cmd = [
@@ -119,6 +124,13 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
   owners = ["099720109477"] # Canonical
+}
+
+module "node_exporter" {
+  count                 = var.node_exporter.enabled ? 1 : 0
+  source                = "../../node_exporter"
+  node_exporter_port    = var.node_exporter.port
+  node_exporter_version = var.node_exporter.version
 }
 
 resource "aws_instance" "runner-manager" {

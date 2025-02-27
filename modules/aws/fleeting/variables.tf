@@ -128,6 +128,16 @@ variable "kms_key_arn" {
   default     = null
 }
 
+variable "node_exporter" {
+  description = "Configuration for node_exporter"
+  type = object({
+    enabled = optional(bool, false)
+    port    = optional(number, 9100)
+    version = optional(string, "0.9.0")
+  })
+  default = {}
+}
+
 #######
 # VPC #
 #######

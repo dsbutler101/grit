@@ -60,7 +60,7 @@ module "ec2" {
   ami                        = var.ami
   usage_logger               = var.usage_logger
   acceptable_durations       = var.acceptable_durations
-
+  node_exporter              = var.node_exporter
 
   name                        = var.metadata.name
   labels                      = var.metadata.labels

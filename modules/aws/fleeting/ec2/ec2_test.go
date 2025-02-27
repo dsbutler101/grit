@@ -50,6 +50,7 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 				"mixed_instances_policy": nil,
 				"ebs_encryption": false,
 				"kms_key_arn": "",
+				"node_exporter":               map[string]string{"enabled": "true", "port": "1234", "version": "1.2.3"},
 			},
 			expectedModules: baseExpectedModules,
 		},
@@ -78,6 +79,7 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 				"mixed_instances_policy": nil,
 				"ebs_encryption": false,
 				"kms_key_arn": "",
+				"node_exporter":               map[string]string{"enabled": "false"},
 			},
 
 			expectedModules: macExpectedModules,

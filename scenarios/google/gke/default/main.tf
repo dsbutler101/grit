@@ -38,8 +38,6 @@ module "cluster" {
 
   metadata = local.metadata
 
-  google_region = var.google_region
-
   google_zone = var.google_zone
   node_pools  = var.node_pools
 

@@ -17,16 +17,6 @@ terraform {
   backend "http" {}
 }
 
-variable "gitlab_project_id" {}
-
-variable "name" {
-  type = string
-}
-
-variable "runner_tag" {
-  type = string
-}
-
 # provider defaults using env vars (GOOGLE_PROJECT etc)
 provider "google" {}
 

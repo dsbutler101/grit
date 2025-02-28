@@ -1,5 +1,5 @@
 variable "name" {
-  description = "Unique name used for indentification and partitioning resources"
+  description = "Unique name used for identification and partitioning resources"
   type        = string
 
   validation {

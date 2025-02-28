@@ -1,19 +1,3 @@
-variable "executor" {
-  type = string
-}
-variable "scale_min" {
-  type = number
-}
-variable "scale_max" {
-  type = number
-}
-variable "idle_percentage" {
-  type = number
-}
-variable "capacity_per_instance" {
-  type = number
-}
-
 locals {
   check_scale_min_fail_message             = "scale_min is required for the autoscaling instance and docker-autoscaler executors"
   check_scale_max_fail_message             = "scale_max is required for the autoscaling instance and docker-autoscaler executors"

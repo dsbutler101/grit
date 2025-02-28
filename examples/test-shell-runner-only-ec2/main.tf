@@ -1,7 +1,3 @@
-variable "runner_token" {
-  default = "MY_RUNNER_TOKEN"
-}
-
 locals {
   metadata = {
     name        = "littlerunner"

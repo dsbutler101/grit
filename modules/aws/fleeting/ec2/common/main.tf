@@ -92,7 +92,7 @@ resource "aws_autoscaling_group" "fleeting-asg" {
     }
   }
 
-  min_size = 0
+  min_size = var.scale_min
   max_size = var.scale_max
 
   health_check_grace_period = 600

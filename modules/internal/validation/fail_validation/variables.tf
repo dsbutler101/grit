@@ -4,6 +4,7 @@
 # https://github.com/opentofu/opentofu/issues/757
 
 variable "message" {
+  type = string
   validation {
     condition     = var.message == ""
     error_message = var.message

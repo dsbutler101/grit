@@ -7,8 +7,17 @@ module "validate-name" {
   name   = var.metadata.name
 }
 
+module "validate-support" {
+  source   = "../../../internal/validation/support"
+  use_case = "gke"
+  use_case_support = tomap({
+    "gke" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
 ###################
-# GKE TEST MODULE #
+# GKE PROD MODULE #
 ###################
 
 module "gke" {
@@ -17,8 +26,7 @@ module "gke" {
   name   = var.metadata.name
   labels = var.metadata.labels
 
-  google_region = var.google_region
-  google_zone   = var.google_zone
+  google_zone = var.google_zone
 
   node_pools = var.node_pools
 

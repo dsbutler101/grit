@@ -5,6 +5,27 @@ terraform formatting:
   script:
     - make terraform-fmt-check
 
+terraform validate:
+  stage: lint
+  extends:
+    - .rules:merge_request_pipelines:code
+    - .tf-cache
+  script:
+    # terraform init files should exist in cache, but just in case
+    - make terraform-init -j4 -Oline
+    - make terraform-validate -j4 -Oline
+
+tflint:
+  stage: lint
+  image:
+    name: ghcr.io/terraform-linters/tflint:v0.55.1
+    entrypoint: ['']
+  extends:
+    - .rules:merge_request_pipelines:code
+    - .tf-cache
+  script:
+    - tflint --recursive --config "$(pwd)/.tflint.hcl"
+
 docs lint markdown:
   image: registry.gitlab.com/gitlab-org/gitlab-docs/lint-markdown:alpine-3.20-vale-3.7.1-markdownlint2-0.14.0-lychee-0.15.1
   stage: lint
@@ -21,6 +42,7 @@ docs lint markdown:
 golang lint:
   image: golangci/golangci-lint:v1.63.4-alpine
   stage: lint
+  needs: []
   extends:
     - .rules:merge_request_pipelines:code
     - .go-cache

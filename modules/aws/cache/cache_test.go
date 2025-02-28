@@ -13,7 +13,7 @@ func TestRunner(t *testing.T) {
 		moduleVars      map[string]interface{}
 		expectedModules []string
 	}{
-		"s3 cahe bucket": {
+		"s3 cache bucket": {
 			moduleVars: map[string]interface{}{
 				"metadata": map[string]interface{}{
 					"name":        name,

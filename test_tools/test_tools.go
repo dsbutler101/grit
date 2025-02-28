@@ -13,18 +13,27 @@ import (
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
-
-	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/common"
 )
 
-func JobName(_ *testing.T) string {
-	jobId := os.Getenv(common.JobIdVar)
-	sha := os.Getenv(common.CommitSHAVar)
+const (
+	JobIdVar     = "CI_JOB_ID"
+	CommitSHAVar = "CI_COMMIT_SHA"
+)
 
-	id := fmt.Sprintf("%s:%s:%d", jobId, sha, time.Now().Unix())
+// JobName returns a unique name for a test
+// that can be used for terraform resources.
+// It should allow integration tests against the same
+// cloud provider to run in parallel without conflicts.
+func JobName(t *testing.T) string {
+	// These CI vars can be empty for local dev
+	jobId := os.Getenv(JobIdVar)
+	sha := os.Getenv(CommitSHAVar)
+	testName := t.Name()
+
+	id := fmt.Sprintf("%s:%s:%s:%d", jobId, sha, testName, time.Now().Unix())
 	hash := sha1.Sum([]byte(id))
 
-	return fmt.Sprintf("u-%x", hash[:5])
+	return fmt.Sprintf("u-%x", hash[:8])
 }
 
 func Plan(t *testing.T, moduleVars map[string]any) *terraform.PlanStruct {

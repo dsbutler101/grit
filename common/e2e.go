@@ -9,26 +9,19 @@ import (
 )
 
 const (
-	JobIdVar                  = "CI_JOB_ID"
-	CommitSHAVar              = "CI_COMMIT_SHA"
-	GitlabTokenVar            = "GITLAB_TOKEN"
-	GitlabTokenVarE2E         = "GITLAB_TOKEN_E2E"
-	GritEndToEndTestProjectID = 52010278
-	GitLabProjectID           = "CI_PROJECT_ID"
-	RunnerTokenVar            = "RUNNER_TOKEN"
+	GitlabTokenVarE2E = "GITLAB_TOKEN_E2E"
+	GitLabProjectID   = "CI_PROJECT_ID"
 
 	TerraformHTTPAddress  = "TF_HTTP_ADDRESS"
 	TerraformHTTPUsername = "TF_HTTP_USERNAME"
 	TerraformHTTPPassword = "TF_HTTP_PASSWORD"
 )
 
-// E2ETestEnv is the environment for the end-to-end tests
-// variables shared between tests for Go automation.
-// Terraform variables are set with TF_VAR_ prefix.
+// E2ETestEnv contains variables shared between Go automation
+// and the terraform e2e modules.
 type E2ETestEnv struct {
 	GitlabToken     string
 	GitLabProjectID string
-	ProjectID       string
 
 	// HTTP state variables used to delete remote
 	// state after destroy is run.
@@ -59,11 +52,6 @@ func getE2ETestEnv() (*E2ETestEnv, error) {
 	}
 
 	je.GitLabProjectID, err = envVar(GitLabProjectID)
-	if err != nil {
-		return nil, fmt.Errorf("setting up job: %w", err)
-	}
-
-	je.ProjectID, err = getGoogleProjectIDFromEnvVar()
 	if err != nil {
 		return nil, fmt.Errorf("setting up job: %w", err)
 	}

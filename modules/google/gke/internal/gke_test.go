@@ -10,26 +10,28 @@ import (
 
 type moduleVars = map[string]any
 
-var defaultModuleVars = moduleVars{
-	"name":          test_tools.JobName(nil),
-	"google_region": "us-east1",
-	"google_zone":   "us-east1-b",
-	"labels": map[string]string{
-		"some": "label",
-	},
-	"node_pools": map[string]any{
-		"default": map[string]any{
-			"node_count": 1,
-			"node_config": map[string]any{
-				"machine_type": "e2-micro",
+func defaultModuleVars(t *testing.T) moduleVars {
+	return moduleVars{
+		"name":          test_tools.JobName(t),
+		"google_region": "us-east1",
+		"google_zone":   "us-east1-b",
+		"labels": map[string]string{
+			"some": "label",
+		},
+		"node_pools": map[string]any{
+			"default": map[string]any{
+				"node_count": 1,
+				"node_config": map[string]any{
+					"machine_type": "e2-micro",
+				},
 			},
 		},
-	},
-	"vpc": map[string]string{
-		"id":        "",
-		"subnet_id": "",
-	},
-	"deletion_protection": "false",
+		"vpc": map[string]string{
+			"id":        "",
+			"subnet_id": "",
+		},
+		"deletion_protection": "false",
+	}
 }
 
 func TestGKE(t *testing.T) {
@@ -57,7 +59,7 @@ func TestGKE(t *testing.T) {
 	for tn, tc := range testCases {
 		t.Run(tn, func(t *testing.T) {
 			mvs := mergeModuleVars(
-				defaultModuleVars,
+				defaultModuleVars(t),
 				tc.moduleVars,
 			)
 			test_tools.PlanAndAssert(t, mvs, tc.expectedModules)
@@ -92,7 +94,7 @@ func TestGKEPlanErrors(t *testing.T) {
 	for tn, tc := range testCases {
 		t.Run(tn, func(t *testing.T) {
 			mvs := mergeModuleVars(
-				defaultModuleVars,
+				defaultModuleVars(t),
 				tc.moduleVars,
 			)
 			test_tools.PlanAndAssertError(t, mvs, !tc.shouldNotError)
@@ -121,8 +123,8 @@ func TestGKEVarsUnused(t *testing.T) {
 
 	for tn, tc := range testCases {
 		t.Run(tn, func(t *testing.T) {
-			mv1 := mergeModuleVars(defaultModuleVars, tc.sharedVars, tc.varsRun1)
-			mv2 := mergeModuleVars(defaultModuleVars, tc.sharedVars, tc.varsRun2)
+			mv1 := mergeModuleVars(defaultModuleVars(t), tc.sharedVars, tc.varsRun1)
+			mv2 := mergeModuleVars(defaultModuleVars(t), tc.sharedVars, tc.varsRun2)
 
 			resourceDiff1 := test_tools.Plan(t, mv1).RawPlan.ResourceChanges
 			resourceDiff2 := test_tools.Plan(t, mv2).RawPlan.ResourceChanges

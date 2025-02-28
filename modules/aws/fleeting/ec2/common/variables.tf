@@ -27,7 +27,8 @@ variable "labels" {
 }
 
 variable "scale_min" {
-  type = number
+  type    = number
+  default = 0
 }
 
 variable "scale_max" {
@@ -43,10 +44,6 @@ variable "jobs-host-resource-group-outputs" {
 }
 
 variable "name" {
-  type = string
-}
-
-variable "vpc_id" {
   type = string
 }
 

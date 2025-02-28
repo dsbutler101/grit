@@ -44,9 +44,9 @@ locals {
     900 = "c2-standard-30"
   }
 
-  runner_manager_machine_type = var.concurrent < 300 ? local.runner_manager_machine_types_map.0 : (
-    var.concurrent < 600 ? local.runner_manager_machine_types_map.300 : (
-      var.concurrent < 900 ? local.runner_manager_machine_types_map.600 : local.runner_manager_machine_types_map.900
+  runner_manager_machine_type = var.concurrent < 300 ? local.runner_manager_machine_types_map[0] : (
+    var.concurrent < 600 ? local.runner_manager_machine_types_map[300] : (
+      var.concurrent < 900 ? local.runner_manager_machine_types_map[600] : local.runner_manager_machine_types_map[900]
     )
   )
 

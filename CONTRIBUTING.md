@@ -103,10 +103,17 @@ Visit the [e2e README](e2e/README.md) for details.
 
 #### Terraform
 
-We check the Terraform style with `terraform fmt` and validate `variables.tf`
-files with a `go` test to ensure variable definitions are in the correct place.
+We check the Terraform style and consistency with [`tflint`](https://github.com/terraform-linters/tflint),
+`terraform fmt -check` and `terraform validate`.
 
-Run `make terraform-fmt-check` to check Terraform formatting.
+A few `make` targets are provided for ease of use:
+
+- `make tflint` to run `tflint` using the `.tflint.hcl` file.
+- `make terraform-fmt-check` to run `terraform fmt` recursively.
+- `make terraform-validate` to run `terraform validate` recursively.
+
+You can use `make terraform-init` to initialize all modules locally and
+`make terraform-init -j` to do this in parallel.
 
 #### Go
 

@@ -162,7 +162,3 @@ resource "aws_instance" "runner-manager" {
     kms_key_id            = var.kms_key_id
   }
 }
-
-output "public_ip" {
-  value = aws_instance.runner-manager.public_ip
-}

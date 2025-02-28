@@ -1,9 +1,9 @@
 unit tests:
   stage: unit
-  needs: [terraform formatting]
+  needs: [terraform init]
   extends:
     - .rules:merge_request_pipelines:code
-    - .go-cache
+    - .go-tf-cache
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   script:

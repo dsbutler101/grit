@@ -20,12 +20,6 @@ variable "metadata" {
 # K8S RUNNER CONFIGURATION #
 ############################
 
-variable "runner_description" {
-  description = "The description for the GitLab runner"
-  type        = string
-  default     = "default GitLab Runner"
-}
-
 variable "gitlab" {
   description = "Outputs from the gitlab module. Or your own"
   type = object({

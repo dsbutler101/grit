@@ -31,10 +31,6 @@ variable "labels" {
   }
 }
 
-variable "google_region" {
-  type = string
-}
-
 variable "google_zone" {
   type = string
 }

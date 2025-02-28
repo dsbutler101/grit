@@ -20,11 +20,6 @@ variable "metadata" {
 # GKE CONFIG #
 ##############
 
-variable "google_region" {
-  type        = string
-  description = "The Google Cloud region in which your cluster will reside"
-}
-
 variable "google_zone" {
   type        = string
   description = "The Google Cloud zone in which to create your cluster"

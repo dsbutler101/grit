@@ -4,7 +4,6 @@ import (
 	"maps"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
@@ -12,9 +11,8 @@ type moduleVars = map[string]any
 
 func defaultModuleVars(t *testing.T) moduleVars {
 	return moduleVars{
-		"name":          test_tools.JobName(t),
-		"google_region": "us-east1",
-		"google_zone":   "us-east1-b",
+		"name":        test_tools.JobName(t),
+		"google_zone": "us-east1-b",
 		"labels": map[string]string{
 			"some": "label",
 		},
@@ -98,42 +96,6 @@ func TestGKEPlanErrors(t *testing.T) {
 				tc.moduleVars,
 			)
 			test_tools.PlanAndAssertError(t, mvs, !tc.shouldNotError)
-		})
-	}
-}
-
-// TestGKEVarsUnused is to test planning with module vars that are either not
-// used yet or anymore (deprecated)
-// When unused module variables are changed across two planning runs, we expect
-// there to be
-//   - no diff between the two plans
-//   - no error on either of the planning runs
-func TestGKEVarsUnused(t *testing.T) {
-	testCases := map[string]struct {
-		sharedVars    moduleVars
-		varsRun1      moduleVars
-		varsRun2      moduleVars
-		expectChanges bool
-	}{
-		"google-region-is-not-used": {
-			varsRun1: moduleVars{"google_region": "some-region"},
-			varsRun2: moduleVars{"google_region": "some-other-region"},
-		},
-	}
-
-	for tn, tc := range testCases {
-		t.Run(tn, func(t *testing.T) {
-			mv1 := mergeModuleVars(defaultModuleVars(t), tc.sharedVars, tc.varsRun1)
-			mv2 := mergeModuleVars(defaultModuleVars(t), tc.sharedVars, tc.varsRun2)
-
-			resourceDiff1 := test_tools.Plan(t, mv1).RawPlan.ResourceChanges
-			resourceDiff2 := test_tools.Plan(t, mv2).RawPlan.ResourceChanges
-
-			if !tc.expectChanges {
-				assert.Equal(t, resourceDiff1, resourceDiff2, "Expected plans not to differ")
-			} else {
-				assert.NotEqual(t, resourceDiff1, resourceDiff2, "Expected plans to differ, but they don't")
-			}
 		})
 	}
 }

@@ -40,7 +40,6 @@ module "fleeting" {
   ami           = var.ephemeral_runner.source_image != "" ? var.ephemeral_runner.source_image : module.ami_lookup.ami_id
   scale_min     = var.autoscaling_policy.scale_min
   scale_max     = var.max_instances
-
 }
 
 module "cache" {
@@ -97,7 +96,6 @@ module "security_groups" {
   metadata = local.metadata
 
   vpc_id = module.vpc.id
-
 }
 
 module "gitlab" {

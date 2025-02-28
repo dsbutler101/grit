@@ -43,3 +43,6 @@ terraform.rc
 kubeconfig
 
 vendor
+
+# junit.xml from CI test jobs
+junit.xml

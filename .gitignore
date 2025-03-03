@@ -47,5 +47,9 @@ vendor
 # junit.xml from CI test jobs
 junit.xml
 
+# coverage report from CI test jobs
+coverage.txt
+coverage.xml
+
 # deployer stuff
 deployer/build/

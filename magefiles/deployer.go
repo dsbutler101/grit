@@ -26,3 +26,8 @@ func (Deployer) CompileFor(platforms string) error {
 
 	return deployer.Compile(platformDefs...)
 }
+
+// GoGenerate runs go generate within the deployer submodule
+func (Deployer) GoGenerate() error {
+	return deployer.GoGenerate()
+}

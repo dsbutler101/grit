@@ -12,9 +12,13 @@ import (
 	"github.com/magefile/mage/sh"
 	"go.maczukin.dev/libs/mageutils"
 	"go.maczukin.dev/libs/version/magefiles"
+
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/magefiles/utils"
 )
 
 const (
+	submodulePath = "deployer"
+
 	binaryName = "deployer"
 
 	outputDir = "build"
@@ -44,7 +48,7 @@ func Compile(platformDefs ...string) error {
 		})
 	}
 
-	return onCustomWD("deployer", func() error {
+	return onDeployerWD(func() error {
 		fmt.Println("Establishing version information...")
 		ver, err := magefiles.Version()
 		if err != nil {
@@ -102,6 +106,10 @@ func Compile(platformDefs ...string) error {
 	})
 }
 
+func onDeployerWD(fn func() error) error {
+	return utils.OnWD(submodulePath, fn)
+}
+
 func compileForPlatform(ldFlags []string, goos string, goarch string) (string, error) {
 	fmt.Println()
 	fmt.Println("Compiling...")
@@ -141,27 +149,6 @@ func compileForPlatform(ldFlags []string, goos string, goarch string) (string, e
 	}
 
 	return fmt.Sprintf("%x  %s", binaryHash, relBinaryPath), nil
-}
-
-func onCustomWD(dir string, fn func() error) error {
-	wd, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("checking working directory: %w", err)
-	}
-
-	err = os.Chdir(dir)
-	if err != nil {
-		return fmt.Errorf("chdir to deployer: %w", err)
-	}
-
-	defer func() {
-		err := os.Chdir(wd)
-		if err != nil {
-			fmt.Println("could not restore working directory")
-		}
-	}()
-
-	return fn()
 }
 
 var packageNameOnce mageutils.Once[string]

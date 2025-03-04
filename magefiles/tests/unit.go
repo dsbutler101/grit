@@ -6,14 +6,13 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
 
 	"github.com/magefile/mage/sh"
+
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/magefiles/utils"
 )
 
 const (
-	ciEnv = "CI"
-
 	gotestsumVersion        = "v1.12.0"
 	gocoverCoberturaVersion = "v1.3.0"
 
@@ -26,7 +25,7 @@ var (
 )
 
 func UnitForPath(path string) error {
-	return onWD(path, func() error {
+	return utils.OnWD(path, func() error {
 		return Unit()
 	})
 }
@@ -44,7 +43,7 @@ func Unit() error {
 		fmt.Sprintf("gotest.tools/gotestsum@%s", gotestsumVersion),
 	}
 
-	if isCI() {
+	if utils.IsCI() {
 		runArgs = append(runArgs, "--junitfile=junit.xml")
 	}
 
@@ -120,39 +119,4 @@ func generateCoverageReportFile(wd string) error {
 	fmt.Printf("\nCoverage TOTAL: %s\n", coverageTotal[1])
 
 	return nil
-}
-
-func onWD(path string, fn func() error) error {
-	origWd, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("failed to get current working directory: %w", err)
-	}
-
-	err = os.Chdir(path)
-	if err != nil {
-		return fmt.Errorf("failed to change directory to %s: %w", origWd, err)
-	}
-
-	defer func() {
-		err := os.Chdir(origWd)
-		if err != nil {
-			panic(fmt.Sprintf("failed to restore original working directory: %v", err))
-		}
-	}()
-
-	return fn()
-}
-
-func isCI() bool {
-	ci := os.Getenv(ciEnv)
-	if ci == "" {
-		return false
-	}
-
-	ok, err := strconv.ParseBool(ci)
-	if err != nil {
-		return false
-	}
-
-	return ok
 }

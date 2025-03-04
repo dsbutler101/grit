@@ -14,19 +14,18 @@ const (
 	DefaultTimeout = 30 * time.Second
 )
 
-type Status struct {
-	Status        api.Status
-	FailureReason string
-}
-
-func (s Status) IsRunning() bool {
-	return s.Status == api.StatusRunning || s.Status == api.StatusInShutdown
+//go:generate mockery --name=grpcClient --inpackage --with-expecter
+type grpcClient interface {
+	ConnectWithTimeout(context.Context, time.Duration) error
+	CheckStatus(context.Context) (client.CheckStatusResponse, error)
+	InitGracefulShutdown(context.Context, api.InitGracefulShutdownRequest) (client.CheckStatusResponse, error)
+	InitForcefulShutdown(context.Context) (client.CheckStatusResponse, error)
 }
 
 type Client struct {
 	logger *slog.Logger
 
-	c *client.Client
+	c grpcClient
 }
 
 func NewClient(logger *slog.Logger, dialer client.Dialer, address string) (*Client, error) {

@@ -43,13 +43,13 @@ func New(logger *slog.Logger, tf *terraform.Client, tfFlags terraform.Flags, ssh
 func (s *Service) ExecuteWaitHealthy(ctx context.Context) error {
 	s.logger = s.logger.With("operation", "wait-healthy")
 
-	return s.execute(ctx, true)
+	return s.execute(ctx, wrapper.CheckForRunning)
 }
 
 func (s *Service) ExecuteWaitTerminated(ctx context.Context) error {
 	s.logger = s.logger.With("operation", "wait-terminated")
 
-	return s.execute(ctx, false)
+	return s.execute(ctx, wrapper.CheckForStopped)
 }
 
 func (s *Service) execute(ctx context.Context, checkForRunning bool) error {

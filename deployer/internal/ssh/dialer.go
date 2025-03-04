@@ -27,6 +27,7 @@ type TargetGRPCServerDef struct {
 	Address string
 }
 
+//go:generate mockery --name=Dialer --inpackage --with-expecter
 type Dialer interface {
 	Dial(network string, address string) (net.Conn, error)
 	Start(ctx context.Context) error

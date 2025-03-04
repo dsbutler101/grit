@@ -23,8 +23,8 @@ type RunnerManager struct {
 	Instance       string
 	Address        string
 	WrapperAddress string
-	Username       *string
-	SSHKeyPem      *string
+	Username       string
+	SSHKeyPem      string
 }
 
 func newRunnerManager(in any) (RunnerManager, error) {
@@ -53,8 +53,8 @@ func newRunnerManager(in any) (RunnerManager, error) {
 		OutputValueInstance:       optionalStringReader(rmMap, &rm.Instance),
 		OutputValueAddress:        requiredStringReader(rmMap, &rm.Address),
 		OutputValueWrapperAddress: requiredStringReader(rmMap, &rm.WrapperAddress),
-		OutputValueUsername:       optionalStringReader(rmMap, rm.Username),
-		OutputValueSSHKeyPem:      optionalStringReader(rmMap, rm.SSHKeyPem),
+		OutputValueUsername:       optionalStringReader(rmMap, &rm.Username),
+		OutputValueSSHKeyPem:      optionalStringReader(rmMap, &rm.SSHKeyPem),
 	}
 
 	for key, reader := range matchingMap {

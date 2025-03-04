@@ -59,7 +59,7 @@ func (c *cmd) Execute(ctx context.Context, _ *cobra.Command, _ []string) error {
 		return nil
 	}
 
-	var rerr *wrapper.GRPCConnectionRetryExceededError
+	var rerr *wrapper.GRPCConnectionWaitTimeoutExceededError
 	if errors.As(err, &rerr) {
 		return cli.NewError(gRPCConnectionRetryExitCode, err)
 	}

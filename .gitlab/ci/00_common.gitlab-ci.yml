@@ -37,9 +37,10 @@ variables:
 
 .tf-cache:
   cache:
-    - key: tf-${CI_COMMIT_REF_SLUG}
+    - key: tf-${CI_PIPELINE_ID}
       paths: 
-        - $CI_PROJECT_DIR/.terraform
+        # TODO: enable terraform caching 
+        # - $CI_PROJECT_DIR/**/.terraform
         - $CI_PROJECT_DIR/**/.terraform.lock.hcl
 
 .go-tf-cache:

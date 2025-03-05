@@ -68,11 +68,12 @@ func setupLogger() {
 func setupTFClient() {
 	var err error
 
-	tf, err = terraform.New(log)
+	tfExecPath, err = terraform.DefaultExecPath()
 	if err != nil {
-		log.Error("Could not create Terraform client", "error", err)
-		os.Exit(unknownErrorExitCode)
+		log.Error("Could not detect Terraform CLI; needs to be provided with flag", "error", err)
 	}
+
+	tf = terraform.New(log)
 }
 
 func setupRootCMD() *cobra.Command {
@@ -82,21 +83,21 @@ func setupRootCMD() *cobra.Command {
 		Version:       deployer.VersionInfo().ExtendedString(),
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		PersistentPreRun: func(_ *cobra.Command, _ []string) {
+		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 			if logDebug {
 				logL.Set(slog.LevelDebug)
 			}
 
-			if tf.ExecPath() != tfExecPath {
-				tf.SetExecPath(tfExecPath)
-			}
+			tf.SetExecPath(tfExecPath)
 
 			log.With("pid", os.Getpid()).Info("Starting deployer")
+
+			return nil
 		},
 	}
 
 	rootCmd.PersistentFlags().BoolVar(&logDebug, "debug", false, "Set log level to debug")
-	rootCmd.PersistentFlags().StringVar(&tfExecPath, "tf-exec-path", tf.ExecPath(), "Path to Terraform executable")
+	rootCmd.PersistentFlags().StringVar(&tfExecPath, "tf-exec-path", tfExecPath, "Path to Terraform executable")
 	tfGroup := cobra.Group{ID: "tf", Title: "Terraform maintenance"}
 
 	wrapperGroup := cobra.Group{ID: "wrapper", Title: "Runner process wrapper integration"}

@@ -28,7 +28,7 @@ func TestMux_Execute(t *testing.T) {
 
 	testRMAlias1 := "runner-manager-1"
 	testRM1 := terraform.RunnerManager{
-		Instance: "test-instance",
+		InstanceName: "test-instance",
 	}
 	testRunnerManagers := terraform.RunnerManagers{
 		testRMAlias1: testRM1,

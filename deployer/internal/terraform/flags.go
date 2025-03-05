@@ -4,6 +4,11 @@ import (
 	"errors"
 )
 
+var (
+	ErrNoTargetFlagSet    = errors.New("one of target or target-state-file must be specified")
+	ErrBothTargetFlagsSet = errors.New("only one of target or target-state-file can be specified at once")
+)
+
 type Flags struct {
 	Target          string
 	TargetStateFile string
@@ -11,11 +16,11 @@ type Flags struct {
 
 func (f *Flags) Validate() error {
 	if f.Target == "" && f.TargetStateFile == "" {
-		return errors.New("one of target or target-state-file must be specified")
+		return ErrNoTargetFlagSet
 	}
 
 	if f.Target != "" && f.TargetStateFile != "" {
-		return errors.New("only one of target or target-state-file can be specified at once")
+		return ErrBothTargetFlagsSet
 	}
 
 	return nil

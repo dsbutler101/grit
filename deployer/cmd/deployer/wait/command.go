@@ -109,7 +109,7 @@ func newCmd(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group, et 
 
 			return nil
 		},
-		RunE: cli.BuildCommandExecutor(c),
+		RunE: cli.BuildRunEFromCommandExecutor(c),
 	}
 
 	c.tfFlags = base.SetupAllTFFlags(cc)

@@ -27,7 +27,10 @@ func TestError_Error(t *testing.T) {
 	for tn, tc := range tt {
 		t.Run(tn, func(t *testing.T) {
 			assert.NotPanics(t, func() {
-				assert.Equal(t, tc.expected, NewError(exitCode, tc.err).Error())
+				err := NewError(exitCode, tc.err)
+				assert.Equal(t, exitCode, err.ExitCode())
+				assert.Equal(t, tc.err, err.Unwrap())
+				assert.Equal(t, tc.expected, err.Error())
 			})
 		})
 	}

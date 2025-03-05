@@ -11,97 +11,81 @@ import (
 	"syscall"
 )
 
-type multiReaderCloserCloseErr struct {
-	failures uint
-	lastErr  error
+var (
+	errStreamCommandAlreadyRunning     = errors.New("stream command is already running")
+	errStreamCommandCreatingStdoutPipe = errors.New("creating stdout pipe")
+	errStreamCommandCreatingStderrPipe = errors.New("creating stderr pipe")
+	errStreamCommandCreatingStdinPipe  = errors.New("creating stdin pipe")
+	errStreamCommandNotStarted         = errors.New("stream command is not started")
+)
+
+//go:generate mockery --name=execCmd --inpackage --with-expecter
+type execCmd interface {
+	StdoutPipe() (io.ReadCloser, error)
+	StderrPipe() (io.ReadCloser, error)
+	StdinPipe() (io.WriteCloser, error)
+	Start() error
+	Wait() error
+	Kill() error
 }
 
-func (e *multiReaderCloserCloseErr) Error() string {
-	return fmt.Sprintf("encountered %d error when closing multi reader sources; last was: %v", e.failures, e.lastErr)
+type defaultExecCmd struct {
+	*exec.Cmd
 }
 
-type multiReadCloser struct {
-	sources []io.ReadCloser
-	r       io.Reader
-}
-
-func newMultiReadCloser(readers ...io.ReadCloser) io.ReadCloser {
-	r := make([]io.Reader, len(readers))
-	for no, in := range readers {
-		r[no] = in
+func (c *defaultExecCmd) Kill() error {
+	if c.Cmd == nil || c.Cmd.Process == nil {
+		return nil
 	}
 
-	return &multiReadCloser{
-		r:       io.MultiReader(r...),
-		sources: readers,
-	}
-}
-
-func (m *multiReadCloser) Read(p []byte) (n int, err error) {
-	return m.r.Read(p)
-}
-
-func (m *multiReadCloser) Close() error {
-	var err error
-
-	failures := uint(0)
-	for _, source := range m.sources {
-		err = source.Close()
-		if err != nil {
-			failures++
-		}
-	}
-
-	if err != nil {
-		return &multiReaderCloserCloseErr{
-			failures: failures,
-			lastErr:  err,
-		}
-	}
-
-	return nil
+	return c.Cmd.Process.Kill()
 }
 
 type streamCommand struct {
 	command string
 	args    []string
 
+	commandFactory func(ctx context.Context, command string, args ...string) execCmd
+
 	conn *streamConn
 	mux  sync.Mutex
 
-	cmd *exec.Cmd
+	cmd execCmd
 }
 
 func newStreamCommand(cmd string, args ...string) *streamCommand {
 	return &streamCommand{
 		command: cmd,
 		args:    args,
+		commandFactory: func(ctx context.Context, command string, args ...string) execCmd {
+			return &defaultExecCmd{Cmd: exec.CommandContext(ctx, command, args...)}
+		},
 	}
 }
 
 func (c *streamCommand) Start(ctx context.Context) error {
 	if c.conn != nil || c.cmd != nil {
-		return fmt.Errorf("proxy command is already running")
+		return errStreamCommandAlreadyRunning
 	}
 
-	c.cmd = exec.CommandContext(ctx, c.command, c.args...)
+	c.cmd = c.commandFactory(ctx, c.command, c.args...)
 
 	outR, err := c.cmd.StdoutPipe()
 	if err != nil {
 		c.cmd = nil
-		return fmt.Errorf("creating stdout pipe: %w", err)
+		return fmt.Errorf("%w: %v", errStreamCommandCreatingStdoutPipe, err)
 	}
 
 	errR, err := c.cmd.StderrPipe()
 	if err != nil {
 		c.cmd = nil
-		return fmt.Errorf("creating stderr pipe: %w", err)
+		return fmt.Errorf("%w: %v", errStreamCommandCreatingStderrPipe, err)
 	}
 
 	inW, err := c.cmd.StdinPipe()
 	if err != nil {
 		c.cmd = nil
-		return fmt.Errorf("creating stdin pipe: %w", err)
+		return fmt.Errorf("%w: %v", errStreamCommandCreatingStdinPipe, err)
 	}
 
 	c.conn = newStreamConn(inW, newMultiReadCloser(outR, errR))
@@ -111,7 +95,7 @@ func (c *streamCommand) Start(ctx context.Context) error {
 
 func (c *streamCommand) Wait() error {
 	if c.cmd == nil {
-		return fmt.Errorf("proxy command is not started")
+		return errStreamCommandNotStarted
 	}
 
 	err := c.cmd.Wait()
@@ -122,6 +106,8 @@ func (c *streamCommand) Wait() error {
 			if !status.Signaled() && !status.Stopped() {
 				return err
 			}
+		} else {
+			return err
 		}
 	}
 
@@ -133,9 +119,5 @@ func (c *streamCommand) Connection() net.Conn {
 }
 
 func (c *streamCommand) Kill() error {
-	if c.cmd == nil || c.cmd.Process == nil {
-		return nil
-	}
-
-	return c.cmd.Process.Kill()
+	return c.cmd.Kill()
 }

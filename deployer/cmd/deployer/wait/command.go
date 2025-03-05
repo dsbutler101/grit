@@ -107,6 +107,11 @@ func newCmd(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group, et 
 				return err
 			}
 
+			err = c.sshFlags.Validate()
+			if err != nil {
+				return err
+			}
+
 			return nil
 		},
 		RunE: cli.BuildRunEFromCommandExecutor(c),

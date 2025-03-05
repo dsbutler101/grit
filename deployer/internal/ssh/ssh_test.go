@@ -15,8 +15,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/gitlab-org/gitlab-runner/helpers/runner_wrapper/api/client"
 	"golang.org/x/crypto/ssh"
+
+	"gitlab.com/gitlab-org/gitlab-runner/helpers/runner_wrapper/api/client"
 )
 
 const (
@@ -41,9 +42,9 @@ Z2FzdXMBAgMEBQYH
 -----END OPENSSH PRIVATE KEY-----`
 )
 
-type closer func()
+type testCloser func()
 
-func startTestSSHServer(t *testing.T) (Config, closer) {
+func startTestSSHServer(t *testing.T) (Config, testCloser) {
 	testSSHUserPrivateKeyPemBytes := []byte(testSSHUserPrivateKeyPem)
 
 	testUserKey, err := ssh.ParsePrivateKey(testSSHUserPrivateKeyPemBytes)
@@ -197,38 +198,6 @@ func testSSHServerTCPIPForwardChannel(t *testing.T, channel ssh.Channel, extraDa
 	testSSHServerProxyTo(t, channel, "tcp", fmt.Sprintf("%s:%d", msg.HostToConnect, msg.PortToConnect))
 }
 
-func TestProxyCommandDialer(t *testing.T) {
-	withSocket(t, func(t *testing.T, socketPath string) {
-		withCompiledNC(t, func(t *testing.T, ncPath string) {
-			withSSHServerCfg(t, func(t *testing.T, cfg Config) {
-				ctx, cancelFn := context.WithCancel(context.Background())
-				defer cancelFn()
-
-				dialer, err := NewProxyCommandDialer(cfg, CommandDef{
-					Cmd:  ncPath,
-					Args: []string{"--tcp-socket", cfg.Address},
-				})
-				require.NoError(t, err)
-
-				err = dialer.Start(ctx)
-				require.NoError(t, err)
-
-				dialerErrChan := make(chan error)
-				go func() {
-					dialerErrChan <- dialer.Wait()
-				}()
-
-				runTestCall(t, dialer.Dial, socketPath)
-
-				err = dialer.Close()
-				require.NoError(t, err)
-
-				require.NoError(t, <-dialerErrChan)
-			})
-		})
-	})
-}
-
 func withCompiledNC(t *testing.T, fn func(t *testing.T, ncPath string)) {
 	sourcePath := "." + string(filepath.Separator) + filepath.Join("testdata", "nc")
 	binPath := filepath.Join(t.TempDir(), "nc.exe")
@@ -301,61 +270,4 @@ func withSocket(t *testing.T, fn func(t *testing.T, socketPath string)) {
 	t.Log("started server on the socket")
 
 	fn(t, socketPath)
-}
-
-func TestDirectDialer(t *testing.T) {
-	withSocket(t, func(t *testing.T, socketPath string) {
-		withSSHServerCfg(t, func(t *testing.T, cfg Config) {
-			dialer, err := NewDirectDialer(cfg)
-			require.NoError(t, err)
-
-			runTestCall(t, dialer.Dial, socketPath)
-
-			require.NoError(t, dialer.Close())
-		})
-	})
-}
-
-func TestProxyJumpDialer(t *testing.T) {
-	withSocket(t, func(t *testing.T, socketPath string) {
-		withSSHServerCfg(t, func(t *testing.T, proxyCfg Config) {
-			withSSHServerCfg(t, func(t *testing.T, targetCfg Config) {
-				dialer, err := NewProxyJumpDialer(targetCfg, proxyCfg)
-				require.NoError(t, err)
-
-				runTestCall(t, dialer.Dial, socketPath)
-
-				require.NoError(t, dialer.Close())
-			})
-		})
-	})
-}
-
-func TestCommandDialer(t *testing.T) {
-	withSocket(t, func(t *testing.T, socketPath string) {
-		withCompiledNC(t, func(t *testing.T, ncPath string) {
-			ctx, cancelFn := context.WithCancel(context.Background())
-			defer cancelFn()
-
-			dialer := NewCommandDialer(CommandDef{
-				Cmd:  ncPath,
-				Args: []string{"--unix-socket", socketPath},
-			})
-
-			err := dialer.Start(ctx)
-			require.NoError(t, err)
-
-			dialerErrChan := make(chan error)
-			go func() {
-				dialerErrChan <- dialer.Wait()
-			}()
-
-			runTestCall(t, dialer.Dial, socketPath)
-
-			err = dialer.Close()
-			require.NoError(t, err)
-
-			require.NoError(t, <-dialerErrChan)
-		})
-	})
 }

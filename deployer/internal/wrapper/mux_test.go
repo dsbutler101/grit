@@ -353,42 +353,44 @@ func TestMuxRunnerManagerHandler_handle(t *testing.T) {
 		SSHKeyPem:      testKeyPem,
 	}
 
-	noopDialerFactory := func(_ *testing.T, _ context.Context, _ *ssh.MockDialer) dialerFactory {
-		return func(_ ssh.Flags, _ ssh.TargetDef) (ssh.Dialer, error) {
-			return nil, nil
-		}
+	noopDialerFactory := func(_ *testing.T, _ context.Context, dialer *ssh.MockDialer) dialerFactory {
+		return newMockDialerFactory(t)
 	}
 
 	defaultDialerFactory := func(t *testing.T, expectedCtx context.Context, dialer *ssh.MockDialer) dialerFactory {
-		return func(flags ssh.Flags, target ssh.TargetDef) (ssh.Dialer, error) {
-			assert.Equal(t, testSSHFlags, flags)
-			assert.Equal(t, testRM.Address, target.Host.Address)
-			assert.Equal(t, testRM.Username, target.Host.Username)
-			assert.Equal(t, []byte(testRM.SSHKeyPem), target.Host.PrivateKeyPem)
-			assert.Equal(t, testSocketNetwork, target.GRPCServer.Network)
-			assert.Equal(t, testSocketPath, target.GRPCServer.Address)
+		dialerClosedCh := make(chan struct{})
 
-			dialerClosedCh := make(chan struct{})
+		dialer.EXPECT().Start(expectedCtx).Return(nil)
+		dialer.EXPECT().
+			Close().
+			Run(func() {
+				close(dialerClosedCh)
+			}).
+			Return(nil)
+		dialer.EXPECT().
+			Wait().
+			Run(func() {
+				select {
+				case <-expectedCtx.Done():
+				case <-dialerClosedCh:
+				}
+			}).
+			Return(errors.New("logged only error"))
 
-			dialer.EXPECT().Start(expectedCtx).Return(nil)
-			dialer.EXPECT().
-				Close().
-				Run(func() {
-					close(dialerClosedCh)
-				}).
-				Return(nil)
-			dialer.EXPECT().
-				Wait().
-				Run(func() {
-					select {
-					case <-expectedCtx.Done():
-					case <-dialerClosedCh:
-					}
-				}).
-				Return(errors.New("logged only error"))
+		df := newMockDialerFactory(t)
+		df.EXPECT().
+			Create(mock.Anything, mock.Anything).
+			Run(func(flags ssh.Flags, def ssh.TargetDef) {
+				assert.Equal(t, testSSHFlags, flags)
+				assert.Equal(t, testRM.Address, def.Host.Address)
+				assert.Equal(t, testRM.Username, def.Host.Username)
+				assert.Equal(t, []byte(testRM.SSHKeyPem), def.Host.PrivateKeyPem)
+				assert.Equal(t, testSocketNetwork, def.GRPCServer.Network)
+				assert.Equal(t, testSocketPath, def.GRPCServer.Address)
+			}).
+			Return(dialer, nil)
 
-			return dialer, nil
-		}
+		return df
 	}
 
 	noopClientFactory := func(_ *testing.T, _ context.Context, _ *ssh.MockDialer, _ *Client) clientFactory {
@@ -456,9 +458,10 @@ func TestMuxRunnerManagerHandler_handle(t *testing.T) {
 		"dialer factory error": {
 			rm: testRM,
 			dialerFactory: func(_ *testing.T, _ context.Context, _ *ssh.MockDialer) dialerFactory {
-				return func(_ ssh.Flags, _ ssh.TargetDef) (ssh.Dialer, error) {
-					return nil, assert.AnError
-				}
+				df := newMockDialerFactory(t)
+				df.EXPECT().Create(mock.Anything, mock.Anything).Return(nil, assert.AnError)
+
+				return df
 			},
 			clientFactory: noopClientFactory,
 			callbackFn:    noopCallbackFn,
@@ -469,12 +472,13 @@ func TestMuxRunnerManagerHandler_handle(t *testing.T) {
 		"dialer start failure": {
 			rm: testRM,
 			dialerFactory: func(t *testing.T, expectedCtx context.Context, dialer *ssh.MockDialer) dialerFactory {
-				return func(_ ssh.Flags, _ ssh.TargetDef) (ssh.Dialer, error) {
-					dialer.EXPECT().Start(expectedCtx).Return(assert.AnError)
-					dialer.EXPECT().Close().Return(errors.New("logged only error"))
+				dialer.EXPECT().Start(expectedCtx).Return(assert.AnError)
+				dialer.EXPECT().Close().Return(errors.New("logged only error"))
 
-					return dialer, nil
-				}
+				df := newMockDialerFactory(t)
+				df.EXPECT().Create(mock.Anything, mock.Anything).Return(dialer, nil)
+
+				return df
 			},
 			clientFactory: noopClientFactory,
 			callbackFn:    noopCallbackFn,

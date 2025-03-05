@@ -55,6 +55,11 @@ type rmHandler interface {
 	handle(context.Context, terraform.RunnerManager, callbackFn) error
 }
 
+//go:generate mockery --name=dialerFactory --inpackage --with-expecter
+type dialerFactory interface {
+	Create(flags ssh.Flags, def ssh.TargetDef) (ssh.Dialer, error)
+}
+
 type Mux struct {
 	logger *slog.Logger
 	tf     tfClient
@@ -149,7 +154,7 @@ type muxRunnerManagerHandlerFactory struct {
 }
 
 func (f *muxRunnerManagerHandlerFactory) new(alias string) rmHandler {
-	df := ssh.NewDialer
+	var df dialerFactory = ssh.NewDialerFactory()
 	if f.dialerFactory != nil {
 		df = f.dialerFactory
 	}
@@ -167,8 +172,6 @@ func (f *muxRunnerManagerHandlerFactory) new(alias string) rmHandler {
 		clientFactory: cf,
 	}
 }
-
-type dialerFactory func(flags ssh.Flags, def ssh.TargetDef) (ssh.Dialer, error)
 
 type clientFactory func(ctx context.Context, logger *slog.Logger, dialer client.Dialer, connectionTimeout time.Duration, address string) (*Client, error)
 
@@ -200,7 +203,7 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 		return fmt.Errorf("getting ssh key bytes: %w", err)
 	}
 
-	dialer, err := h.dialerFactory(h.sshFlags, ssh.TargetDef{
+	dialer, err := h.dialerFactory.Create(h.sshFlags, ssh.TargetDef{
 		Host: ssh.TargetHostDef{
 			Address:       rm.Address,
 			Username:      username,

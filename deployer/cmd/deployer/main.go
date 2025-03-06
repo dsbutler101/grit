@@ -70,7 +70,7 @@ func setupTFClient() {
 
 	tfExecPath, err = terraform.DefaultExecPath()
 	if err != nil {
-		log.Error("Could not detect Terraform CLI; needs to be provided with flag", "error", err)
+		log.Error("Could not detect Terraform CLI; needs to be provided with flag", logger.ErrorKey, err)
 	}
 
 	tf = terraform.New(log)
@@ -130,7 +130,7 @@ func determineExitCode(err error) int {
 		exitCode = cliErr.ExitCode()
 	}
 
-	log.Error("failed to execute command", "error", err, "exitCode", exitCode)
+	log.Error("failed to execute command", logger.ErrorKey, err, "exitCode", exitCode)
 
 	return exitCode
 }

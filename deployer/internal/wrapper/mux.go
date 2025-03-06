@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/ssh"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/terraform"
 	"gitlab.com/gitlab-org/gitlab-runner/helpers/runner_wrapper/api/client"
@@ -123,7 +124,7 @@ func (m *Mux) Execute(ctx context.Context, fn callbackFn) error {
 		case result := <-resultCh:
 			log := m.logger.With(runnerManagerAliasLogKey, result.alias)
 			if result.err != nil {
-				log.With("error", result.err).Error("Runner manager execution failed")
+				log.With(logger.ErrorKey, result.err).Error("Runner manager execution failed")
 				lastErr = result.err
 				continue
 			}
@@ -203,6 +204,24 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 		return fmt.Errorf("getting ssh key bytes: %w", err)
 	}
 
+	log := h.logger.
+		WithGroup("dialer").
+		With("ssh-config", struct {
+			Address  string
+			Username string
+		}{
+			Address:  rm.Address,
+			Username: rm.Username,
+		}).
+		With("grpc-config", struct {
+			Network string
+			Address string
+		}{
+			Network: wa.network,
+			Address: wa.address,
+		})
+	log.Debug("Creating SSH dialer")
+
 	dialer, err := h.dialerFactory.Create(h.sshFlags, ssh.TargetDef{
 		Host: ssh.TargetHostDef{
 			Address:       rm.Address,
@@ -223,7 +242,7 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 	defer func() {
 		err := dialer.Close()
 		if err != nil {
-			h.logger.With("error", err).Error("Closing SSH Dialer")
+			h.logger.With(logger.ErrorKey, err).Error("Closing SSH Dialer")
 		}
 		wg.Wait()
 	}()
@@ -239,7 +258,7 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 
 		err := dialer.Wait()
 		if err != nil {
-			h.logger.With("error", err).Error("SSH execution failure")
+			h.logger.With(logger.ErrorKey, err).Error("SSH execution failure")
 		}
 	}()
 

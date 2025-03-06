@@ -9,6 +9,8 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
 )
 
 const (
@@ -127,7 +129,7 @@ func (c *Client) runTerraformWithOutput(ctx context.Context, out io.Writer, work
 
 	err = cmd.run(ctx, c.execPath, args...)
 	if err != nil {
-		log.Error("Terraform execution failed", "error", err, "exit-code", cmd.exitCode())
+		log.Error("Terraform execution failed", logger.ErrorKey, err, "exit-code", cmd.exitCode())
 
 		return newCommandError(command, cmd.exitCode(), err)
 	}

@@ -95,3 +95,19 @@ variable "pod_spec_patches" {
   description = "A JSON or YAML format string that describes the changes which must be applied to the final PodSpec object before it is generated."
   default     = []
 }
+
+variable "log_level" {
+  type        = string
+  description = "The log level for the runner manager"
+  default     = "info"
+}
+
+variable "listen_address" {
+  type        = string
+  description = "The address to listen on for the runner manager"
+  default     = ""
+}
+
+variable "runner_opts" {
+  type = map(any)
+}

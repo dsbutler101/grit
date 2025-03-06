@@ -1,21 +1,24 @@
 variable "operator_version" {
-  default     = "current"
+  default     = "latest"
   type        = string
   description = <<-EOF
-    The operator version to deploy.
-
-    For supported version see either
-    https://gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/-/releases
-    or this module's output 'supported_operator_versions'.
+    The operator version to deploy. This should be specified in semantic version format
+    (e.g. 'v1.2.3') or set to 'latest' to use the most recent release.
   EOF
 }
 
 variable "override_manifests" {
-  default     = ""
   type        = string
-  description = <<-EOF
-    The manifests for the operator deployment. If this is set, the
-    `operator_version` will be ignored, and users of this module have to provide
-    the path to a yaml file, containing all needed objects to apply to the cluster.
-  EOF
+  description = <<-EOT
+    Optional path to custom operator manifests. Supports the following formats:
+      - HTTP(S) URL (e.g., "https://example.com/custom-operator.yaml")
+      - Local file path with "file://" prefix (e.g., "file:///path/to/operator.yaml")
+      - If empty, uses the official GitLab Runner Operator manifest
+  EOT
+  default     = ""
+
+  validation {
+    condition     = var.override_manifests == "" || can(regex("^(https?://|file://)", var.override_manifests))
+    error_message = "override_manifests must be empty or start with 'http://', 'https://', or 'file://'"
+  }
 }

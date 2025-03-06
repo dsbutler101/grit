@@ -1,3 +1,8 @@
+variable "deletion_protection" {
+  description = "Set deletion protection for the cluster"
+  type        = bool
+}
+
 variable "google_region" {
   description = "The region to deploy the into, see `gcloud compute zones`"
   type        = string
@@ -18,6 +23,21 @@ variable "labels" {
   description = "Labels to add to the created GKE cluster"
   type        = map(string)
   default     = {}
+}
+
+# Used in examples/test-runner-gke-google
+# tflint-ignore: terraform_unused_declarations
+variable "autoscaling" {
+  type = object({
+    enabled                     = bool
+    auto_provisioning_locations = list(string)
+    autoscaling_profile         = string
+    resource_limits = list(object({
+      resource_type = string
+      minimum       = number
+      maximum       = number
+    }))
+  })
 }
 
 variable "node_pools" {
@@ -108,4 +128,26 @@ variable "pod_spec_patches" {
   type        = any
   description = "A JSON or YAML format string that describes the changes which must be applied to the final PodSpec object before it is generated."
   default     = []
+}
+
+variable "runner_opts" {
+  type    = map(any)
+  default = {}
+}
+
+variable "log_level" {
+  type        = string
+  description = "The log level for the GitLab Runner manager"
+  default     = "info"
+}
+
+variable "listen_address" {
+  type        = string
+  description = "The address to listen on for the GitLab Runner manager"
+  default     = "[::]:9252"
+}
+
+variable "override_operator_manifests" {
+  type    = string
+  default = ""
 }

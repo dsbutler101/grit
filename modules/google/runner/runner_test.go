@@ -113,7 +113,8 @@ func TestRunner(t *testing.T) {
 				"vpc": map[string]string{
 					"id":        "vpc-id",
 					"subnet_id": "subnet-id",
-				}},
+				},
+			},
 			expectedModules: expectedModules,
 		},
 	}

@@ -16,4 +16,7 @@ module "runner" {
   pod_spec_patches = var.pod_spec_patches
   runner_image     = var.runner_image
   helper_image     = var.helper_image
+  log_level        = var.log_level
+  listen_address   = var.listen_address
+  runner_opts      = var.runner_opts
 }

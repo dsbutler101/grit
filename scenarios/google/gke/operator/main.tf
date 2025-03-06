@@ -36,13 +36,16 @@ module "cluster" {
   google_zone = var.google_zone
   node_pools  = var.node_pools
 
-  vpc = local.vpc
+  deletion_protection = var.deletion_protection
+  vpc                 = local.vpc
 
   depends_on = [module.vpc]
 }
 
 module "operator" {
   source = "../../../../modules/k8s/operator/test/"
+
+  override_manifests = var.override_operator_manifests
 
   depends_on = [module.cluster]
 }
@@ -74,6 +77,9 @@ module "runner" {
   pod_spec_patches = var.pod_spec_patches
   runner_image     = var.runner_image
   helper_image     = var.helper_image
+  runner_opts      = var.runner_opts
+  log_level        = var.log_level
+  listen_address   = var.listen_address
 
   depends_on = [module.operator]
 }

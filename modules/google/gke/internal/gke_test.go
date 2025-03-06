@@ -21,6 +21,13 @@ func defaultModuleVars(t *testing.T) moduleVars {
 				"node_count": 1,
 				"node_config": map[string]any{
 					"machine_type": "e2-micro",
+					"taints": []map[string]string{
+						{
+							"key":    "key",
+							"value":  "value",
+							"effect": "NO_EXECUTE",
+						},
+					},
 				},
 			},
 		},
@@ -29,6 +36,23 @@ func defaultModuleVars(t *testing.T) moduleVars {
 			"subnet_id": "",
 		},
 		"deletion_protection": "false",
+		"autoscaling": map[string]any{
+			"enabled":                     false,
+			"autoscaling_profile":         "",
+			"auto_provisioning_locations": []string{},
+			"resource_limits": []map[string]any{
+				{
+					"resource_type": "cpu",
+					"minimum":       1,
+					"maximum":       10,
+				},
+				{
+					"resource_type": "memory",
+					"minimum":       1,
+					"maximum":       10,
+				},
+			},
+		},
 	}
 }
 

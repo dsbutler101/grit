@@ -86,3 +86,17 @@ variable "pod_spec_patches" {
     error_message = "All pod_spec_patches must have patch parameter set with a non empty value."
   }
 }
+
+variable "runner_opts" {
+  type = map(any)
+}
+
+variable "log_level" {
+  type        = string
+  description = "The log level for the GitLab Runner manager"
+}
+
+variable "listen_address" {
+  type        = string
+  description = "The address to listen on for the GitLab Runner manager"
+}

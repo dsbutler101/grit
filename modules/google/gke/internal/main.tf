@@ -29,6 +29,26 @@ resource "google_container_cluster" "primary" {
   release_channel {
     channel = local.release_channel
   }
+
+  dynamic "cluster_autoscaling" {
+    for_each = var.autoscaling != null && var.autoscaling.enabled ? [var.autoscaling] : []
+
+    content {
+      enabled                     = true
+      auto_provisioning_locations = cluster_autoscaling.value.auto_provisioning_locations
+      autoscaling_profile         = cluster_autoscaling.value.autoscaling_profile
+
+      dynamic "resource_limits" {
+        for_each = cluster_autoscaling.value.resource_limits != null ? cluster_autoscaling.value.resource_limits : []
+
+        content {
+          resource_type = resource_limits.value.resource_type
+          minimum       = resource_limits.value.minimum
+          maximum       = resource_limits.value.maximum
+        }
+      }
+    }
+  }
 }
 
 resource "google_container_node_pool" "linux_node_pool" {
@@ -37,9 +57,8 @@ resource "google_container_node_pool" "linux_node_pool" {
   name     = format("%s-%s", var.name, each.key)
   location = var.google_zone
 
-  cluster = google_container_cluster.primary.id
-  version = data.google_container_engine_versions.gke_version.release_channel_default_version[local.release_channel]
-
+  cluster    = google_container_cluster.primary.id
+  version    = data.google_container_engine_versions.gke_version.release_channel_default_version[local.release_channel]
   node_count = each.value.node_count
 
   node_config {
@@ -51,6 +70,23 @@ resource "google_container_node_pool" "linux_node_pool" {
     disk_type    = each.value.node_config.disk_type
     oauth_scopes = each.value.node_config.oauth_scopes
     metadata     = each.value.node_config.metadata
+
+    dynamic "taint" {
+      for_each = each.value.node_config.taints != null ? each.value.node_config.taints : []
+      content {
+        key    = taint.value.key
+        value  = taint.value.value
+        effect = taint.value.effect
+      }
+    }
+  }
+
+  dynamic "autoscaling" {
+    for_each = each.value.autoscaling != null ? [each.value.autoscaling] : []
+    content {
+      min_node_count = autoscaling.value.min_node_count
+      max_node_count = autoscaling.value.max_node_count
+    }
   }
 
   management {

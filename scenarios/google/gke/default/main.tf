@@ -39,7 +39,10 @@ module "cluster" {
   metadata = local.metadata
 
   google_zone = var.google_zone
+  autoscaling = var.autoscaling
   node_pools  = var.node_pools
+
+  deletion_protection = var.deletion_protection
 
   vpc = local.vpc
 
@@ -49,7 +52,9 @@ module "cluster" {
 module "operator" {
   source = "../../../../modules/k8s/operator/prod/"
 
-  metadata = local.metadata
+  metadata           = local.metadata
+  operator_version   = var.operator_version
+  override_manifests = var.override_operator_manifests
 
   depends_on = [module.cluster]
 }
@@ -67,6 +72,9 @@ module "runner" {
   pod_spec_patches = var.pod_spec_patches
   runner_image     = var.runner_image
   helper_image     = var.helper_image
+  runner_opts      = var.runner_opts
+  log_level        = var.log_level
+  listen_address   = var.listen_address
 
   depends_on = [module.operator]
 }

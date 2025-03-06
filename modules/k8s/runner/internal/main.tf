@@ -8,21 +8,23 @@ locals {
       name      = var.name
       namespace = var.namespace
     }
-    spec = {
-      gitlabUrl   = var.url
-      token       = var.name
-      locked      = var.locked
-      protected   = var.protected
-      tags        = join(",", var.runner_tags)
-      runUntagged = length(var.runner_tags) == 0 ? true : var.run_untagged
-      interval    = var.check_interval
-      concurrent  = var.concurrent
-      config      = var.config_template == "" ? null : local.config_template_name
-      env         = length(var.envvars) == 0 ? null : local.envvars_name
-      podSpec     = var.pod_spec_patches
-      runnerImage = var.runner_image
-      helperImage = var.helper_image
-    }
+    spec = merge({
+      gitlabUrl     = var.url
+      token         = var.name
+      locked        = var.locked
+      protected     = var.protected
+      tags          = join(",", var.runner_tags)
+      runUntagged   = length(var.runner_tags) == 0 ? true : var.run_untagged
+      interval      = var.check_interval
+      concurrent    = var.concurrent
+      config        = var.config_template == "" ? null : local.config_template_name
+      env           = length(var.envvars) == 0 ? null : local.envvars_name
+      podSpec       = var.pod_spec_patches
+      runnerImage   = var.runner_image
+      helperImage   = var.helper_image
+      logLevel      = var.log_level
+      listenAddress = var.listen_address
+    }, var.runner_opts)
   })
   token_secret = yamlencode({
     apiVersion = "v1"
@@ -64,13 +66,25 @@ module "check_config_template" {
   message = local.config_template_check ? "" : "The config template must contain the definition of [[runners]]."
 }
 
+resource "terraform_data" "token_secret" {
+  input = local.token_secret
+}
+
+resource "terraform_data" "config_template" {
+  input = local.config_template
+}
+
 resource "kubectl_manifest" "token_secret" {
-  yaml_body = local.token_secret
+  yaml_body = terraform_data.token_secret.input
+  wait      = true
+  force_new = true
 }
 
 resource "kubectl_manifest" "config_template" {
   count     = var.config_template == "" ? 0 : 1
   yaml_body = local.config_template
+  wait      = true
+  force_new = true
 }
 
 resource "kubectl_manifest" "envvars" {
@@ -80,9 +94,19 @@ resource "kubectl_manifest" "envvars" {
 
 resource "kubectl_manifest" "manifest" {
   yaml_body = local.manifest
+  wait      = true
+  force_new = true
+
   depends_on = [
     kubectl_manifest.token_secret,
     kubectl_manifest.config_template,
     kubectl_manifest.envvars,
   ]
+
+  lifecycle {
+    replace_triggered_by = [
+      terraform_data.token_secret,
+      terraform_data.config_template,
+    ]
+  }
 }

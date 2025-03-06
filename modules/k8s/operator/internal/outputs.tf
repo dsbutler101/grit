@@ -1,10 +1,7 @@
 output "namespace" {
-  value = one([
-    for id, res in kubectl_manifest.operator_resources :
-    res.name if res.kind == "Namespace"
-  ])
+  value = local.namespace
 }
 
-output "supported_operator_versions" {
-  value = local.supported_versions_info
+output "operator_version" {
+  value = local.operator_version
 }

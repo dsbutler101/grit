@@ -1,3 +1,9 @@
+variable "deletion_protection" {
+  description = "Set deletion protection for the cluster"
+  type        = bool
+  default     = false
+}
+
 variable "google_project" {
   description = "The google project to use"
   type        = string
@@ -112,4 +118,44 @@ variable "pod_spec_patches" {
   type        = any
   description = "A JSON or YAML format string that describes the changes which must be applied to the final PodSpec object before it is generated."
   default     = []
+}
+
+variable "runner_opts" {
+  type    = map(any)
+  default = {}
+}
+
+variable "log_level" {
+  type    = string
+  default = "info"
+}
+
+variable "listen_address" {
+  type    = string
+  default = "[::]:9252"
+}
+
+variable "autoscaling" {
+  type = object({
+    enabled                     = bool
+    auto_provisioning_locations = list(string)
+    autoscaling_profile         = string
+    resource_limits = list(object({
+      resource_type = string
+      minimum       = number
+      maximum       = number
+    }))
+  })
+
+  default = {
+    enabled                     = false
+    auto_provisioning_locations = []
+    autoscaling_profile         = ""
+    resource_limits             = []
+  }
+}
+
+variable "override_operator_manifests" {
+  type    = string
+  default = "file://./operator.k8s.yaml"
 }

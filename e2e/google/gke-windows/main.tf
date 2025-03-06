@@ -32,10 +32,11 @@ provider "kubectl" {
 module "gke_runner" {
   source = "../../../scenarios/google/gke/operator"
 
-  google_region = data.google_client_config.current.region
-  google_zone   = data.google_client_config.current.zone
-  subnet_cidr   = "10.0.0.0/16"
-
+  google_region       = data.google_client_config.current.region
+  google_zone         = data.google_client_config.current.zone
+  subnet_cidr         = "10.0.0.0/16"
+  deletion_protection = false
+  autoscaling         = { enabled = false, autoscaling_profile = "", auto_provisioning_locations = [], resource_limits = [] }
   labels = {
     "gitlab-project-id" = var.gitlab_project_id
     "e2e"               = "gke-windows-node"
@@ -88,4 +89,8 @@ module "gke_runner" {
     "FF_TIMESTAMPS"           = "true"
   }
   helper_image = "gitlab/gitlab-runner-helper:x86_64-latest-servercore1809"
+  // TODO: The default runner image in operator is now registry.gitlab.com/gitlab-org/gitlab-runner:alpine-bleeding which
+  // isn't ideal as it doesn't run in the security context of the Operator by default
+  runner_image                = "registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp:v17.9.0"
+  override_operator_manifests = "file://../../../examples/test-runner-gke-google/operator.k8s.yaml"
 }

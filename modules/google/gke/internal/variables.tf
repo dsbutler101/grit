@@ -35,6 +35,19 @@ variable "google_zone" {
   type = string
 }
 
+variable "autoscaling" {
+  type = object({
+    enabled                     = bool
+    auto_provisioning_locations = list(string)
+    autoscaling_profile         = string
+    resource_limits = list(object({
+      resource_type = string
+      minimum       = number
+      maximum       = number
+    }))
+  })
+}
+
 ###########################
 # NODE POOL CONFIGURATION #
 ###########################
@@ -42,6 +55,10 @@ variable "google_zone" {
 variable "node_pools" {
   type = map(object({
     node_count = optional(number, 1)
+    autoscaling = optional(object({
+      min_node_count = number
+      max_node_count = number
+    }))
     node_config = optional(object({
       labels = optional(map(string))
       tags   = optional(list(string), [])
@@ -56,6 +73,11 @@ variable "node_pools" {
       image_type   = optional(string, "cos_containerd")
       disk_size_gb = optional(number)
       disk_type    = optional(string)
+      taints = optional(list(object({
+        key    = optional(string)
+        value  = optional(string)
+        effect = optional(string)
+      })))
     }), {})
   }))
 

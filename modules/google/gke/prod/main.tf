@@ -32,5 +32,7 @@ module "gke" {
 
   deletion_protection = var.deletion_protection
 
+  autoscaling = var.autoscaling
+
   vpc = var.vpc
 }

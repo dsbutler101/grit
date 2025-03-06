@@ -1,7 +1,7 @@
 package operator
 
 import (
-	"io/fs"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,20 +11,22 @@ import (
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
+const defaultKubectlManifestTemplate = `kubectl_manifest.operator_resources["%s"]`
+
 func TestK8sOperator(t *testing.T) {
 	testCases := map[string]struct {
 		operatorVersion   string
-		overrideFile      string
+		overrideManifests string
 		expectedResources []string
 	}{
 		"defaults": {
-			operatorVersion:   "current",
-			overrideFile:      "",
-			expectedResources: defaultExpectedResources,
+			operatorVersion:   "v1.31.0",
+			overrideManifests: "",
+			expectedResources: mapResources(defaultExpectedResources),
 		},
 		"override-manifests": {
 			operatorVersion: "will-be-ignored-because-we-explicitly-use-an-override",
-			overrideFile: asFile(t, join(
+			overrideManifests: asFile(t, join(
 				"apiVersion: v1",
 				"kind: Namespace",
 				"metadata:",
@@ -43,11 +45,11 @@ func TestK8sOperator(t *testing.T) {
 				"  namespace: some-namespace",
 				"data: {}",
 			)),
-			expectedResources: []string{
-				`kubectl_manifest.operator_resources["v1::Namespace::_cluster_scoped_::some-namespace"]`,
-				`kubectl_manifest.operator_resources["v1::ConfigMap::some-namespace::some-cm"]`,
-				`kubectl_manifest.operator_resources["apiextensions.k8s.io/v1::CustomResourceDefinition::_cluster_scoped_::some-crd"]`,
-			},
+			expectedResources: mapResources([]string{
+				"Namespace:some-namespace",
+				"CustomResourceDefinition:some-crd",
+				"ConfigMap:some-cm",
+			}),
 		},
 	}
 
@@ -55,33 +57,10 @@ func TestK8sOperator(t *testing.T) {
 		t.Run(tn, func(t *testing.T) {
 			plan := test_tools.Plan(t, map[string]any{
 				"operator_version":   tc.operatorVersion,
-				"override_manifests": tc.overrideFile,
+				"override_manifests": tc.overrideManifests,
 			})
 			test_tools.AssertProviderConfigExists(t, plan, "kubectl")
 			test_tools.AssertWithPlan(t, plan, tc.expectedResources)
-		})
-	}
-}
-
-func TestK8sOperator_versions(t *testing.T) {
-	testCases := map[string]bool{
-		"no-such-version": false,
-	}
-
-	entries, err := os.ReadDir("versions")
-	assert.NoError(t, err)
-	for _, e := range entries {
-		if e.Type() == fs.ModeSymlink || e.IsDir() {
-			testCases[e.Name()] = true
-		}
-	}
-
-	for version, expectSuccess := range testCases {
-		t.Run(version, func(t *testing.T) {
-			test_tools.PlanAndAssertError(t, map[string]any{
-				"operator_version":   version,
-				"override_manifests": "",
-			}, !expectSuccess)
 		})
 	}
 }
@@ -92,26 +71,35 @@ func asFile(t *testing.T, content string) string {
 	filePath := filepath.Join(t.TempDir(), t.Name()+".yaml")
 	assert.NoError(t, os.WriteFile(filePath, []byte(content), 0640))
 
-	return filePath
+	return "file://" + filePath
 }
 
 func join(parts ...string) string {
 	return strings.Join(parts, "\n")
 }
 
+func mapResources(resources []string) []string {
+	mapped := make([]string, 0, len(resources))
+	for _, r := range resources {
+		mapped = append(mapped, fmt.Sprintf(defaultKubectlManifestTemplate, r))
+	}
+
+	return mapped
+}
+
 var defaultExpectedResources = []string{
-	`kubectl_manifest.operator_resources["apiextensions.k8s.io/v1::CustomResourceDefinition::_cluster_scoped_::runners.apps.gitlab.com"]`,
-	`kubectl_manifest.operator_resources["apps/v1::Deployment::gitlab-runner-system::gitlab-runner-gitlab-runnercontroller-manager"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::ClusterRole::_cluster_scoped_::gitlab-runner-proxy-role"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::Role::gitlab-runner-system::gitlab-runner-app-role"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::ClusterRole::_cluster_scoped_::gitlab-runner-manager-role"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::ClusterRole::_cluster_scoped_::gitlab-runner-metrics-reader"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::ClusterRoleBinding::_cluster_scoped_::gitlab-runner-manager-rolebinding"]`,
-	`kubectl_manifest.operator_resources["v1::Service::gitlab-runner-system::gitlab-runner-controller-manager-metrics-service"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::Role::gitlab-runner-system::gitlab-runner-leader-election-role"]`,
-	`kubectl_manifest.operator_resources["v1::ServiceAccount::gitlab-runner-system::gitlab-runner-sa"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::ClusterRoleBinding::_cluster_scoped_::gitlab-runner-proxy-rolebinding"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::RoleBinding::gitlab-runner-system::gitlab-runner-app-rolebinding"]`,
-	`kubectl_manifest.operator_resources["rbac.authorization.k8s.io/v1::RoleBinding::gitlab-runner-system::gitlab-runner-leader-election-rolebinding"]`,
-	`kubectl_manifest.operator_resources["v1::Namespace::_cluster_scoped_::gitlab-runner-system"]`,
+	"ClusterRole:gitlab-runner-manager-role",
+	"ClusterRole:gitlab-runner-metrics-reader",
+	"ClusterRole:gitlab-runner-proxy-role",
+	"ClusterRoleBinding:gitlab-runner-manager-rolebinding",
+	"ClusterRoleBinding:gitlab-runner-proxy-rolebinding",
+	"CustomResourceDefinition:runners.apps.gitlab.com",
+	"Deployment:gitlab-runner-gitlab-runnercontroller-manager",
+	"Namespace:gitlab-runner-system",
+	"Role:gitlab-runner-app-role",
+	"Role:gitlab-runner-leader-election-role",
+	"RoleBinding:gitlab-runner-app-rolebinding",
+	"RoleBinding:gitlab-runner-leader-election-rolebinding",
+	"Service:gitlab-runner-controller-manager-metrics-service",
+	"ServiceAccount:gitlab-runner-sa",
 }

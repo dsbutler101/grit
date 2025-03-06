@@ -32,6 +32,26 @@ variable "node_pools" {
   type = map(any)
 }
 
+variable "autoscaling" {
+  type = object({
+    enabled                     = bool
+    auto_provisioning_locations = list(string)
+    autoscaling_profile         = string
+    resource_limits = list(object({
+      resource_type = string
+      minimum       = number
+      maximum       = number
+    }))
+  })
+
+  default = {
+    enabled                     = false
+    auto_provisioning_locations = []
+    autoscaling_profile         = ""
+    resource_limits             = []
+  }
+}
+
 ##############
 # VPC CONFIG #
 ##############

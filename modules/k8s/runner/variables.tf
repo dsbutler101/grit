@@ -1,3 +1,24 @@
+############
+# METADATA #
+############
+
+variable "metadata" {
+  type = object({
+    # Unique name used for identification and partitioning resources
+    name = string
+
+    # Labels to apply to supported resources
+    labels = map(string)
+
+    # Minimum required feature support. See https://docs.gitlab.com/ee/policy/experiment-beta-support.html
+    min_support = string
+  })
+}
+
+############################
+# K8S RUNNER CONFIGURATION #
+############################
+
 variable "gitlab" {
   description = "Outputs from the gitlab module. Or your own"
   type = object({
@@ -6,24 +27,15 @@ variable "gitlab" {
   })
 }
 
-variable "metadata" {
-  type = object({
-
-    # Unique name used for identification and partitioning resources
-    name = string
-
-    # Labels to apply to supported resources
-    labels = map(string)
-  })
-}
-
-variable "name_override" {
-  type    = string
-  default = null
+variable "name" {
+  description = "The name of the Runner. Will be used in the names of the resources created"
+  type        = string
+  default     = ""
 }
 
 variable "namespace" {
-  type = string
+  description = "The namespace in which to deploy the Runner"
+  type        = string
 }
 
 ################################
@@ -91,23 +103,39 @@ variable "helper_image" {
 }
 
 variable "pod_spec_patches" {
-  type        = any
+  type = list(object({
+    name      = optional(string)
+    patch     = optional(string)
+    patchType = optional(string, "strategic")
+  }))
   description = "A JSON or YAML format string that describes the changes which must be applied to the final PodSpec object before it is generated."
-  default     = []
+
+  validation {
+    condition     = length([for patch in var.pod_spec_patches : true if patch.name != null && patch.name != ""]) == length(var.pod_spec_patches)
+    error_message = "All pod_spec_patches must have name parameter set with a non empty value."
+  }
+
+  validation {
+    condition     = length([for patch in var.pod_spec_patches : true if patch.patch != null && patch.patch != ""]) == length(var.pod_spec_patches)
+    error_message = "All pod_spec_patches must have patch parameter set with a non empty value."
+  }
+
+  default = []
+}
+
+variable "runner_opts" {
+  type    = map(any)
+  default = {}
 }
 
 variable "log_level" {
   type        = string
-  description = "The log level for the runner manager"
+  description = "The log level for the GitLab Runner manager"
   default     = "info"
 }
 
 variable "listen_address" {
   type        = string
-  description = "The address to listen on for the runner manager"
-  default     = ""
-}
-
-variable "runner_opts" {
-  type = map(any)
+  description = "The address to listen on for the GitLab Runner manager"
+  default     = "[::]:9252"
 }

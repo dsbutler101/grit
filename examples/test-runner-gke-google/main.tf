@@ -1,30 +1,17 @@
+locals {
+  name = "test-gke-google"
+}
+
 module "gke_runner" {
   source = "../../scenarios/google/gke/operator/"
   # source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/google/gke/operator"
 
-  name   = var.name
-  labels = var.labels
-
-  deletion_protection         = var.deletion_protection
   google_region               = var.google_region
   google_zone                 = var.google_zone
-  subnet_cidr                 = var.subnet_cidr
-  node_pools                  = var.node_pools
   gitlab_project_id           = var.gitlab_project_id
-  runner_description          = var.runner_description
-  concurrent                  = var.concurrent
-  check_interval              = var.check_interval
-  locked                      = var.locked
-  protected                   = var.protected
-  run_untagged                = var.run_untagged
-  runner_tags                 = var.runner_tags
-  config_template             = var.config_template
-  pod_spec_patches            = var.pod_spec_patches
-  runner_image                = var.runner_image
-  helper_image                = var.helper_image
-  log_level                   = var.log_level
-  listen_address              = var.listen_address
-  runner_opts                 = var.runner_opts
-  autoscaling                 = var.autoscaling
   override_operator_manifests = var.override_operator_manifests
+  name                        = local.name
+  node_pools = {
+    defaut = {}
+  }
 }

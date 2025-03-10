@@ -2,10 +2,13 @@ locals {
   node_tags = ["gke-node", "grit-gke"]
 
   release_channel = "STABLE"
+
+  name = coalesce(var.name, var.metadata.name)
 }
 
-data "google_container_engine_versions" "gke_version" {
-  location = var.google_zone
+module "validate-name" {
+  source = "../../internal/validation/name"
+  name   = local.name
 }
 
 locals {
@@ -14,8 +17,12 @@ locals {
   windows_node_pools = { for key, value in var.node_pools : key => value if contains(local.windows_images, lower(value.node_config.image_type)) }
 }
 
+data "google_container_engine_versions" "gke_version" {
+  location = var.google_zone
+}
+
 resource "google_container_cluster" "primary" {
-  name     = var.name
+  name     = local.name
   location = var.google_zone
 
   remove_default_node_pool = true
@@ -54,7 +61,7 @@ resource "google_container_cluster" "primary" {
 resource "google_container_node_pool" "linux_node_pool" {
   for_each = local.linux_node_pools
 
-  name     = format("%s-%s", var.name, each.key)
+  name     = format("%s-%s", local.name, each.key)
   location = var.google_zone
 
   cluster    = google_container_cluster.primary.id
@@ -62,7 +69,7 @@ resource "google_container_node_pool" "linux_node_pool" {
   node_count = each.value.node_count
 
   node_config {
-    labels       = merge(var.labels, each.value.node_config.labels)
+    labels       = merge(var.metadata.labels, each.value.node_config.labels)
     tags         = concat(local.node_tags, each.value.node_config.tags)
     machine_type = each.value.node_config.machine_type
     image_type   = each.value.node_config.image_type
@@ -98,16 +105,15 @@ resource "google_container_node_pool" "linux_node_pool" {
 resource "google_container_node_pool" "windows_node_pool" {
   for_each = local.windows_node_pools
 
-  name     = format("%s-%s", var.name, each.key)
+  name     = format("%s-%s", local.name, each.key)
   location = var.google_zone
 
-  cluster = google_container_cluster.primary.id
-  version = data.google_container_engine_versions.gke_version.release_channel_default_version[local.release_channel]
-
+  cluster    = google_container_cluster.primary.id
+  version    = data.google_container_engine_versions.gke_version.release_channel_default_version[local.release_channel]
   node_count = each.value.node_count
 
   node_config {
-    labels       = merge(var.labels, each.value.node_config.labels)
+    labels       = merge(var.metadata.labels, each.value.node_config.labels)
     tags         = concat(local.node_tags, each.value.node_config.tags)
     machine_type = each.value.node_config.machine_type
     image_type   = each.value.node_config.image_type
@@ -115,6 +121,24 @@ resource "google_container_node_pool" "windows_node_pool" {
     disk_type    = each.value.node_config.disk_type
     oauth_scopes = each.value.node_config.oauth_scopes
     metadata     = each.value.node_config.metadata
+
+
+    dynamic "taint" {
+      for_each = each.value.node_config.taints != null ? each.value.node_config.taints : []
+      content {
+        key    = taint.value.key
+        value  = taint.value.value
+        effect = taint.value.effect
+      }
+    }
+  }
+
+  dynamic "autoscaling" {
+    for_each = each.value.autoscaling != null ? [each.value.autoscaling] : []
+    content {
+      min_node_count = autoscaling.value.min_node_count
+      max_node_count = autoscaling.value.max_node_count
+    }
   }
 
   management {

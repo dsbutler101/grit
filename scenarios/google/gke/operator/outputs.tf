@@ -13,3 +13,7 @@ output "cluster_access_token" {
   value       = module.cluster.access_token
   sensitive   = true
 }
+
+output "namespace" {
+  value = module.operator.namespace
+}

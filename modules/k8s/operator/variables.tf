@@ -1,10 +1,5 @@
-############
-# METADATA #
-############
-
 variable "metadata" {
   type = object({
-
     # Unique name used for identification and partitioning resources
     name = string
 
@@ -14,11 +9,13 @@ variable "metadata" {
     # Minimum required feature support. See https://docs.gitlab.com/ee/policy/experiment-beta-support.html
     min_support = string
   })
-}
 
-###################
-# OPERATOR CONFIG #
-###################
+  default = {
+    name        = "",
+    labels      = {},
+    min_support = "experimental"
+  }
+}
 
 variable "operator_version" {
   default     = "latest"
@@ -37,7 +34,6 @@ variable "override_manifests" {
       - Local file path with "file://" prefix (e.g., "file:///path/to/operator.yaml")
       - If empty, uses the official GitLab Runner Operator manifest
   EOT
-  default     = ""
 
   validation {
     condition     = var.override_manifests == "" || can(regex("^(https?://|file://)", var.override_manifests))

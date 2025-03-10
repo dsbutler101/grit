@@ -1,16 +1,26 @@
+module "validate-support" {
+  source   = "../../internal/validation/support"
+  use_case = "k8s-operator-runner"
+  use_case_support = tomap({
+    "k8s-operator-runner" = "experimental"
+  })
+  min_support = var.metadata.min_support
+}
+
 locals {
-  config_template_name = format("%s-%s", var.name, "config-template")
-  envvars_name         = format("%s-%s", var.name, "envvars")
+  name                 = coalesce(var.name, var.metadata.name)
+  config_template_name = format("%s-%s", local.name, "config-template")
+  envvars_name         = format("%s-%s", local.name, "envvars")
   manifest = yamlencode({
     apiVersion = "apps.gitlab.com/v1beta2"
     kind       = "Runner"
     metadata = {
-      name      = var.name
+      name      = local.name
       namespace = var.namespace
     }
     spec = merge({
-      gitlabUrl     = var.url
-      token         = var.name
+      gitlabUrl     = var.gitlab.url
+      token         = local.name
       locked        = var.locked
       protected     = var.protected
       tags          = join(",", var.runner_tags)
@@ -30,11 +40,11 @@ locals {
     apiVersion = "v1"
     kind       = "Secret"
     metadata = {
-      name      = var.name
+      name      = local.name
       namespace = var.namespace
     }
     data = {
-      runner-token = base64encode(var.token)
+      runner-token = base64encode(var.gitlab.runner_token)
     }
   })
   config_template = yamlencode({
@@ -62,7 +72,7 @@ locals {
 }
 
 module "check_config_template" {
-  source  = "../../../internal/validation/fail_validation"
+  source  = "../../internal/validation/fail_validation"
   message = local.config_template_check ? "" : "The config template must contain the definition of [[runners]]."
 }
 
@@ -74,15 +84,12 @@ resource "terraform_data" "config_template" {
   input = local.config_template
 }
 
-resource "kubectl_manifest" "token_secret" {
-  yaml_body = terraform_data.token_secret.input
-  wait      = true
-  force_new = true
+resource "terraform_data" "envvars" {
+  input = local.envvars
 }
 
-resource "kubectl_manifest" "config_template" {
-  count     = var.config_template == "" ? 0 : 1
-  yaml_body = local.config_template
+resource "kubectl_manifest" "token_secret" {
+  yaml_body = terraform_data.token_secret.input
   wait      = true
   force_new = true
 }
@@ -90,6 +97,15 @@ resource "kubectl_manifest" "config_template" {
 resource "kubectl_manifest" "envvars" {
   count     = length(var.envvars) == 0 ? 0 : 1
   yaml_body = local.envvars
+  wait      = true
+  force_new = true
+}
+
+resource "kubectl_manifest" "config_template" {
+  count     = var.config_template == "" ? 0 : 1
+  yaml_body = terraform_data.config_template.input
+  wait      = true
+  force_new = true
 }
 
 resource "kubectl_manifest" "manifest" {
@@ -107,6 +123,7 @@ resource "kubectl_manifest" "manifest" {
     replace_triggered_by = [
       terraform_data.token_secret,
       terraform_data.config_template,
+      terraform_data.envvars,
     ]
   }
 }

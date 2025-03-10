@@ -3,6 +3,7 @@ stages:
   - lint
   - unit
   - e2e
+  - release
 
 include:
   - local: .gitlab/ci/00_common.gitlab-ci.yml
@@ -12,3 +13,4 @@ include:
   - local: .gitlab/ci/30_unit.gitlab-ci.yml
   - local: .gitlab/ci/31_sast.gitlab-ci.yml
   - local: .gitlab/ci/40_e2e.gitlab-ci.yml
+  - local: .gitlab/ci/release.gitlab-ci.yml

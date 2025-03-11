@@ -1,6 +1,9 @@
 workflow:
   # set a useful name for the pipeline
   name: "E2E ${E2E_TEST_NAME} (ID: ${E2E_TEST_ID})"
+  auto_cancel:
+    # allow everything to be cancelled except destroy
+    on_new_commit: interruptible
 
 stages:
   - apply
@@ -13,6 +16,7 @@ include:
 .e2e:base:
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+  interruptible: true
   variables:
     # Used to tag created runners, name resources and state
     # E2E_TEST_NAME is set in each e2e test scenario
@@ -23,7 +27,12 @@ include:
   extends:
     - .e2e:base
     - .go-cache
+  timeout: 2h
   variables:
+    # split timeout between script and after script
+    RUNNER_SCRIPT_TIMEOUT: 1h
+    RUNNER_AFTER_SCRIPT_TIMEOUT: 1h
+
     # common E2E tf vars
     TF_VAR_runner_tag: ${RUNNER_NAME}
     TF_VAR_name: ${RUNNER_NAME}
@@ -42,18 +51,31 @@ include:
 
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
 
+  environment:
+    name: "e2e-${E2E_TEST_NAME}/${RUNNER_NAME}"
+
+
   before_script:
     # TODO: replace GITLAB_TOKEN in CI/CD settings once
     # all the E2E tests are migrated to inline jobs
     - export GITLAB_TOKEN="${GITLAB_TOKEN_E2E}"
     # Google provider specific credentials file
     - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+  # if the job is cancelled or fails, run destroy again to clean up
+  after_script:
+    # export these again since after_script runs in a separate shell
+    - export GITLAB_TOKEN="${GITLAB_TOKEN_E2E}"
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+    - if [ "$CI_JOB_STATUS" == "success" ]; then exit 0; fi
+    - mage terraform:initAndDestroy "${E2E_TEST_DIR}" "1h"
 
 e2e:apply:
   stage: apply
-  timeout: 60m
   extends:
     - .e2e:terraform:base
+  environment:
+    auto_stop_in: 3h
+    on_stop: e2e:destroy:manual
   script:
     - mage terraform:initAndApply "${E2E_TEST_DIR}" "${CI_JOB_TIMEOUT}s"
     - mage runner:waitForRunners "${RUNNER_NAME}" 20
@@ -87,11 +109,20 @@ e2e:test:powershell:
   rules:
     - if: $E2E_TEST_POWERSHELL
 
-e2e:destroy:
+# NOTE: please do not disable these destroy jobs as it will leave resources behind
+# incurring cloud charges and time to manually clean up.
+e2e:destroy: &destroy
   stage: destroy
-  timeout: 60m
   extends:
     - .e2e:terraform:base
+  interruptible: false
+  environment:
+    action: stop
   when: always
   script:
-    - mage terraform:initAndDestroy "${E2E_TEST_DIR}" "${CI_JOB_TIMEOUT}s"
+    - mage terraform:initAndDestroy "${E2E_TEST_DIR}" "1h"
+
+e2e:destroy:manual:
+  <<: *destroy
+  when: manual
+  needs: []

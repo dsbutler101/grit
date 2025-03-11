@@ -58,24 +58,6 @@ resource "gitlab_project_variable" "aws_region" {
   description = "Region in which to provision resources. Terraform managed (ci/cloud/gitlab_variables.tf)"
 }
 
-resource "gitlab_project_variable" "runner_token" {
-  project     = data.gitlab_project.grit.id
-  key         = "RUNNER_TOKEN"
-  value       = gitlab_user_runner.grit-e2e.token
-  masked      = true
-  raw         = true
-  description = "Authentication token for a runner registered in gitlab-org/ci-cd/runner-tools/grit-e2e. Terraform managed (ci/cloud/gitlab_variables.tf)"
-}
-
-resource "gitlab_project_variable" "gitlab_token" {
-  project     = data.gitlab_project.grit.id
-  key         = "GITLAB_TOKEN"
-  value       = gitlab_project_access_token.e2e-tests-trigger.token
-  masked      = true
-  raw         = true
-  description = "Project access token for gitlab-org/ci-cd/runner-tools/grit-e2e with API scope, used to trigger jobs. Terraform managed (ci/cloud/gitlab_variables.tf). Expires on ${gitlab_project_access_token.e2e-tests-trigger.expires_at}"
-}
-
 resource "gitlab_project_variable" "gandalf_gitlab_token" {
   project     = data.gitlab_project.grit.id
   key         = "GANDALF_GITLAB_TOKEN"
@@ -101,13 +83,4 @@ resource "gitlab_project_variable" "gitlab_token_e2e_tests" {
   masked      = true
   raw         = true
   description = "Project access token for gitlab-org/ci-cd/runner-tools/grit with API, create_runner and manage_runner scope, used to run e2e test and manage runners they need. Terraform managed (ci/cloud/gitlab_variables.tf). Expires on ${gitlab_project_access_token.e2e-tests-jobs.expires_at}"
-}
-
-resource "gitlab_project_variable" "runner_token_powershell" {
-  project     = data.gitlab_project.grit.id
-  key         = "RUNNER_TOKEN_POWERSHELL"
-  value       = gitlab_user_runner.grit-e2e-powershell.token
-  masked      = true
-  raw         = true
-  description = "Authentication token for a runner registered in gitlab-org/ci-cd/runner-tools/grit-e2e with PowerShell. Terraform managed (ci/cloud/gitlab_variables.tf)"
 }

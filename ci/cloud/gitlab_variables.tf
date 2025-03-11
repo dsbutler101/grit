@@ -76,11 +76,11 @@ resource "gitlab_project_variable" "gitlab_token_terraform" {
   description = "Project access token for gitlab-org/ci-cd/runner-tools/grit with API scope, used to store terraform state. Terraform managed (ci/cloud/gitlab_variables.tf). Expires on ${gitlab_project_access_token.e2e-tests-terraform.expires_at}"
 }
 
-resource "gitlab_project_variable" "gitlab_token_e2e_tests" {
+resource "gitlab_project_variable" "gitlab_token_tests" {
   project     = data.gitlab_project.grit.id
-  key         = "GITLAB_TOKEN_E2E"
+  key         = "GITLAB_TOKEN"
   value       = gitlab_project_access_token.e2e-tests-jobs.token
   masked      = true
   raw         = true
-  description = "Project access token for gitlab-org/ci-cd/runner-tools/grit with API, create_runner and manage_runner scope, used to run e2e test and manage runners they need. Terraform managed (ci/cloud/gitlab_variables.tf). Expires on ${gitlab_project_access_token.e2e-tests-jobs.expires_at}"
+  description = "Project access token for gitlab-org/ci-cd/runner-tools/grit with API, create_runner and manage_runner scope, used to run integration/e2e tests and manage runners they need. Terraform managed (ci/cloud/gitlab_variables.tf). Expires on ${gitlab_project_access_token.e2e-tests-jobs.expires_at}"
 }

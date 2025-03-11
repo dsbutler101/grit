@@ -5,70 +5,70 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	backoff "github.com/cenkalti/backoff/v5"
 	gitlab "gitlab.com/gitlab-org/api/client-go"
 )
 
-func WaitForRunners(runnerTag string, maxRetries uint) error {
+func WaitForRunners(ctx context.Context, runnerTag string) error {
 	log.SetOutput(os.Stdout)
-	log.Println("Waiting for runner tagged '" + runnerTag + "' to be ready ...")
+	log.Printf("Waiting for runner tagged %q to be ready ...", runnerTag)
 
 	env, err := getE2ETestEnv()
 	if err != nil {
 		return fmt.Errorf("failed to retrieve some environment variables: %w", err)
 	}
 
-	ctx := context.Background()
-	runnerStatusChecker := func() (bool, error) {
-		err := checkRunnersStatus(ctx, runnerTag, env)
-		return err == nil, err
+	glab, err := gitlab.NewClient(env.GitlabToken)
+	if err != nil {
+		return fmt.Errorf("initializing glab client: %w", err)
 	}
 
 	_, err = backoff.Retry(
 		ctx,
-		runnerStatusChecker,
-		backoff.WithMaxTries(maxRetries),
+		func() (bool, error) {
+			runner, err := checkRunnersStatus(glab, runnerTag, env)
+			if err == nil {
+				runner.Token = "REDACTED"
+				log.Printf("success: %#v", runner)
+			}
+			return err == nil, err
+		},
+		backoff.WithBackOff(&backoff.ExponentialBackOff{
+			InitialInterval: time.Second,
+			Multiplier:      2,
+			MaxInterval:     time.Minute,
+		}),
+		backoff.WithNotify(func(err error, d time.Duration) {
+			log.Printf("error: %s", err)
+			log.Printf("trying again in %s", d)
+		}),
 	)
 
 	return err
 }
 
-func checkRunnersStatus(ctx context.Context, runnerTag string, env *E2ETestEnv) error {
-
-	runnerRetrieval := func() ([]*gitlab.Runner, error) {
-		return getProjectRunners(env.GitlabToken, env.GitLabProjectID, "online", runnerTag)
-	}
-	runners, err := backoff.Retry(
-		ctx,
-		runnerRetrieval,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(10),
-	)
+func checkRunnersStatus(glab *gitlab.Client, runnerTag string, env *E2ETestEnv) (*gitlab.Runner, error) {
+	runners, err := getProjectRunners(glab, env.GitLabProjectID, "online", runnerTag)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	switch {
-	case len(runners) != 1:
-		return fmt.Errorf("no online runners found")
-	default:
-		return nil
+	if len(runners) != 1 {
+		return nil, fmt.Errorf("no online runners found with tag '%s'", runnerTag)
 	}
+
+	return runners[0], nil
 }
 
-func getProjectRunners(gitlabToken, projectId string, status string, runnerTags ...string) ([]*gitlab.Runner, error) {
-	glab, err := gitlab.NewClient(gitlabToken)
-	if err != nil {
-		return nil, fmt.Errorf("initializing glab client: %w", err)
-	}
-
+func getProjectRunners(glab *gitlab.Client, projectId string, status string, runnerTags ...string) ([]*gitlab.Runner, error) {
 	runners, _, err := glab.Runners.ListProjectRunners(
 		projectId,
 		&gitlab.ListProjectRunnersOptions{
 			ListOptions: gitlab.ListOptions{
 				Page:    1,
-				PerPage: 100,
+				PerPage: 1,
 			},
 			Status:  &status,
 			TagList: &runnerTags,

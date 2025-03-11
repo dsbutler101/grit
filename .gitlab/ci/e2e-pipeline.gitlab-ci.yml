@@ -56,18 +56,14 @@ include:
 
 
   before_script:
-    # TODO: replace GITLAB_TOKEN in CI/CD settings once
-    # all the E2E tests are migrated to inline jobs
-    - export GITLAB_TOKEN="${GITLAB_TOKEN_E2E}"
     # Google provider specific credentials file
     - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
   # if the job is cancelled or fails, run destroy again to clean up
   after_script:
-    # export these again since after_script runs in a separate shell
-    - export GITLAB_TOKEN="${GITLAB_TOKEN_E2E}"
-    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
     - if [ "$CI_JOB_STATUS" == "success" ]; then exit 0; fi
-    - mage terraform:initAndDestroy "${E2E_TEST_DIR}" "1h"
+    # export this again since after_script runs in a separate shell
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+    - mage -t 1h terraform:initAndDestroy "${E2E_TEST_DIR}"
 
 e2e:apply:
   stage: apply
@@ -77,8 +73,8 @@ e2e:apply:
     auto_stop_in: 3h
     on_stop: e2e:destroy:manual
   script:
-    - mage terraform:initAndApply "${E2E_TEST_DIR}" "${CI_JOB_TIMEOUT}s"
-    - mage runner:waitForRunners "${RUNNER_NAME}" 20
+    - mage -t 40m terraform:initAndApply "${E2E_TEST_DIR}"
+    - mage -t 20m runner:waitForRunners "${RUNNER_NAME}"
 
 e2e:test:
   stage: test
@@ -120,7 +116,7 @@ e2e:destroy: &destroy
     action: stop
   when: always
   script:
-    - mage terraform:initAndDestroy "${E2E_TEST_DIR}" "1h"
+    - mage -t 1h terraform:initAndDestroy "${E2E_TEST_DIR}"
 
 e2e:destroy:manual:
   <<: *destroy

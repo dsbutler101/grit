@@ -1,0 +1,11 @@
+deployer:build:
+  stage: build
+  extends:
+    - .rules:merge_request_pipelines
+  needs:
+    - job: prepare done
+  script:
+    - mage deployer:compileFor "linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64"
+  artifacts:
+    paths:
+      - deployer/build/*

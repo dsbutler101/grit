@@ -2,10 +2,14 @@ module gitlab.com/gitlab-org/ci-cd/runner-tools/grit
 
 go 1.23
 
+toolchain go1.23.6
+
 require (
 	github.com/gruntwork-io/terratest v0.48.1
 	github.com/stretchr/testify v1.10.0
 	gitlab.com/gitlab-org/api/client-go v0.119.0
+	go.maczukin.dev/libs/mageutils v0.1.0
+	go.maczukin.dev/libs/version v0.1.0
 )
 
 require (

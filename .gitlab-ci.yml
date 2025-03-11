@@ -2,15 +2,18 @@ stages:
   - prepare
   - lint
   - unit
+  - build
   - e2e
   - release
 
 include:
   - local: .gitlab/ci/00_common.gitlab-ci.yml
   - local: .gitlab/ci/00_rules.gitlab-ci.yml
+  - local: .gitlab/ci/01_stage_done_tpl.gitlab-ci.yml
   - local: .gitlab/ci/10_prepare.gitlab-ci.yml
   - local: .gitlab/ci/20_lint.gitlab-ci.yml
   - local: .gitlab/ci/30_unit.gitlab-ci.yml
   - local: .gitlab/ci/31_sast.gitlab-ci.yml
-  - local: .gitlab/ci/40_e2e.gitlab-ci.yml
-  - local: .gitlab/ci/release.gitlab-ci.yml
+  - local: .gitlab/ci/40_build.gitlab-ci.yml
+  - local: .gitlab/ci/50_e2e.gitlab-ci.yml
+  - local: .gitlab/ci/60_release.gitlab-ci.yml

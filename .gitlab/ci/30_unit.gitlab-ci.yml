@@ -1,6 +1,11 @@
+include:
+  - local: .gitlab/ci/31_sast.gitlab-ci.yml
+
 unit tests:
   stage: unit
-  needs: [terraform init]
+  needs:
+    - job: prepare done
+    - job: terraform init
   extends:
     - .rules:merge_request_pipelines:code
     - .go-tf-cache

@@ -46,3 +46,6 @@ vendor
 
 # junit.xml from CI test jobs
 junit.xml
+
+# deployer stuff
+deployer/build/

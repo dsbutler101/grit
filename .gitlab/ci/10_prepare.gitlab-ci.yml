@@ -2,10 +2,10 @@ include:
   - local: .gitlab/ci/11_build_ci_image.gitlab-ci.yml
 
 terraform init:
+  stage: prepare
   needs:
     - job: build CI image
       optional: true
-  stage: prepare
   extends:
     - .rules:merge_request_pipelines:code
     - .tf-cache

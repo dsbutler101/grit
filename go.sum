@@ -119,6 +119,10 @@ github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940 h1:4r45xpDWB6
 github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmBdvvj3nqzfzJ6nTCIwDTPZ56aVGvDrmztiO5g3qrM=
 gitlab.com/gitlab-org/api/client-go v0.119.0 h1:YBZyx9XUTtEDBBYtY36cZWz6JmT7om/8HPSk37IS95g=
 gitlab.com/gitlab-org/api/client-go v0.119.0/go.mod h1:ygHmS3AU3TpvK+AC6DYO1QuAxLlv6yxYK+/Votr/WFQ=
+go.maczukin.dev/libs/mageutils v0.1.0 h1:CUx84MrLeospPMfFUomCICdcWApDIRnE0G0f0TZBkqc=
+go.maczukin.dev/libs/mageutils v0.1.0/go.mod h1:vPqhBXpe84lXJZRHRGuEyjqTJTreV66cuJKOi8/Kd6Q=
+go.maczukin.dev/libs/version v0.1.0 h1:CxnZqLCGLThZMJ74mNipWo5Q5ok7qJCTqfdIiSvjNPg=
+go.maczukin.dev/libs/version v0.1.0/go.mod h1:2hVmZpy9mkmmxpTSUoPEgeEeUAivgr11OHcxMkLGcCQ=
 golang.org/x/crypto v0.29.0 h1:L5SG1JTTXupVV3n6sUqMTeWbjAyfPwoda2DLX8J8FrQ=
 golang.org/x/crypto v0.29.0/go.mod h1:+F4F4N5hv6v38hfeYwTdx20oUvLLc+QfrE9Ax9HtgRg=
 golang.org/x/mod v0.21.0 h1:vvrHzRwRfVKSiLrG+d4FMl/Qi4ukBCE6kZlTUkDYRT0=

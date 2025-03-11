@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+version=$(cat VERSION || echo dev | sed -e 's/^v//g')
+exact_tag=$(git describe --exact-match 2>/dev/null | sed -e 's/^v//g' || echo "")
+
+if echo "${exact_tag}" | grep -qE "^[0-9]+\.[0-9]+\.[0-9]+(-pre.[0-9]+){0,1}$"; then
+    echo "$exact_tag"
+    exit 0
+fi
+
+# Calculate next minor version
+major=$(echo "$version" | cut -d. -f1)
+minor=$(echo "$version" | cut -d. -f2)
+next_minor=$((minor + 1))
+next_version="${major}.${next_minor}.0"
+
+last_tag=$(git describe --abbrev=0 --tags --exclude='*-pre*')
+commits_count=$(git rev-list --count "${last_tag}..HEAD")
+revision=$(git rev-parse --short=8 HEAD || echo unknown) # we could include the revision for added specificity
+
+echo "v${next_version}-pre.${commits_count}"

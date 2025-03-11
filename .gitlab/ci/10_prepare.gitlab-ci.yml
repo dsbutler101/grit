@@ -10,4 +10,4 @@ terraform init:
     - .rules:merge_request_pipelines:code
     - .tf-cache
   script:
-    - make terraform-init
+    - make terraform-init -j4 -Oline

@@ -21,7 +21,7 @@ func defaultModuleVars(t *testing.T) moduleVars {
 		"deletion_protection": "false",
 		"node_pools": map[string]any{
 			"default": map[string]any{
-				"node_count": 1,
+				"node_count": 0,
 				"node_config": map[string]any{
 					"machine_type": "e2-micro",
 					"taints": []map[string]string{

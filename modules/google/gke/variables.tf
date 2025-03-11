@@ -97,7 +97,7 @@ variable "autoscaling" {
 variable "node_pools" {
   description = "The configuration required for each node pool added to the GKE cluster"
   type = map(object({
-    node_count = optional(number, 1)
+    node_count = optional(number, 0)
     autoscaling = optional(object({
       min_node_count = number
       max_node_count = number

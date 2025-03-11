@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	GitlabTokenVarE2E = "GITLAB_TOKEN_E2E"
+	GitlabTokenVarE2E = "GITLAB_TOKEN"
 	GitLabProjectID   = "CI_PROJECT_ID"
 
 	TerraformHTTPAddress  = "TF_HTTP_ADDRESS"

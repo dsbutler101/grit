@@ -4,6 +4,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/magefile/mage/mg"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/common"
 )
@@ -11,6 +13,6 @@ import (
 type Runner mg.Namespace
 
 // WaitForRunners waits for the runners to be online and fails if Runner doesn't come online.
-func (Runner) WaitForRunners(runnerTag string, tries int) error {
-	return common.WaitForRunners(runnerTag, uint(tries))
+func (Runner) WaitForRunners(ctx context.Context, runnerTag string) error {
+	return common.WaitForRunners(ctx, runnerTag)
 }

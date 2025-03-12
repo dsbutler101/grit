@@ -11,6 +11,10 @@ output "public_ip" {
   value = aws_instance.runner_manager.public_ip
 }
 
+output "instance_name" {
+  value = local.instance_name
+}
+
 output "instance_id" {
   value = aws_instance.runner_manager.id
 }

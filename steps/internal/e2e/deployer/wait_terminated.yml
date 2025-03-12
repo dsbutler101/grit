@@ -1,0 +1,17 @@
+spec:
+  inputs:
+    tf_dir:
+      type: string
+    runner_name:
+      type: string
+    runner_tag:
+      type: string
+---
+run:
+  - name: wait_terminated
+    step: ./with_tf_state.yml
+    inputs:
+      runner_name: ${{ inputs.runner_name }}
+      runner_tag: ${{ inputs.runner_tag }}
+      tf_dir: ${{ inputs.tf_dir }}
+      command: wait-terminated

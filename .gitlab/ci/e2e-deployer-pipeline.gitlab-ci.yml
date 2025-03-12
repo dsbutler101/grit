@@ -1,0 +1,152 @@
+workflow:
+  # set a useful name for the pipeline
+  name: "E2E ${E2E_TEST_NAME} (ID: ${E2E_TEST_ID})"
+  auto_cancel:
+    # allow everything to be cancelled except destroy
+    on_new_commit: interruptible
+
+stages:
+  - apply
+  - test
+  - destroy
+
+include:
+  - local: .gitlab/ci/00_common.gitlab-ci.yml
+
+.e2e:base:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+  interruptible: true
+  variables:
+    # Used to tag created runners, name resources and state
+    # E2E_TEST_NAME is set in each e2e test scenario
+    # `tags` has limited variables but CI_PIPELINE_IID works
+    RUNNER_NAME: &runner_name "u${E2E_TEST_ID}-${E2E_TEST_NAME}"
+    FF_USE_NATIVE_STEPS: true
+  environment:
+    name: "e2e-${E2E_TEST_NAME}/${RUNNER_NAME}"
+
+e2e:setup:
+  stage: apply
+  extends:
+    - .e2e:base
+  run:
+    - name: apply_blue
+      step: ./steps/internal/e2e/deployer/up.yml
+      inputs: &blue
+        tf_dir: e2e/deployer/blue
+        runner_name: ${{ job.RUNNER_NAME }}-b
+        runner_tag: ${{ job.RUNNER_NAME }}
+    - name: destroy_green
+      step: ./steps/internal/e2e/deployer/down.yml
+      inputs: &green
+        tf_dir: e2e/deployer/green
+        runner_name: ${{ job.RUNNER_NAME }}-g
+        runner_tag: ${{ job.RUNNER_NAME }}
+
+e2e:pre-load:
+  stage: test
+  extends:
+    - .e2e:base
+  tags:
+    - *runner_name
+    - blue
+  script:
+    - sleep 1
+  # step-runner doesn't seem to be working in GRIT
+  # run:
+  #   - name: load
+  #     step: ./steps/internal/e2e/deployer/load.yml
+  #     inputs:
+  #       duration_seconds: 1
+
+e2e:load:
+  stage: test
+  extends:
+    - .e2e:base
+  needs:
+    - e2e:pre-load
+  tags:
+    - *runner_name
+  parallel: 20
+  script:
+    - sleep $(( 60 + $RANDOM % (10 + 1) ))
+  # step-runner doesn't seem to be working in GRIT
+  # run:
+  #   - name: load
+  #     step: ./steps/internal/e2e/deployer/load.yml
+  #     inputs:
+  #       duration_seconds: 60
+  #       shuffle_seconds: 10
+
+e2e:green-up:
+  stage: test
+  extends:
+    - .e2e:base
+  needs:
+    - e2e:pre-load
+  run:
+    - name: green_up
+      step: ./steps/internal/e2e/deployer/up.yml
+      inputs: *green
+    - name: green_wait_healthy
+      step: ./steps/internal/e2e/deployer/wait_healthy.yml
+      inputs: *green
+
+e2e:blue-down:
+  stage: test
+  extends:
+    - .e2e:base
+  needs:
+    - e2e:green-up
+  run:
+    - name: blue_shutdown
+      step: ./steps/internal/e2e/deployer/shutdown.yml
+      inputs: *blue
+    - name: blue_wait_terminated
+      step: ./steps/internal/e2e/deployer/wait_terminated.yml
+      inputs: *blue
+    - name: blue_down
+      step: ./steps/internal/e2e/deployer/down.yml
+      inputs: *blue
+
+e2e:post-load:
+  stage: test
+  extends:
+    - .e2e:base
+  needs:
+    - e2e:blue-down
+  tags:
+    - *runner_name
+    - green
+  script:
+    - sleep 1
+  # step-runner doesn't seem to be working in GRIT
+  # run:
+  #   - name: load
+  #     step: ./steps/internal/e2e/deployer/load.yml
+  #     inputs:
+  #       duration_seconds: 1
+
+# NOTE: please do not disable these destroy jobs as it will leave resources behind
+# incurring cloud charges and time to manually clean up.
+e2e:destroy: &destroy
+  stage: destroy
+  extends:
+    - .e2e:base
+  interruptible: false
+  environment:
+    action: stop
+  when: always
+  run:
+    - name: destroy_blue
+      step: ./steps/internal/e2e/deployer/down.yml
+      inputs: *blue
+    - name: destroy_green
+      step: ./steps/internal/e2e/deployer/down.yml
+      inputs: *green
+
+e2e:destroy:manual:
+  <<: *destroy
+  when: manual
+  needs: []

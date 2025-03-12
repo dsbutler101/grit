@@ -1,0 +1,11 @@
+spec:
+  inputs:
+    duration_seconds:
+      type: number
+    shuffle_seconds:
+      type: number
+      default: 0
+---
+run:
+  - name: load
+    script: sleep $(( ${{ inputs.duration_seconds }} + $RANDOM % (${{ inputs.shuffle_seconds }} + 1) ))

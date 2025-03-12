@@ -8,6 +8,11 @@ output "ec2_public_ip" {
   description = "GitLab Runner manager public IP."
 }
 
+output "ec2_instance_name" {
+  value       = try(module.ec2[0].instance_name, "")
+  description = "GitLab Runner manager instance name."
+}
+
 output "ec2_instance_id" {
   value       = try(module.ec2[0].instance_id, "")
   description = "GitLab Runner manager instance ID."

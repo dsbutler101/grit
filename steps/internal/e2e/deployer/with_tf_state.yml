@@ -1,0 +1,45 @@
+spec:
+  inputs:
+    tf_dir:
+      type: string
+    runner_name:
+      type: string
+    runner_tag:
+      type: string
+    runner_version:
+      type: string
+      default: "17.10.0"
+    command:
+      type: string
+---
+env:
+  E2E_TEST_ID: ${{ job.E2E_TEST_ID }}
+  E2E_TEST_NAME: ${{ job.E2E_TEST_NAME }}
+  CI_PROJECT_ID: ${{ job.CI_PROJECT_ID }}
+
+  GITLAB_TOKEN: ${{ job.GITLAB_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ job.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ job.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ job.AWS_REGION }}
+
+  TF_VAR_runner_tag: ${{ inputs.runner_tag }}
+  TF_VAR_name: ${{ inputs.runner_name }}
+  TF_VAR_gitlab_project_id: ${{ job.CI_PROJECT_ID }}
+  TF_VAR_runner_version: ${{ inputs.runner_version }}
+
+  TF_HTTP_ADDRESS: "https://gitlab.com/api/v4/projects/${{ job.CI_PROJECT_ID }}/terraform/state/${{ inputs.runner_name }}"
+  TF_HTTP_LOCK_ADDRESS: "https://gitlab.com/api/v4/projects/${{ job.CI_PROJECT_ID }}/terraform/state/${{ inputs.runner_name }}/lock"
+  TF_HTTP_UNLOCK_ADDRESS: "https://gitlab.com/api/v4/projects/${{ job.CI_PROJECT_ID }}/terraform/state/${{ inputs.runner_name }}/lock"
+  TF_HTTP_USERNAME: ${{ job.GITLAB_USER_LOGIN }}
+  TF_HTTP_PASSWORD: ${{ job.GITLAB_TOKEN_TERRAFORM }}
+  TF_HTTP_LOCK_METHOD: POST
+  TF_HTTP_UNLOCK_METHOD: DELETE
+exec:
+  work_dir: ${{ work_dir }}/deployer/cmd/deployer
+  command:
+    - go
+    - run
+    - .
+    - ${{ inputs.command }}
+    - --tf-target
+    - ${{ work_dir }}/${{ inputs.tf_dir }}

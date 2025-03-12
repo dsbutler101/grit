@@ -10,6 +10,9 @@ ExecStart=/usr/bin/docker run \
             --rm \
             --name=gitlab-runner \
             -p ${runner_metrics_port}:${runner_metrics_port} \
+%{ for volume in additional_volumes ~}
+            -v ${volume} \
+%{ endfor ~}
             -v /etc/gitlab-runner:/etc/gitlab-runner/ \
             -v /var/run/docker.sock:/var/run/docker.sock \
             --entrypoint /etc/gitlab-runner/entrypoint.sh \

@@ -1,6 +1,6 @@
 resource "google_kms_key_ring" "default" {
   name     = var.metadata.name
-  location = "global"
+  location = var.kms_location
 }
 
 resource "google_kms_crypto_key" "default" {

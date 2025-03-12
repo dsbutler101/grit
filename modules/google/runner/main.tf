@@ -21,7 +21,9 @@ module "validate-support" {
 ######################
 
 locals {
-  runner_manager_tag = "gitlab-runner-manager"
+  runner_manager_name = "${var.metadata.name}-runner-manager"
+  runner_manager_tag  = "gitlab-runner-manager"
+  runner_manager_tags = concat([local.runner_manager_tag], var.additional_tags)
 
   use_autoscaling = var.executor == "docker-autoscaler" || var.executor == "instance"
   use_docker      = var.executor == "docker-autoscaler" || var.executor == "docker"
@@ -83,6 +85,10 @@ data "cloudinit_config" "config" {
 
             use_autoscaling                       = local.use_autoscaling
             fleeting_googlecompute_plugin_version = var.fleeting_googlecompute_plugin_version
+
+            https_proxy = var.https_proxy
+            http_proxy  = var.http_proxy
+            no_proxy    = var.no_proxy
           })
         },
         {
@@ -131,8 +137,9 @@ data "cloudinit_config" "config" {
           owner       = "root:root"
           permissions = "0644"
           content = templatefile("${path.module}/templates/gitlab-runner.service", {
-            gitlab_runner_image = "registry.gitlab.com/gitlab-org/gitlab-runner:alpine-${var.runner_version}"
+            gitlab_runner_image = "${var.runner_registry}:alpine-${var.runner_version}"
             runner_metrics_port = local.metrics_listener_port
+            additional_volumes  = var.additional_volumes
           })
         },
         {
@@ -158,7 +165,7 @@ data "cloudinit_config" "config" {
 }
 
 resource "google_compute_instance" "runner-manager" {
-  name         = "${var.metadata.name}-runner-manager"
+  name         = local.runner_manager_name
   machine_type = var.machine_type != "" ? var.machine_type : local.runner_manager_machine_type
 
   metadata = {
@@ -173,9 +180,7 @@ resource "google_compute_instance" "runner-manager" {
 
   zone = var.google_zone
 
-  tags = [
-    local.runner_manager_tag
-  ]
+  tags = local.runner_manager_tags
 
   boot_disk {
     initialize_params {
@@ -186,10 +191,15 @@ resource "google_compute_instance" "runner-manager" {
   }
 
   network_interface {
-    network    = var.vpc.id
-    subnetwork = var.vpc.subnet_id
-    access_config {
-      nat_ip = ""
+    network            = var.vpc.id
+    subnetwork         = var.vpc.subnet_id
+    subnetwork_project = var.subnetwork_project
+
+    dynamic "access_config" {
+      for_each = var.access_config_enabled ? [1] : []
+      content {
+        nat_ip = ""
+      }
     }
   }
 
@@ -216,3 +226,8 @@ resource "google_compute_instance" "runner-manager" {
   }
 }
 
+resource "google_compute_address" "runner-manager" {
+  name         = local.runner_manager_name
+  address_type = var.address_type
+  subnetwork   = var.address_type == "INTERNAL" ? var.vpc.subnet_id : null
+}

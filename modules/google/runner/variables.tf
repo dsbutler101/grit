@@ -25,6 +25,11 @@ variable "google_project" {
   description = "Google Cloud project to use"
 }
 
+variable "subnetwork_project" {
+  description = "Project where the subnetwork is located"
+  type        = string
+}
+
 variable "google_zone" {
   type        = string
   description = "Google Cloud zone to use"
@@ -256,4 +261,65 @@ variable "vpc" {
     subnet_id = string
   })
   description = "VPC and subnet to use fur runner manager deployment"
+}
+
+variable "source_ranges" {
+  description = "Runner manager source ranges"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+# KMS
+variable "kms_location" {
+  description = "KMS key ring location"
+  type        = string
+  default     = "global"
+}
+
+variable "address_type" {
+  type        = string
+  description = "Type of the address to be created for the runner manager instance `INTERNAL` or `EXTERNAL`"
+  default     = "EXTERNAL"
+}
+
+variable "access_config_enabled" {
+  description = "Runner manager access config enabled"
+  type        = bool
+  default     = true
+}
+
+variable "additional_tags" {
+  type        = list(string)
+  description = "Additional tags to attach to the runner manager instance"
+  default     = []
+}
+
+variable "runner_registry" {
+  type        = string
+  description = "The registry where the runner image is stored"
+  default     = "registry.gitlab.com/gitlab-org/gitlab-runner"
+}
+
+variable "https_proxy" {
+  description = "https proxy to use"
+  type        = string
+  default     = ""
+}
+
+variable "http_proxy" {
+  description = "http proxy to use"
+  type        = string
+  default     = ""
+}
+
+variable "no_proxy" {
+  description = "no proxy"
+  type        = string
+  default     = ""
+}
+
+variable "additional_volumes" {
+  type        = list(string)
+  description = "Additional volumes to mount in docker runner"
+  default     = []
 }

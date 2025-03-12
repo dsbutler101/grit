@@ -5,6 +5,7 @@ locals {
 resource "google_compute_firewall" "ephemeral-runners-ssh-access" {
   name    = "${var.name}-ephemeral-runners-ssh-access"
   network = var.vpc.id
+  project = var.subnetwork_project
 
   direction = "INGRESS"
   priority  = 1000
@@ -22,6 +23,7 @@ resource "google_compute_firewall" "ephemeral-runners-ssh-access" {
 resource "google_compute_firewall" "ephemeral-runners-cross-vm-deny" {
   name    = "${var.name}-ephemeral-runners-cross-vm-deny"
   network = var.vpc.id
+  project = var.subnetwork_project
 
   direction = "EGRESS"
   priority  = 1000
@@ -30,11 +32,7 @@ resource "google_compute_firewall" "ephemeral-runners-cross-vm-deny" {
     protocol = "all"
   }
 
-  destination_ranges = [
-    "10.0.0.0/8",
-    "172.16.0.0/12",
-    "192.168.0.0/16",
-  ]
+  destination_ranges = var.cross_vm_deny_egress_destination_ranges
 
   target_tags = [local.ephemeral_runner_tag]
 }

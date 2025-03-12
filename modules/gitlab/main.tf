@@ -16,14 +16,24 @@ module "validate-support" {
   min_support = var.metadata.min_support
 }
 
-######################
-# GITLAB PROD MODULE #
-######################
-
 resource "gitlab_user_runner" "primary" {
   description = "${var.runner_description} ${var.metadata.name}_GRIT"
-  runner_type = "project_type"
-  project_id  = var.project_id
+  runner_type = var.runner_type
   tag_list    = var.runner_tags
   untagged    = length(var.runner_tags) == 0 ? true : false
+  group_id    = var.runner_type == "group_type" ? var.group_id : null
+  project_id  = var.runner_type == "project_type" ? var.project_id : null
+
+  lifecycle {
+
+    precondition {
+      condition     = !(var.runner_type == "group_type" && var.group_id == "")
+      error_message = "The group_id must be set when runner_type is 'group_type'."
+    }
+
+    precondition {
+      condition     = !(var.runner_type == "project_type" && var.project_id == "")
+      error_message = "The project_id must be set when runner_type is 'project_type'."
+    }
+  }
 }

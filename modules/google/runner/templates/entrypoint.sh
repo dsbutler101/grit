@@ -2,6 +2,10 @@
 
 set -eo pipefail
 
+export HTTPS_PROXY="${https_proxy}"
+export HTTP_PROXY="${http_proxy}"
+export NO_PROXY="${no_proxy}"
+
 function decrypt_secret {
   local token=$${1}
   local secret=$${2}

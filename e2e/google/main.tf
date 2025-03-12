@@ -67,6 +67,7 @@ module "fleeting" {
 
   fleeting_service      = "gce"
   google_project        = data.google_client_config.current.project
+  subnetwork_project    = data.google_client_config.current.project
   google_zone           = data.google_client_config.current.zone
   service_account_email = module.iam.service_account_email
   machine_type          = "n2d-standard-2"
@@ -77,8 +78,9 @@ module "runner" {
   source   = "../../modules/google/runner"
   metadata = local.metadata
 
-  google_project = data.google_client_config.current.project
-  google_zone    = data.google_client_config.current.zone
+  google_project     = data.google_client_config.current.project
+  subnetwork_project = data.google_client_config.current.project
+  google_zone        = data.google_client_config.current.zone
 
   service_account_email = module.iam.service_account_email
 

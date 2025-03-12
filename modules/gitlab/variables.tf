@@ -25,9 +25,16 @@ variable "url" {
   type        = string
 }
 
-variable "project_id" {
-  description = "The numeric project ID to which to register the runner."
+variable "group_id" {
+  description = "The numeric ID to which to register the runner for group type runners."
   type        = string
+  default     = ""
+}
+
+variable "project_id" {
+  description = "The numeric ID to which to register the runner for project type runners."
+  type        = string
+  default     = ""
 }
 
 variable "runner_description" {
@@ -38,4 +45,14 @@ variable "runner_description" {
 variable "runner_tags" {
   description = "The list of runner tags for selecting jobs. An empty list will run untagged jobs."
   type        = list(string)
+}
+
+variable "runner_type" {
+  type        = string
+  description = "The scope of the runner. Valid values are: instance_type, group_type, project_type."
+  default     = "project_type"
+  validation {
+    condition     = contains(["instance_type", "group_type", "project_type"], var.runner_type)
+    error_message = "The runner_type must be one of: instance_type, group_type, project_type."
+  }
 }

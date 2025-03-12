@@ -5,7 +5,7 @@ resource "google_compute_instance_template" "ephemeral-runner" {
     create_before_destroy = true
   }
 
-  tags   = [local.ephemeral_runner_tag]
+  tags   = concat([local.ephemeral_runner_tag], var.additional_tags)
   labels = var.labels
 
   machine_type = var.machine_type
@@ -16,10 +16,15 @@ resource "google_compute_instance_template" "ephemeral-runner" {
   }
 
   network_interface {
-    network    = var.vpc.id
-    subnetwork = var.vpc.subnet_id
-    access_config {
-      nat_ip = ""
+    network            = var.vpc.id
+    subnetwork         = var.vpc.subnet_id
+    subnetwork_project = var.subnetwork_project
+
+    dynamic "access_config" {
+      for_each = var.access_config_enabled ? [1] : []
+      content {
+        nat_ip = ""
+      }
     }
   }
 

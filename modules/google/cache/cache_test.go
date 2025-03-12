@@ -25,10 +25,12 @@ func TestCache(t *testing.T) {
 					"labels":      map[string]string{"env": "another place"},
 					"min_support": "experimental",
 				},
-				"cache_object_lifetime": 10,
-				"bucket_name":           "optional-explicit-bucket-name",
-				"bucket_location":       "us-east1",
-				"service_account_emails": []string{
+				"cache_object_lifetime":       10,
+				"force_destroy":               true,
+				"uniform_bucket_level_access": true,
+				"bucket_name":                 "optional-explicit-bucket-name",
+				"bucket_location":             "us-east1",
+				"service_account_emails":      []string{
 					"service-account@example.com",
 				},
 			},

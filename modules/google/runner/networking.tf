@@ -1,6 +1,7 @@
 resource "google_compute_firewall" "runner-manager-ssh-access" {
   name    = "${var.metadata.name}-runner-manager-ssh-access"
   network = var.vpc.id
+  project = var.subnetwork_project
 
   direction = "INGRESS"
   priority  = 1000
@@ -10,7 +11,7 @@ resource "google_compute_firewall" "runner-manager-ssh-access" {
     ports    = ["22"]
   }
 
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = var.source_ranges
 
   target_tags = [local.runner_manager_tag]
 }

@@ -34,6 +34,11 @@ variable "google_project" {
   description = "Google Cloud project to use"
 }
 
+variable "subnetwork_project" {
+  description = "Project where the subnetwork is located"
+  type        = string
+}
+
 variable "google_zone" {
   type        = string
   description = "The zone that instances in this group should be created in"
@@ -85,4 +90,22 @@ variable "vpc" {
 variable "manager_subnet_cidr" {
   type        = string
   description = "CIDR of the subnetwork where runner manager is deployed"
+}
+
+variable "additional_tags" {
+  type        = list(string)
+  description = "Additional tags to attach to the fleeting instances"
+  default     = []
+}
+
+variable "cross_vm_deny_egress_destination_ranges" {
+  description = "List of destination ranges to deny egress cross-VM communication to"
+  type        = list(string)
+  default     = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+}
+
+variable "access_config_enabled" {
+  description = "Runner manager access config enabled"
+  type        = bool
+  default     = true
 }

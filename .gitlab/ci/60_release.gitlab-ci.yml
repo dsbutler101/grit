@@ -1,3 +1,11 @@
+prerelease tag on main:
+  stage: release
+  extends:
+    - .rules:after-merge
+  needs: []
+  script:
+    - ./ci/prerelease-tag.sh
+
 # This job is invoked when a new stable release tag is applied. This job then associates the new tag with a new release.
 stable release:
   stage: release

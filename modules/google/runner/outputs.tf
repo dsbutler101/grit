@@ -1,6 +1,6 @@
 output "external_ip" {
-  description = "External IP of deployed runner manager"
-  value       = google_compute_instance.runner-manager.network_interface[0].access_config[0].nat_ip
+  description = "External IP of deployed runner manager only if access config is enabled"
+  value       = var.access_config_enabled ? google_compute_instance.runner-manager.network_interface[0].access_config[0].nat_ip : null
 }
 
 output "internal_hostname" {

@@ -28,9 +28,10 @@ module "gce" {
   name   = var.metadata.name
   labels = var.metadata.labels
 
-  google_project = var.google_project
-  google_zone    = var.google_zone
-
+  google_project        = var.google_project
+  subnetwork_project    = var.subnetwork_project
+  access_config_enabled = var.access_config_enabled
+  google_zone           = var.google_zone
   service_account_email = var.service_account_email
 
   machine_type = var.machine_type
@@ -38,6 +39,8 @@ module "gce" {
   disk_size_gb = var.disk_size_gb
   source_image = var.source_image
 
-  vpc                 = var.vpc
-  manager_subnet_cidr = var.manager_subnet_cidr
+  vpc                                     = var.vpc
+  manager_subnet_cidr                     = var.manager_subnet_cidr
+  additional_tags                         = var.additional_tags
+  cross_vm_deny_egress_destination_ranges = var.cross_vm_deny_egress_destination_ranges
 }

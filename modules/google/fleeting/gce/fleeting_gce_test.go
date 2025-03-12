@@ -27,6 +27,7 @@ func TestFleetingGCE(t *testing.T) {
 				"name":                  name,
 				"labels":                map[string]string{"env": "another place"},
 				"google_project":        "example-project-a1b2c3",
+				"subnetwork_project":    "example-subnetwork-project-a1b2c3",
 				"google_zone":           "us-central1-a",
 				"service_account_email": "service-account@example.com",
 				"machine_type":          "e2-micro",

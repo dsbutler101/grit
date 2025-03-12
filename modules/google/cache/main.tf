@@ -30,8 +30,9 @@ resource "google_storage_bucket" "cache-bucket" {
 
   location = var.bucket_location
 
-  force_destroy            = true
-  public_access_prevention = "enforced"
+  force_destroy               = var.force_destroy
+  public_access_prevention    = var.public_access_prevention
+  uniform_bucket_level_access = var.uniform_bucket_level_access
 
   lifecycle_rule {
     action {
@@ -49,4 +50,3 @@ resource "google_storage_bucket_iam_binding" "cache-bucket" {
   role    = "roles/storage.objectAdmin"
   members = [for email in var.service_account_emails : "serviceAccount:${email}"]
 }
-

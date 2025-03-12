@@ -42,3 +42,21 @@ variable "bucket_name" {
   description = "Bucket name to use. If set then automatic name derived from metadata.name is not used"
   default     = ""
 }
+
+variable "force_destroy" {
+  description = "Whether to allow force destroy of the bucket"
+  type        = bool
+  default     = true
+}
+
+variable "public_access_prevention" {
+  description = "The public access prevention configuration for this bucket"
+  type        = string
+  default     = "enforced"
+}
+
+variable "uniform_bucket_level_access" {
+  description = "Whether to enable uniform bucket-level access"
+  type        = bool
+  default     = false
+}

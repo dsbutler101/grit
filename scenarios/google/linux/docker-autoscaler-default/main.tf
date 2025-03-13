@@ -31,8 +31,9 @@ module "fleeting" {
 
   metadata = local.metadata
 
-  google_project = var.google_project
-  google_zone    = var.google_zone
+  google_project     = var.google_project
+  google_zone        = var.google_zone
+  subnetwork_project = var.google_project
 
   fleeting_service = "gce"
 
@@ -56,8 +57,9 @@ module "runner" {
 
   metadata = local.metadata
 
-  google_project = var.google_project
-  google_zone    = var.google_zone
+  google_project     = var.google_project
+  google_zone        = var.google_zone
+  subnetwork_project = var.google_project
 
   service_account_email = module.iam.service_account_email
 

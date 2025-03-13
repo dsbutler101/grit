@@ -8,6 +8,12 @@ terraform-init: $(TF_MODULES:%=%-terraform-init)
 %-terraform-init:
 	cd $(MODULE) && terraform init -backend=false
 
+.PHONY: terraform-validate
+terraform-validate: $(TF_MODULES:%=%-terraform-validate)
+%-terraform-validate: MODULE=$*
+%-terraform-validate:
+	cd $(MODULE) && terraform validate
+
 # clean up local terraform caches and lock files
 .PHONY: clean
 clean:

@@ -13,7 +13,7 @@ terraform validate:
   script:
     # terraform init files should exist in cache, but just in case
     - make terraform-init -j4 -Oline
-    - make terraform-validate -j4 -Oline
+    - make terraform-validate -j2 -Oline
 
 tflint:
   stage: lint

@@ -127,6 +127,26 @@ Public AMIs are removed if they are either created:
 
 If your GRIT version uses AMIs that are removed, upgrade to the latest version.
 
+## Releases
+
+GRIT follows a structured release process for both standard version updates and patch releases. The process is managed through the [Releases](https://gitlab.com/gitlab-org/ci-cd/runner-tools/releases) project.
+
+### Version Scheme
+
+GRIT follows semantic versioning (`vX.Y.Z`):
+
+- **X**: Major version - Significant changes that may include breaking changes
+- **Y**: Minor version - New features and improvements with backward compatibility
+- **Z**: Patch version - Bug fixes and security updates
+
+### Pre-release Tags
+
+All merges to the `main` branch automatically receive a pre-release tag (without creating an official release).
+For example, if the latest release is `v1.0.0` and there are 10 new commits, the pre-release tag is `v1.1.0-pre.10`.
+This action provides versioned references to development builds.
+
+For detailed instructions on creating new releases, see [Release Process](docs/release_process.md) documentation.
+
 ## Contributing
 
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.

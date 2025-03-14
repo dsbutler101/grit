@@ -53,7 +53,7 @@ func main() {
 }
 
 func setupLogger() {
-	logL = &slog.LevelVar{}
+	logL = new(slog.LevelVar)
 	logL.Set(slog.LevelInfo)
 
 	logOpts := []logger.Option{

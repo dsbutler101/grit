@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	defaultAddSource = false
-	customLogFormat  = false
+	defaultAddSource       = false
+	defaultCustomLogFormat = false
 )
 
 type Option func(o *options)
@@ -18,12 +18,12 @@ type options struct {
 }
 
 func setupOptions(opts []Option) options {
-	l := &slog.LevelVar{}
+	l := new(slog.LevelVar)
 	l.Set(slog.LevelInfo)
 
 	o := options{
 		addSource:       defaultAddSource,
-		customLogFormat: customLogFormat,
+		customLogFormat: defaultCustomLogFormat,
 		leveler:         l,
 	}
 

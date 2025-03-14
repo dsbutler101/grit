@@ -23,7 +23,7 @@ func (_m *mockRmHandler) EXPECT() *mockRmHandler_Expecter {
 }
 
 // handle provides a mock function with given fields: _a0, _a1, _a2
-func (_m *mockRmHandler) handle(_a0 context.Context, _a1 terraform.RunnerManager, _a2 callbackFn) error {
+func (_m *mockRmHandler) handle(_a0 context.Context, _a1 terraform.RunnerManager, _a2 CallbackFn) error {
 	ret := _m.Called(_a0, _a1, _a2)
 
 	if len(ret) == 0 {
@@ -31,7 +31,7 @@ func (_m *mockRmHandler) handle(_a0 context.Context, _a1 terraform.RunnerManager
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, terraform.RunnerManager, callbackFn) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, terraform.RunnerManager, CallbackFn) error); ok {
 		r0 = rf(_a0, _a1, _a2)
 	} else {
 		r0 = ret.Error(0)
@@ -48,14 +48,14 @@ type mockRmHandler_handle_Call struct {
 // handle is a helper method to define mock.On call
 //   - _a0 context.Context
 //   - _a1 terraform.RunnerManager
-//   - _a2 callbackFn
+//   - _a2 CallbackFn
 func (_e *mockRmHandler_Expecter) handle(_a0 interface{}, _a1 interface{}, _a2 interface{}) *mockRmHandler_handle_Call {
 	return &mockRmHandler_handle_Call{Call: _e.mock.On("handle", _a0, _a1, _a2)}
 }
 
-func (_c *mockRmHandler_handle_Call) Run(run func(_a0 context.Context, _a1 terraform.RunnerManager, _a2 callbackFn)) *mockRmHandler_handle_Call {
+func (_c *mockRmHandler_handle_Call) Run(run func(_a0 context.Context, _a1 terraform.RunnerManager, _a2 CallbackFn)) *mockRmHandler_handle_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(terraform.RunnerManager), args[2].(callbackFn))
+		run(args[0].(context.Context), args[1].(terraform.RunnerManager), args[2].(CallbackFn))
 	})
 	return _c
 }
@@ -65,7 +65,7 @@ func (_c *mockRmHandler_handle_Call) Return(_a0 error) *mockRmHandler_handle_Cal
 	return _c
 }
 
-func (_c *mockRmHandler_handle_Call) RunAndReturn(run func(context.Context, terraform.RunnerManager, callbackFn) error) *mockRmHandler_handle_Call {
+func (_c *mockRmHandler_handle_Call) RunAndReturn(run func(context.Context, terraform.RunnerManager, CallbackFn) error) *mockRmHandler_handle_Call {
 	_c.Call.Return(run)
 	return _c
 }

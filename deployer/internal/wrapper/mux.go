@@ -33,7 +33,14 @@ var (
 	ErrWrapperExecution             = errors.New("wrapper execution")
 )
 
-type callbackFn func(ctx context.Context, c *Client) error
+type CallbackFn func(ctx context.Context, c CallbackClient) error
+
+//go:generate mockery --name=CallbackClient --inpackage --with-expecter
+type CallbackClient interface {
+	CheckStatus(context.Context) (Status, error)
+	InitForcefulShutdown(context.Context) error
+	InitGracefulShutdown(context.Context) error
+}
 
 type runnerManagerResult struct {
 	alias string
@@ -53,7 +60,7 @@ type rmHandlerFactory interface {
 
 //go:generate mockery --name=rmHandler --inpackage --with-expecter
 type rmHandler interface {
-	handle(context.Context, terraform.RunnerManager, callbackFn) error
+	handle(context.Context, terraform.RunnerManager, CallbackFn) error
 }
 
 //go:generate mockery --name=dialerFactory --inpackage --with-expecter
@@ -83,7 +90,7 @@ func NewMux(logger *slog.Logger, tf tfClient, tfFlags terraform.Flags, sshFlags 
 	}
 }
 
-func (m *Mux) Execute(ctx context.Context, fn callbackFn) error {
+func (m *Mux) Execute(ctx context.Context, fn CallbackFn) error {
 	if fn == nil {
 		return ErrNilCallbackFunction
 	}
@@ -186,7 +193,7 @@ type muxRunnerManagerHandler struct {
 	clientFactory clientFactory
 }
 
-func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.RunnerManager, fn callbackFn) error {
+func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.RunnerManager, fn CallbackFn) error {
 	h.logger.Info("Handling runner manager")
 
 	wa, err := getWrapperAddress(rm)

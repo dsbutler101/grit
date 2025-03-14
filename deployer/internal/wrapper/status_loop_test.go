@@ -15,11 +15,11 @@ func TestLoopStatusCheck(t *testing.T) {
 	testTimeout := 50 * time.Millisecond
 
 	tests := map[string]struct {
-		prepareClientMock func(ctx context.Context, client *mockLoopStatusCheckClient)
+		prepareClientMock func(ctx context.Context, client *MockLoopStatusCheckClient)
 		assertError       func(t *testing.T, err error)
 	}{
 		"gRPC request error failure": {
-			prepareClientMock: func(ctx context.Context, client *mockLoopStatusCheckClient) {
+			prepareClientMock: func(ctx context.Context, client *MockLoopStatusCheckClient) {
 				client.EXPECT().
 					CheckStatus(ctx).
 					Return(Status{Status: api.StatusUnknown}, assert.AnError)
@@ -29,14 +29,14 @@ func TestLoopStatusCheck(t *testing.T) {
 			},
 		},
 		"quick successful check": {
-			prepareClientMock: func(ctx context.Context, client *mockLoopStatusCheckClient) {
+			prepareClientMock: func(ctx context.Context, client *MockLoopStatusCheckClient) {
 				client.EXPECT().
 					CheckStatus(ctx).
 					Return(Status{Status: api.StatusRunning}, nil)
 			},
 		},
 		"successful check after a retry": {
-			prepareClientMock: func(ctx context.Context, client *mockLoopStatusCheckClient) {
+			prepareClientMock: func(ctx context.Context, client *MockLoopStatusCheckClient) {
 				client.EXPECT().
 					CheckStatus(ctx).
 					Return(Status{Status: api.StatusUnknown}, nil).
@@ -49,7 +49,7 @@ func TestLoopStatusCheck(t *testing.T) {
 			},
 		},
 		"successful check after a retry when timeout potentially exceeded": {
-			prepareClientMock: func(ctx context.Context, client *mockLoopStatusCheckClient) {
+			prepareClientMock: func(ctx context.Context, client *MockLoopStatusCheckClient) {
 				client.EXPECT().
 					CheckStatus(ctx).
 					Return(Status{Status: api.StatusUnknown}, nil).
@@ -65,7 +65,7 @@ func TestLoopStatusCheck(t *testing.T) {
 			},
 		},
 		"unsuccessful check after a retry when timeout exceeded": {
-			prepareClientMock: func(ctx context.Context, client *mockLoopStatusCheckClient) {
+			prepareClientMock: func(ctx context.Context, client *MockLoopStatusCheckClient) {
 				client.EXPECT().
 					CheckStatus(ctx).
 					Return(Status{Status: api.StatusUnknown}, nil).
@@ -93,7 +93,7 @@ func TestLoopStatusCheck(t *testing.T) {
 			ctx, cancelFn := context.WithCancel(context.Background())
 			defer cancelFn()
 
-			clientMock := newMockLoopStatusCheckClient(t)
+			clientMock := NewMockLoopStatusCheckClient(t)
 
 			require.NotNil(t, tt.prepareClientMock, "prepareClientMock function in the test definition must be defined")
 			tt.prepareClientMock(ctx, clientMock)

@@ -22,7 +22,7 @@ import (
 
 func TestMux_Execute(t *testing.T) {
 	testTarget := "/test/target/dir"
-	testCallbackFn := func(ctx context.Context, c *Client) error {
+	testCallbackFn := func(ctx context.Context, c CallbackClient) error {
 		return nil
 	}
 
@@ -38,7 +38,7 @@ func TestMux_Execute(t *testing.T) {
 		tfFlags                     terraform.Flags
 		prepareTFClientMock         func(ctx context.Context, client *mockTfClient)
 		prepareRMHandlerFactoryMock func(t *testing.T, ctx context.Context, factory *mockRmHandlerFactory)
-		callbackFn                  callbackFn
+		callbackFn                  CallbackFn
 		cancelContext               bool
 		assertError                 func(t *testing.T, err error)
 	}{
@@ -91,7 +91,7 @@ func TestMux_Execute(t *testing.T) {
 				handler := newMockRmHandler(t)
 				factory.EXPECT().new(testRMAlias1).Return(handler)
 
-				handler.EXPECT().handle(ctx, testRM1, mock.AnythingOfType("callbackFn")).Return(nil)
+				handler.EXPECT().handle(ctx, testRM1, mock.AnythingOfType("CallbackFn")).Return(nil)
 			},
 			callbackFn: testCallbackFn,
 		},
@@ -108,7 +108,7 @@ func TestMux_Execute(t *testing.T) {
 				handler := newMockRmHandler(t)
 				factory.EXPECT().new(testRMAlias1).Return(handler)
 
-				handler.EXPECT().handle(ctx, testRM1, mock.AnythingOfType("callbackFn")).Return(assert.AnError)
+				handler.EXPECT().handle(ctx, testRM1, mock.AnythingOfType("CallbackFn")).Return(assert.AnError)
 			},
 			callbackFn: testCallbackFn,
 			assertError: func(t *testing.T, err error) {
@@ -407,8 +407,8 @@ func TestMuxRunnerManagerHandler_handle(t *testing.T) {
 		}
 	}
 
-	noopCallbackFn := func(_ *testing.T, _ context.Context, _ *Client) callbackFn {
-		return func(_ context.Context, _ *Client) error {
+	noopCallbackFn := func(_ *testing.T, _ context.Context, _ *Client) CallbackFn {
+		return func(_ context.Context, _ CallbackClient) error {
 			return nil
 		}
 	}
@@ -418,7 +418,7 @@ func TestMuxRunnerManagerHandler_handle(t *testing.T) {
 		rm            terraform.RunnerManager
 		dialerFactory func(t *testing.T, expectedCtx context.Context, dialerMock *ssh.MockDialer) dialerFactory
 		clientFactory func(t *testing.T, expectedCtx context.Context, expectedDialer *ssh.MockDialer, client *Client) clientFactory
-		callbackFn    func(t *testing.T, expectedCtx context.Context, expectedClient *Client) callbackFn
+		callbackFn    func(t *testing.T, expectedCtx context.Context, expectedClient *Client) CallbackFn
 		assertError   func(t *testing.T, err error)
 	}{
 		"runner manager address failure": {
@@ -507,8 +507,8 @@ func TestMuxRunnerManagerHandler_handle(t *testing.T) {
 			rm:            testRM,
 			dialerFactory: defaultDialerFactory,
 			clientFactory: defaultClientFactory,
-			callbackFn: func(t *testing.T, expectedCtx context.Context, expectedClient *Client) callbackFn {
-				return func(ctx context.Context, client *Client) error {
+			callbackFn: func(t *testing.T, expectedCtx context.Context, expectedClient *Client) CallbackFn {
+				return func(ctx context.Context, client CallbackClient) error {
 					assert.Equal(t, expectedCtx, ctx)
 					assert.Equal(t, expectedClient, client)
 
@@ -524,8 +524,8 @@ func TestMuxRunnerManagerHandler_handle(t *testing.T) {
 			rm:            testRM,
 			dialerFactory: defaultDialerFactory,
 			clientFactory: defaultClientFactory,
-			callbackFn: func(t *testing.T, expectedCtx context.Context, expectedClient *Client) callbackFn {
-				return func(ctx context.Context, client *Client) error {
+			callbackFn: func(t *testing.T, expectedCtx context.Context, expectedClient *Client) CallbackFn {
+				return func(ctx context.Context, client CallbackClient) error {
 					assert.Equal(t, expectedCtx, ctx)
 					assert.Equal(t, expectedClient, client)
 

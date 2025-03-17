@@ -24,4 +24,4 @@ git config --global user.name "Auto Runner Releaser"
 PRERELEASE_TAG=$(./ci/version)
 echo "Creating tag: $PRERELEASE_TAG"
 git tag -a $PRERELEASE_TAG -m "Prerelease $PRERELEASE_TAG"
-git push https://oauth2:$GRIT_IMAGES_RELEASE_GITLAB_TOKEN@gitlab.com/gitlab-org/ci-cd/shared-runners/images/aws/grit-images.git $PRERELEASE_TAG
+git push https://oauth2:$GRIT_RELEASE_GITLAB_TOKEN@gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git $PRERELEASE_TAG

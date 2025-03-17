@@ -11,9 +11,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer"
-	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/cmd/deployer/down"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/cmd/deployer/shutdown"
-	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/cmd/deployer/up"
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/cmd/deployer/tfexec"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/cmd/deployer/version"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/cmd/deployer/wait"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/cli"
@@ -104,8 +103,8 @@ func setupRootCMD() *cobra.Command {
 	rootCmd.AddGroup(&tfGroup, &wrapperGroup)
 
 	for _, cmd := range []*cobra.Command{
-		up.New(log, tf, tfGroup),
-		down.New(log, tf, tfGroup),
+		tfexec.NewUp(log, tf, tfGroup),
+		tfexec.NewDown(log, tf, tfGroup),
 		shutdown.New(log, tf, wrapperGroup),
 		wait.NewHealthy(log, tf, wrapperGroup),
 		wait.NewTerminated(log, tf, wrapperGroup),

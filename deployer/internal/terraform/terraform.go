@@ -36,7 +36,7 @@ type CommandError struct {
 	err      error
 }
 
-func newCommandError(command string, exitCode int, err error) *CommandError {
+func NewCommandError(command string, exitCode int, err error) *CommandError {
 	return &CommandError{
 		command:  command,
 		exitCode: exitCode,
@@ -131,7 +131,7 @@ func (c *Client) runTerraformWithOutput(ctx context.Context, out io.Writer, work
 	if err != nil {
 		log.Error("Terraform execution failed", logger.ErrorKey, err, "exit-code", cmd.exitCode())
 
-		return newCommandError(command, cmd.exitCode(), err)
+		return NewCommandError(command, cmd.exitCode(), err)
 	}
 
 	log.Info("Terraform execution succeeded", "command", command)

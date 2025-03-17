@@ -14,7 +14,7 @@ type cmd struct {
 	outputJSON bool
 }
 
-func (c *cmd) Execute(ctx context.Context, cmd *cobra.Command, args []string) error {
+func (c *cmd) Execute(_ context.Context, _ *cobra.Command, _ []string) error {
 	if c.outputJSON {
 		ver, err := deployer.VersionInfo().JSON()
 		if err != nil {

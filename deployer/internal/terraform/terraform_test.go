@@ -19,7 +19,7 @@ func TestCommandError(t *testing.T) {
 	testCommand := "show"
 	testExitCode := 1
 
-	err := newCommandError(testCommand, testExitCode, assert.AnError)
+	err := NewCommandError(testCommand, testExitCode, assert.AnError)
 	assert.Equal(t, testExitCode, err.ExitCode())
 	assert.Equal(t, assert.AnError, err.Unwrap())
 }

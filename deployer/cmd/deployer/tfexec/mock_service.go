@@ -21,12 +21,12 @@ func (_m *mockService) EXPECT() *mockService_Expecter {
 	return &mockService_Expecter{mock: &_m.Mock}
 }
 
-// Execute provides a mock function with given fields: _a0
-func (_m *mockService) Execute(_a0 context.Context) error {
+// ExecuteDown provides a mock function with given fields: _a0
+func (_m *mockService) ExecuteDown(_a0 context.Context) error {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Execute")
+		panic("no return value specified for ExecuteDown")
 	}
 
 	var r0 error
@@ -39,30 +39,76 @@ func (_m *mockService) Execute(_a0 context.Context) error {
 	return r0
 }
 
-// mockService_Execute_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Execute'
-type mockService_Execute_Call struct {
+// mockService_ExecuteDown_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ExecuteDown'
+type mockService_ExecuteDown_Call struct {
 	*mock.Call
 }
 
-// Execute is a helper method to define mock.On call
+// ExecuteDown is a helper method to define mock.On call
 //   - _a0 context.Context
-func (_e *mockService_Expecter) Execute(_a0 interface{}) *mockService_Execute_Call {
-	return &mockService_Execute_Call{Call: _e.mock.On("Execute", _a0)}
+func (_e *mockService_Expecter) ExecuteDown(_a0 interface{}) *mockService_ExecuteDown_Call {
+	return &mockService_ExecuteDown_Call{Call: _e.mock.On("ExecuteDown", _a0)}
 }
 
-func (_c *mockService_Execute_Call) Run(run func(_a0 context.Context)) *mockService_Execute_Call {
+func (_c *mockService_ExecuteDown_Call) Run(run func(_a0 context.Context)) *mockService_ExecuteDown_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *mockService_Execute_Call) Return(_a0 error) *mockService_Execute_Call {
+func (_c *mockService_ExecuteDown_Call) Return(_a0 error) *mockService_ExecuteDown_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *mockService_Execute_Call) RunAndReturn(run func(context.Context) error) *mockService_Execute_Call {
+func (_c *mockService_ExecuteDown_Call) RunAndReturn(run func(context.Context) error) *mockService_ExecuteDown_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ExecuteUp provides a mock function with given fields: _a0
+func (_m *mockService) ExecuteUp(_a0 context.Context) error {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ExecuteUp")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// mockService_ExecuteUp_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ExecuteUp'
+type mockService_ExecuteUp_Call struct {
+	*mock.Call
+}
+
+// ExecuteUp is a helper method to define mock.On call
+//   - _a0 context.Context
+func (_e *mockService_Expecter) ExecuteUp(_a0 interface{}) *mockService_ExecuteUp_Call {
+	return &mockService_ExecuteUp_Call{Call: _e.mock.On("ExecuteUp", _a0)}
+}
+
+func (_c *mockService_ExecuteUp_Call) Run(run func(_a0 context.Context)) *mockService_ExecuteUp_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *mockService_ExecuteUp_Call) Return(_a0 error) *mockService_ExecuteUp_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *mockService_ExecuteUp_Call) RunAndReturn(run func(context.Context) error) *mockService_ExecuteUp_Call {
 	_c.Call.Return(run)
 	return _c
 }

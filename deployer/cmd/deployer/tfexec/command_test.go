@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/cli"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
@@ -15,32 +16,76 @@ import (
 func TestCommand_Execute(t *testing.T) {
 	testTFExitCode := 123
 
-	tests := map[string]struct {
-		serviceError error
-		assertError  func(t *testing.T, err error)
-	}{
-		"service execution success": {},
-		"service execution fails with unknown error": {
-			serviceError: assert.AnError,
-			assertError: func(t *testing.T, err error) {
-				assert.ErrorIs(t, err, assert.AnError)
+	upPrepareServiceMock := func(err error) func(t *testing.T, sm *mockService, expectedCtx context.Context) {
+		return func(t *testing.T, sm *mockService, expectedCtx context.Context) {
+			sm.EXPECT().ExecuteUp(expectedCtx).Return(err)
+		}
+	}
 
-				var eerr *cli.Error
-				if assert.ErrorAs(t, err, &eerr) {
-					assert.Equal(t, unknownFailureExitCode, eerr.ExitCode())
-				}
+	downPrepareServiceMock := func(err error) func(t *testing.T, sm *mockService, expectedCtx context.Context) {
+		return func(t *testing.T, sm *mockService, expectedCtx context.Context) {
+			sm.EXPECT().ExecuteDown(expectedCtx).Return(err)
+		}
+	}
+
+	assertTerraformCommandError := func(t *testing.T, err error) {
+		assert.ErrorIs(t, err, assert.AnError)
+
+		var eerr *cli.Error
+		if assert.ErrorAs(t, err, &eerr) {
+			assert.Equal(t, testTFExitCode, eerr.ExitCode())
+		}
+	}
+
+	assertUnknownFailureError := func(t *testing.T, err error) {
+		assert.ErrorIs(t, err, assert.AnError)
+
+		var eerr *cli.Error
+		if assert.ErrorAs(t, err, &eerr) {
+			assert.Equal(t, unknownFailureExitCode, eerr.ExitCode())
+		}
+	}
+
+	tests := map[string]struct {
+		executionType      executionType
+		prepareServiceMock func(t *testing.T, sm *mockService, expectedCtx context.Context)
+		assertError        func(t *testing.T, err error)
+	}{
+		"unknown execution type": {
+			executionType:      255,
+			prepareServiceMock: func(_ *testing.T, _ *mockService, _ context.Context) {},
+			assertError: func(t *testing.T, err error) {
+				assert.ErrorIs(t, err, errUnknownExecutionType)
 			},
 		},
-		"service execution fails with a terraform command error": {
-			serviceError: terraform.NewCommandError("test-error", testTFExitCode, assert.AnError),
-			assertError: func(t *testing.T, err error) {
-				assert.ErrorIs(t, err, assert.AnError)
+		"service execution for up success": {
+			executionType:      executionTypeUp,
+			prepareServiceMock: upPrepareServiceMock(nil),
+		},
+		"service execution for down success": {
+			executionType:      executionTypeDown,
+			prepareServiceMock: downPrepareServiceMock(nil),
+		},
+		"service execution for up fails with a terraform command error": {
+			executionType:      executionTypeUp,
+			prepareServiceMock: upPrepareServiceMock(terraform.NewCommandError("test-error", testTFExitCode, assert.AnError)),
+			assertError:        assertTerraformCommandError,
+		},
+		"service execution for down fails with a terraform command error": {
+			executionType:      executionTypeDown,
+			prepareServiceMock: downPrepareServiceMock(terraform.NewCommandError("test-error", testTFExitCode, assert.AnError)),
+			assertError:        assertTerraformCommandError,
+		},
 
-				var eerr *cli.Error
-				if assert.ErrorAs(t, err, &eerr) {
-					assert.Equal(t, testTFExitCode, eerr.ExitCode())
-				}
-			},
+		"service execution for up fails with unknown error": {
+			executionType:      executionTypeUp,
+			prepareServiceMock: upPrepareServiceMock(assert.AnError),
+			assertError:        assertUnknownFailureError,
+		},
+		"service execution for down fails with unknown error": {
+			executionType:      executionTypeDown,
+			prepareServiceMock: downPrepareServiceMock(assert.AnError),
+			assertError:        assertUnknownFailureError,
 		},
 	}
 
@@ -49,12 +94,14 @@ func TestCommand_Execute(t *testing.T) {
 			ctx, cancelFn := context.WithCancel(context.Background())
 			defer cancelFn()
 
-			testTFClient := new(terraform.Client)
+			require.NotNil(t, tt.prepareServiceMock, "prepareServiceMock must be defined in test definition")
 
 			sMock := newMockService(t)
-			sMock.EXPECT().Execute(ctx).Return(tt.serviceError)
+			tt.prepareServiceMock(t, sMock, ctx)
 
-			c := newCmd(logger.New(), testTFClient, func(s *slog.Logger, tfClient *terraform.Client, flags terraform.Flags) service {
+			testTFClient := new(terraform.Client)
+
+			c := newCmd(logger.New(), testTFClient, tt.executionType, func(s *slog.Logger, tfClient *terraform.Client, flags terraform.Flags) service {
 				assert.Equal(t, testTFClient, tfClient)
 				return sMock
 			})

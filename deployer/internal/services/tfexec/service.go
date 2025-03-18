@@ -1,4 +1,4 @@
-package down
+package tfexec
 
 import (
 	"context"
@@ -11,12 +11,14 @@ import (
 
 var (
 	errInitializingTerraform        = errors.New("initializing terraform ")
+	errApplyingTerraformResources   = errors.New("applying terraform resources")
 	errDestroyingTerraformResources = errors.New("destroying terraform resources")
 )
 
 //go:generate mockery --name=tfClient --inpackage --with-expecter
 type tfClient interface {
 	Init(ctx context.Context, dir string) error
+	Apply(ctx context.Context, dir string) error
 	Destroy(ctx context.Context, dir string) error
 }
 
@@ -35,7 +37,21 @@ func New(logger *slog.Logger, tf tfClient, tfFlags terraform.Flags) *Service {
 	}
 }
 
-func (s *Service) Execute(ctx context.Context) error {
+func (s *Service) ExecuteUp(ctx context.Context) error {
+	err := s.tf.Init(ctx, s.tfFlags.Target)
+	if err != nil {
+		return fmt.Errorf("%w: %w", errInitializingTerraform, err)
+	}
+
+	err = s.tf.Apply(ctx, s.tfFlags.Target)
+	if err != nil {
+		return fmt.Errorf("%w: %w", errApplyingTerraformResources, err)
+	}
+
+	return nil
+}
+
+func (s *Service) ExecuteDown(ctx context.Context) error {
 	err := s.tf.Init(ctx, s.tfFlags.Target)
 	if err != nil {
 		return fmt.Errorf("%w: %w", errInitializingTerraform, err)

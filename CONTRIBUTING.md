@@ -42,6 +42,8 @@ available at [https://contributor-covenant.org/version/1/1/0/](https://contribut
 
 ## Contribute to GRIT
 
+Please see [GORP Guidelines](GORP.md) for overall architectural design.
+
 ### General Guidance
 
 The GRIT codebase must conform to
@@ -51,18 +53,6 @@ The goal of GRIT is to decompose runner infrastructure sufficiently that
 there is little repetition. GRIT uses composable modules to reduce the
 complexity of each module. See the
 [Zen of Fabric](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/blob/master/CONTRIBUTING.md#the-zen-of-fabric).
-
-The structure should be very consistent and predictable so the
-codebase is easy to navigate. All consumable modules must be in the
-`modules` directory. The next directory layer must be the provider.
-We separate modules by provider so consumers are not forced to configure
-any providers they are not using.
-
-The next layer must be a series of logical modules. The primary module
-must be `runner`. The rest can be a decomposition of runner setups on
-that provider platform (for example, the `aws` container `iam`, `vpc`, `fleeting`,
-and `runner` modules). Consider creating a separate module for aspects
-with low coupling where consumers might want to bring their own.
 
 ### Tests
 

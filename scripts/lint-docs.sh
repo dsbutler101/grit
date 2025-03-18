@@ -19,7 +19,7 @@ fi
 
 echo "Lint Markdown"
 if command -v markdownlint-cli2 >/dev/null 2>&1; then
-    markdownlint-cli2 "**/*.md" '!**/.terraform/**' || ((ERROR_RESULTS++))
+    markdownlint-cli2 "**/*.md" '!**/.terraform/**' '!CHANGELOG.md' || ((ERROR_RESULTS++))
 else
     echo "markdownlint-cli2 is missing, please install it from https://github.com/DavidAnson/markdownlint-cli2#install"
 fi

@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+const (
+	CheckForRunning = true
+	CheckForStopped = false
+
+	defaultSleepTime = 1 * time.Second
+)
+
 type StatusCheckLoopTimeoutExceededError struct {
 	timeout time.Duration
 }
@@ -14,7 +21,16 @@ func (e *StatusCheckLoopTimeoutExceededError) Error() string {
 	return fmt.Sprintf("status check loop timed out after %v", e.timeout)
 }
 
-func LoopStatusCheck(ctx context.Context, c *Client, timeout time.Duration, checkForRunning bool) error {
+//go:generate mockery --name=LoopStatusCheckClient --inpackage --with-expecter
+type LoopStatusCheckClient interface {
+	CheckStatus(context.Context) (Status, error)
+}
+
+func LoopStatusCheck(ctx context.Context, c LoopStatusCheckClient, timeout time.Duration, checkForRunning bool) error {
+	return loopStatusCheckWithSleep(ctx, c, timeout, checkForRunning, defaultSleepTime)
+}
+
+func loopStatusCheckWithSleep(ctx context.Context, c LoopStatusCheckClient, timeout time.Duration, checkForRunning bool, sleep time.Duration) error {
 	startTime := time.Now()
 	for {
 		status, err := c.CheckStatus(ctx)
@@ -30,6 +46,6 @@ func LoopStatusCheck(ctx context.Context, c *Client, timeout time.Duration, chec
 			return &StatusCheckLoopTimeoutExceededError{timeout}
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(sleep)
 	}
 }

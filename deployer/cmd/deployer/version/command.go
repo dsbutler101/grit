@@ -14,7 +14,7 @@ type cmd struct {
 	outputJSON bool
 }
 
-func (c *cmd) Execute(ctx context.Context, cmd *cobra.Command, args []string) error {
+func (c *cmd) Execute(_ context.Context, _ *cobra.Command, _ []string) error {
 	if c.outputJSON {
 		ver, err := deployer.VersionInfo().JSON()
 		if err != nil {
@@ -36,7 +36,7 @@ func New() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "version",
 		Short: "Prints Deployer version and exits",
-		RunE:  cli.BuildCommandExecutor(c),
+		RunE:  cli.BuildRunEFromCommandExecutor(c),
 	}
 
 	cc.PersistentFlags().BoolVarP(&c.outputJSON, "json", "j", false, "Print out in JSON format")

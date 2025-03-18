@@ -3,12 +3,31 @@ package terraform
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"os"
 	"os/exec"
-	"path/filepath"
+
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
+)
+
+const (
+	tfBinary         = "terraform"
+	tfCommandInit    = "init"
+	tfCommandApply   = "apply"
+	tfCommandDestroy = "destroy"
+	tfCommandShow    = "show"
+
+	tfAutoApproveFlag = "--auto-approve"
+)
+
+var (
+	errReadingTerraformState = errors.New("reading terraform state")
+	errReadingRunnerManager  = errors.New("reading runner manager")
+
+	errReadingTerraformStateFile = errors.New("reading terraform state file")
 )
 
 type CommandError struct {
@@ -17,7 +36,7 @@ type CommandError struct {
 	err      error
 }
 
-func newCommandError(command string, exitCode int, err error) *CommandError {
+func NewCommandError(command string, exitCode int, err error) *CommandError {
 	return &CommandError{
 		command:  command,
 		exitCode: exitCode,
@@ -37,28 +56,39 @@ func (e *CommandError) ExitCode() int {
 	return e.exitCode
 }
 
+var (
+	ErrTerraformNotFoundInPath = errors.New("terraform not found in $PATH")
+	ErrTerraformExecPathNotSet = errors.New("terraform exec path is not set")
+)
+
+func DefaultExecPath() (string, error) {
+	execPath, err := exec.LookPath(tfBinary)
+	if err != nil {
+		return "", fmt.Errorf("%w: %v", ErrTerraformNotFoundInPath, err)
+	}
+
+	return execPath, nil
+}
+
+type stateReader func(buf *bytes.Buffer) (RunnerManagers, error)
+
 type Client struct {
 	logger *slog.Logger
+
+	commanderFactory func(stdout io.Writer, stderr io.Writer, workdir string) commander
+	stateReader      stateReader
 
 	execPath string
 }
 
-func New(logger *slog.Logger) (*Client, error) {
-	execPath, err := exec.LookPath("terraform")
-	if err != nil {
-		return nil, fmt.Errorf("terraform not found in $PATH: %w", err)
-	}
-
+func New(logger *slog.Logger) *Client {
 	c := &Client{
-		logger:   logger,
-		execPath: execPath,
+		logger:           logger,
+		commanderFactory: newDefaultCommander,
+		stateReader:      readState,
 	}
 
-	return c, nil
-}
-
-func (c *Client) ExecPath() string {
-	return c.execPath
+	return c
 }
 
 func (c *Client) SetExecPath(execPath string) {
@@ -66,7 +96,15 @@ func (c *Client) SetExecPath(execPath string) {
 }
 
 func (c *Client) Init(ctx context.Context, workdir string) error {
-	return c.runTerraform(ctx, workdir, "init")
+	return c.runTerraform(ctx, workdir, tfCommandInit)
+}
+
+func (c *Client) Apply(ctx context.Context, workdir string) error {
+	return c.runTerraform(ctx, workdir, tfCommandApply, tfAutoApproveFlag)
+}
+
+func (c *Client) Destroy(ctx context.Context, workdir string) error {
+	return c.runTerraform(ctx, workdir, tfCommandDestroy, tfAutoApproveFlag)
 }
 
 func (c *Client) runTerraform(ctx context.Context, workdir string, command string, args ...string) error {
@@ -74,25 +112,26 @@ func (c *Client) runTerraform(ctx context.Context, workdir string, command strin
 }
 
 func (c *Client) runTerraformWithOutput(ctx context.Context, out io.Writer, workdir string, command string, args ...string) error {
+	if c.execPath == "" {
+		return ErrTerraformExecPathNotSet
+	}
+
 	workdir, err := assertWorkdir(workdir)
 	if err != nil {
 		return err
 	}
 
-	args = append([]string{command}, args...)
-	cmd := exec.CommandContext(ctx, c.execPath, args...)
-	cmd.Stdout = out
-	cmd.Stderr = os.Stdout
-	cmd.Dir = workdir
-
 	log := c.logger.With("command", command, "workdir", workdir)
-	log.Info("Running terraform", "command", command, "workdir", workdir)
+	log.Info("Running terraform")
 
-	err = cmd.Run()
+	args = append([]string{command}, args...)
+	cmd := c.commanderFactory(out, os.Stdout, workdir)
+
+	err = cmd.run(ctx, c.execPath, args...)
 	if err != nil {
-		log.Error("Terraform execution failed", "command", command, "error", err, "exit-code", cmd.ProcessState.ExitCode())
+		log.Error("Terraform execution failed", logger.ErrorKey, err, "exit-code", cmd.exitCode())
 
-		return newCommandError(command, cmd.ProcessState.ExitCode(), err)
+		return NewCommandError(command, cmd.exitCode(), err)
 	}
 
 	log.Info("Terraform execution succeeded", "command", command)
@@ -100,55 +139,31 @@ func (c *Client) runTerraformWithOutput(ctx context.Context, out io.Writer, work
 	return nil
 }
 
-func assertWorkdir(wd string) (string, error) {
-	if filepath.IsAbs(wd) {
-		return wd, nil
-	}
-
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("requesting current working directory: %w", err)
-	}
-
-	return filepath.Join(dir, wd), nil
-}
-
-func (c *Client) Apply(ctx context.Context, workdir string) error {
-	return c.runTerraform(ctx, workdir, "apply", "--auto-approve")
-}
-
 func (c *Client) ReadStateDir(ctx context.Context, workdir string) (RunnerManagers, error) {
 	buf := new(bytes.Buffer)
-	err := c.runTerraformWithOutput(ctx, buf, workdir, "show", "-json")
+	err := c.runTerraformWithOutput(ctx, buf, workdir, tfCommandShow, "-json")
 	if err != nil {
 		return RunnerManagers{}, fmt.Errorf("reading terraform state: %w", err)
 	}
 
-	return c.readState(buf)
+	return c.stateReader(buf)
 }
 
 func (c *Client) ReadStateFile(_ context.Context, filePath string) (RunnerManagers, error) {
-	buf := new(bytes.Buffer)
-	f, err := os.Open(filePath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return RunnerManagers{}, fmt.Errorf("opening terraform state file: %w", err)
-	}
-	defer f.Close()
-
-	_, err = io.Copy(buf, f)
-	if err != nil {
-		return RunnerManagers{}, fmt.Errorf("reading terraform state file: %w", err)
+		return RunnerManagers{}, fmt.Errorf("%w: %w", errReadingTerraformStateFile, err)
 	}
 
-	return c.readState(buf)
+	return c.stateReader(bytes.NewBuffer(data))
 }
 
-func (c *Client) readState(buf *bytes.Buffer) (RunnerManagers, error) {
+func readState(buf *bytes.Buffer) (RunnerManagers, error) {
 	var output RunnerManagers
 
 	rmsMap, err := readRunnerManagersMap(buf.Bytes())
 	if err != nil {
-		return output, fmt.Errorf("reading terraform state: %w", err)
+		return output, fmt.Errorf("%w: %w", errReadingTerraformState, err)
 	}
 
 	output = make(RunnerManagers, len(rmsMap))
@@ -156,15 +171,11 @@ func (c *Client) readState(buf *bytes.Buffer) (RunnerManagers, error) {
 	for name, runnerManager := range rmsMap {
 		rm, err := newRunnerManager(runnerManager)
 		if err != nil {
-			return output, fmt.Errorf("reading runner manager %q: %w", name, err)
+			return output, fmt.Errorf("%w %q: %w", errReadingRunnerManager, name, err)
 		}
 
 		output[name] = rm
 	}
 
 	return output, nil
-}
-
-func (c *Client) Destroy(ctx context.Context, workdir string) error {
-	return c.runTerraform(ctx, workdir, "destroy", "--auto-approve")
 }

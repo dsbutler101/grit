@@ -1,7 +1,16 @@
 package terraform
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+)
+
+var (
+	errIsNotAString         = errors.New("is not a string")
+	errMissingRequiredEntry = errors.New("missing required entry")
+	errRequiredEntryIsEmpty = errors.New("required entry is empty")
 )
 
 func readRequiredStringTo(rmMap map[string]any, key string, target *string) error {
@@ -19,15 +28,32 @@ func readStringTo(rmMap map[string]any, key string, target *string, optional boo
 			return nil
 		}
 
-		return fmt.Errorf("does not contain %q output", key)
+		return fmt.Errorf("%w: %s", errMissingRequiredEntry, key)
 	}
 
 	value, ok := src.(string)
 	if !ok {
-		return fmt.Errorf("%s is not a string; got %T", key, src)
+		return fmt.Errorf("%s %w; got %T", key, errIsNotAString, src)
+	}
+
+	if value == "" && !optional {
+		return fmt.Errorf("%w: %s", errRequiredEntryIsEmpty, key)
 	}
 
 	*target = value
 
 	return nil
+}
+
+func assertWorkdir(wd string) (string, error) {
+	if filepath.IsAbs(wd) {
+		return wd, nil
+	}
+
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("requesting current working directory: %w", err)
+	}
+
+	return filepath.Join(dir, wd), nil
 }

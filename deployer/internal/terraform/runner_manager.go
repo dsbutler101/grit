@@ -10,21 +10,30 @@ import (
 const (
 	OutputName = "grit_runner_managers"
 
-	OutputValueInstance       = "instance"
+	OutputValueInstanceName   = "instance_name"
 	OutputValueAddress        = "address"
 	OutputValueWrapperAddress = "wrapper_address"
 	OutputValueUsername       = "username"
 	OutputValueSSHKeyPem      = "ssh_key_pem"
 )
 
+var (
+	errIsNotAMapString = errors.New("is not a map[string]any")
+
+	errParsingTerraformState               = errors.New("parsing terraform state")
+	errTerraformStateMissingValues         = errors.New("terraform state does not contain any values")
+	errTerraformStateMissingOutputs        = errors.New("terraform state does not contain outputs")
+	errTerraformStateMissingRequiredOutput = errors.New("terraform state does not contain required output")
+)
+
 type RunnerManagers map[string]RunnerManager
 
 type RunnerManager struct {
-	Instance       string
+	InstanceName   string
 	Address        string
 	WrapperAddress string
-	Username       *string
-	SSHKeyPem      *string
+	Username       string
+	SSHKeyPem      string
 }
 
 func newRunnerManager(in any) (RunnerManager, error) {
@@ -32,7 +41,7 @@ func newRunnerManager(in any) (RunnerManager, error) {
 
 	rmMap, ok := in.(map[string]any)
 	if !ok {
-		return rm, errors.New("not a map[string]any")
+		return rm, errIsNotAMapString
 	}
 
 	type keyReader func(key string) error
@@ -50,11 +59,11 @@ func newRunnerManager(in any) (RunnerManager, error) {
 	}
 
 	matchingMap := map[string]keyReader{
-		OutputValueInstance:       optionalStringReader(rmMap, &rm.Instance),
+		OutputValueInstanceName:   optionalStringReader(rmMap, &rm.InstanceName),
 		OutputValueAddress:        requiredStringReader(rmMap, &rm.Address),
 		OutputValueWrapperAddress: requiredStringReader(rmMap, &rm.WrapperAddress),
-		OutputValueUsername:       optionalStringReader(rmMap, rm.Username),
-		OutputValueSSHKeyPem:      optionalStringReader(rmMap, rm.SSHKeyPem),
+		OutputValueUsername:       optionalStringReader(rmMap, &rm.Username),
+		OutputValueSSHKeyPem:      optionalStringReader(rmMap, &rm.SSHKeyPem),
 	}
 
 	for key, reader := range matchingMap {
@@ -71,25 +80,25 @@ func readRunnerManagersMap(in []byte) (map[string]any, error) {
 	st := new(tfjson.State)
 	err := st.UnmarshalJSON(in)
 	if err != nil {
-		return nil, fmt.Errorf("parsing terraform state: %w", err)
+		return nil, fmt.Errorf("%w: %v", errParsingTerraformState, err)
 	}
 
 	if st.Values == nil {
-		return nil, errors.New("terraform state does not contain any values")
+		return nil, errTerraformStateMissingValues
 	}
 
 	if st.Values.Outputs == nil {
-		return nil, errors.New("terraform state does not contain outputs")
+		return nil, errTerraformStateMissingOutputs
 	}
 
 	runnerManagers, ok := st.Values.Outputs[OutputName]
 	if !ok {
-		return nil, fmt.Errorf("terraform state does not contain %s output", OutputName)
+		return nil, fmt.Errorf("%w: %s", errTerraformStateMissingRequiredOutput, OutputName)
 	}
 
 	rmsMap, ok := runnerManagers.Value.(map[string]any)
 	if !ok {
-		return nil, fmt.Errorf("%s output is not map[string]any", OutputName)
+		return nil, fmt.Errorf("%s %w", OutputName, errIsNotAMapString)
 	}
 
 	return rmsMap, nil

@@ -9,41 +9,25 @@ import (
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/wrapper"
 )
 
-func SetupAllTFFlags(cc *cobra.Command) *terraform.Flags {
-	tfFlags := SetupTFFlagsTargetOnly(cc)
+func SetupAllTFFlags(cc *cobra.Command, tfFlags *terraform.Flags) {
+	SetupTFFlagsTargetOnly(cc, tfFlags)
 
 	cc.PersistentFlags().StringVar(&tfFlags.TargetStateFile, "tf-target-state-file", "", "Path to the Terraform state file for the Deployment Version to use")
-
-	return tfFlags
 }
 
-func SetupTFFlagsTargetOnly(cc *cobra.Command) *terraform.Flags {
-	tfFlags := &terraform.Flags{}
-
+func SetupTFFlagsTargetOnly(cc *cobra.Command, tfFlags *terraform.Flags) {
 	cc.PersistentFlags().StringVar(&tfFlags.Target, "tf-target", "", "Path to the Terraform code directory for the Deployment Version to use")
-
-	return tfFlags
 }
 
-func SetupWrapperFlags(cc *cobra.Command) *wrapper.Flags {
-	wrapperFlags := &wrapper.Flags{}
-
+func SetupWrapperFlags(cc *cobra.Command, wrapperFlags *wrapper.Flags) {
 	cc.PersistentFlags().DurationVar(&wrapperFlags.ConnectionTimeout, "wrapper-connection-timeout", wrapper.DefaultTimeout, "How long to wait for gRPC connection to be established before reporting error")
-
-	return wrapperFlags
 }
 
-func SetupWaitFlags(cc *cobra.Command) *wait.Flags {
-	waitFlags := &wait.Flags{}
-
+func SetupWaitFlags(cc *cobra.Command, waitFlags *wait.Flags) {
 	cc.PersistentFlags().DurationVar(&waitFlags.Timeout, "timeout", wait.DefaultTimeout, "How long the wait check should run before failing")
-
-	return waitFlags
 }
 
-func SetupSSHFlags(cc *cobra.Command) *ssh.Flags {
-	sshFlags := &ssh.Flags{}
-
+func SetupSSHFlags(cc *cobra.Command, sshFlags *ssh.Flags) {
 	flags := cc.PersistentFlags()
 	flags.StringVar(&sshFlags.Username, "ssh-username", "", "SSH target username")
 	flags.StringVar(&sshFlags.KeyFile, "ssh-key-file", "", "Path to the SSH private key file")
@@ -55,6 +39,4 @@ func SetupSSHFlags(cc *cobra.Command) *ssh.Flags {
 	flags.StringVar(&sshFlags.ProxyCommand, "ssh-proxy-command", "", "SSH Proxy Command")
 
 	flags.StringVar(&sshFlags.Command, "ssh-command", "", "SSH Command")
-
-	return sshFlags
 }

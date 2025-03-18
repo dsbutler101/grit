@@ -29,6 +29,18 @@ const (
 	executionTypeTerminatedCheck
 )
 
+var (
+	errUnknownExecutionType = errors.New("unknown execution type")
+)
+
+//go:generate mockery --name=service --inpackage --with-expecter
+type service interface {
+	ExecuteWaitHealthy(context.Context) error
+	ExecuteWaitTerminated(context.Context) error
+}
+
+type serviceFactoryFn func(*slog.Logger, *terraform.Client, terraform.Flags, ssh.Flags, wrapper.Flags, wait.Flags) service
+
 type cmd struct {
 	logger *slog.Logger
 	tf     *terraform.Client
@@ -39,10 +51,25 @@ type cmd struct {
 	waitFlags    *wait.Flags
 
 	executionType executionType
+
+	serviceFactory serviceFactoryFn
+}
+
+func newCmd(logger *slog.Logger, tf *terraform.Client, et executionType, sf serviceFactoryFn) *cmd {
+	return &cmd{
+		logger:         logger,
+		tf:             tf,
+		tfFlags:        new(terraform.Flags),
+		wrapperFlags:   new(wrapper.Flags),
+		sshFlags:       new(ssh.Flags),
+		waitFlags:      new(wait.Flags),
+		executionType:  et,
+		serviceFactory: sf,
+	}
 }
 
 func (c *cmd) Execute(ctx context.Context, _ *cobra.Command, _ []string) error {
-	svc := wait.New(c.logger, c.tf, *c.tfFlags, *c.sshFlags, *c.wrapperFlags, *c.waitFlags)
+	svc := c.serviceFactory(c.logger, c.tf, *c.tfFlags, *c.sshFlags, *c.wrapperFlags, *c.waitFlags)
 
 	executionsMap := map[executionType]func(ctx context.Context) error{
 		executionTypeHealthyCheck:    svc.ExecuteWaitHealthy,
@@ -51,7 +78,7 @@ func (c *cmd) Execute(ctx context.Context, _ *cobra.Command, _ []string) error {
 
 	execute, ok := executionsMap[c.executionType]
 	if !ok {
-		return fmt.Errorf("unknown execution type: %v", c.executionType)
+		return fmt.Errorf("%w: %v", errUnknownExecutionType, c.executionType)
 	}
 
 	err := execute(ctx)
@@ -59,21 +86,21 @@ func (c *cmd) Execute(ctx context.Context, _ *cobra.Command, _ []string) error {
 		return nil
 	}
 
-	var rerr *wrapper.GRPCConnectionRetryExceededError
+	var rerr *wrapper.GRPCConnectionWaitTimeoutExceededError
 	if errors.As(err, &rerr) {
 		return cli.NewError(gRPCConnectionRetryExitCode, err)
 	}
 
 	var terr *wrapper.StatusCheckLoopTimeoutExceededError
 	if errors.As(err, &terr) {
-		return cli.NewError(gRPCRunnerProcessReadinessExitCode, terr)
+		return cli.NewError(gRPCRunnerProcessReadinessExitCode, err)
 	}
 
 	return cli.NewError(unknownFailureExitCode, err)
 }
 
 func NewHealthy(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group) *cobra.Command {
-	cc := newCmd(logger, tf, cmdGroup, executionTypeHealthyCheck)
+	cc := newCobraCmd(logger, tf, cmdGroup, executionTypeHealthyCheck)
 
 	cc.Use = "wait-healthy"
 	cc.Short = "Awaits Runner Managers startup for the given Deployment Version of the Shard"
@@ -83,7 +110,7 @@ func NewHealthy(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group)
 }
 
 func NewTerminated(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group) *cobra.Command {
-	cc := newCmd(logger, tf, cmdGroup, executionTypeTerminatedCheck)
+	cc := newCobraCmd(logger, tf, cmdGroup, executionTypeTerminatedCheck)
 
 	cc.Use = "wait-terminated"
 	cc.Short = "Awaits Runner Managers termination for the given Deployment Version of the Shard"
@@ -92,12 +119,10 @@ func NewTerminated(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Gro
 	return cc
 }
 
-func newCmd(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group, et executionType) *cobra.Command {
-	c := &cmd{
-		logger:        logger,
-		tf:            tf,
-		executionType: et,
-	}
+func newCobraCmd(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group, et executionType) *cobra.Command {
+	c := newCmd(logger, tf, et, func(logger *slog.Logger, client *terraform.Client, tfFlags terraform.Flags, sshFlags ssh.Flags, wrapperFlags wrapper.Flags, waitFlags wait.Flags) service {
+		return wait.New(logger, client, tfFlags, sshFlags, wrapperFlags, waitFlags)
+	})
 
 	cc := &cobra.Command{
 		GroupID: cmdGroup.ID,
@@ -107,15 +132,20 @@ func newCmd(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group, et 
 				return err
 			}
 
+			err = c.sshFlags.Validate()
+			if err != nil {
+				return err
+			}
+
 			return nil
 		},
-		RunE: cli.BuildCommandExecutor(c),
+		RunE: cli.BuildRunEFromCommandExecutor(c),
 	}
 
-	c.tfFlags = base.SetupAllTFFlags(cc)
-	c.wrapperFlags = base.SetupWrapperFlags(cc)
-	c.sshFlags = base.SetupSSHFlags(cc)
-	c.waitFlags = base.SetupWaitFlags(cc)
+	base.SetupAllTFFlags(cc, c.tfFlags)
+	base.SetupWrapperFlags(cc, c.wrapperFlags)
+	base.SetupSSHFlags(cc, c.sshFlags)
+	base.SetupWaitFlags(cc, c.waitFlags)
 
 	return cc
 }

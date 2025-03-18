@@ -1,6 +1,7 @@
 package ssh
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,6 +12,10 @@ const (
 	sshNetwork = "tcp"
 
 	sshClientConnectionTimeout = 30 * time.Second
+)
+
+var (
+	errParsingPrivateKey = errors.New("parsing private key bytes")
 )
 
 type Config struct {
@@ -26,7 +31,7 @@ type Config struct {
 func (c Config) SSHClientConfig() (*ssh.ClientConfig, error) {
 	key, err := ssh.ParsePrivateKey(c.KeyPemBytes)
 	if err != nil {
-		return nil, fmt.Errorf("parsing private key bytes: %w", err)
+		return nil, fmt.Errorf("%w: %v", errParsingPrivateKey, err)
 	}
 
 	clientCfg := &ssh.ClientConfig{

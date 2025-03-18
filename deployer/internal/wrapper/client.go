@@ -2,6 +2,7 @@ package wrapper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -14,19 +15,37 @@ const (
 	DefaultTimeout = 30 * time.Second
 )
 
-type Status struct {
-	Status        api.Status
-	FailureReason string
+var (
+	ErrCheckStatus          = errors.New("check status request failed")
+	ErrInitGracefulShutdown = errors.New("graceful shutdown initialization failed")
+	ErrInitForcefulShutdown = errors.New("forceful shutdown initialization failed")
+)
+
+type GRPCConnectionWaitTimeoutExceededError struct {
+	timeout time.Duration
+	err     error
 }
 
-func (s Status) IsRunning() bool {
-	return s.Status == api.StatusRunning || s.Status == api.StatusInShutdown
+func (e *GRPCConnectionWaitTimeoutExceededError) Error() string {
+	return fmt.Sprintf("GRPC connection timeout %s exceeded: %v", e.timeout, e.err)
+}
+
+func (e *GRPCConnectionWaitTimeoutExceededError) Unwrap() error {
+	return e.err
+}
+
+//go:generate mockery --name=grpcClient --inpackage --with-expecter
+type grpcClient interface {
+	ConnectWithTimeout(context.Context, time.Duration) error
+	CheckStatus(context.Context) (client.CheckStatusResponse, error)
+	InitGracefulShutdown(context.Context, api.InitGracefulShutdownRequest) (client.CheckStatusResponse, error)
+	InitForcefulShutdown(context.Context) (client.CheckStatusResponse, error)
 }
 
 type Client struct {
 	logger *slog.Logger
 
-	c *client.Client
+	c grpcClient
 }
 
 func NewClient(logger *slog.Logger, dialer client.Dialer, address string) (*Client, error) {
@@ -54,7 +73,7 @@ func NewClient(logger *slog.Logger, dialer client.Dialer, address string) (*Clie
 func (c *Client) Connect(ctx context.Context, connectionTimeout time.Duration) error {
 	err := c.c.ConnectWithTimeout(ctx, connectionTimeout)
 	if err != nil {
-		return &GRPCConnectionRetryExceededError{
+		return &GRPCConnectionWaitTimeoutExceededError{
 			timeout: connectionTimeout,
 			err:     err,
 		}
@@ -66,7 +85,7 @@ func (c *Client) Connect(ctx context.Context, connectionTimeout time.Duration) e
 func (c *Client) CheckStatus(ctx context.Context) (Status, error) {
 	s, err := c.c.CheckStatus(ctx)
 	if err != nil {
-		return Status{}, err
+		return Status{}, fmt.Errorf("%w: %v", ErrCheckStatus, err)
 	}
 
 	status := Status{
@@ -74,13 +93,15 @@ func (c *Client) CheckStatus(ctx context.Context) (Status, error) {
 		FailureReason: s.FailureReason,
 	}
 
+	c.logger.WithGroup("status").With("status", s.Status.String(), "failureReason", s.FailureReason).Info("Status information received")
+
 	return status, nil
 }
 
 func (c *Client) InitGracefulShutdown(ctx context.Context) error {
 	s, err := c.c.InitGracefulShutdown(ctx, api.NewInitGracefulShutdownRequest(nil))
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %v", ErrInitGracefulShutdown, err)
 	}
 
 	c.logger.WithGroup("response").With("status", s.Status.String(), "failureReason", s.FailureReason).Info("Graceful shutdown started")
@@ -91,7 +112,7 @@ func (c *Client) InitGracefulShutdown(ctx context.Context) error {
 func (c *Client) InitForcefulShutdown(ctx context.Context) error {
 	s, err := c.c.InitForcefulShutdown(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %v", ErrInitForcefulShutdown, err)
 	}
 
 	c.logger.WithGroup("response").With("status", s.Status.String(), "failureReason", s.FailureReason).Info("Forceful shutdown started")

@@ -1,22 +1,38 @@
 include:
   - local: .gitlab/ci/31_sast.gitlab-ci.yml
 
-unit tests:
+.unit_tests:
   stage: unit
-  needs:
-    - job: prepare done
-    - job: terraform init
   extends:
     - .rules:merge_request_pipelines:code
     - .go-tf-cache
-  variables:
-    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+  needs:
+    - job: terraform init
   script:
-    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
-    - make test
+    - mage test:unit ${UNIT_TEST_EXECUTION_PATH}
+  coverage: '/Coverage TOTAL: ([0-9]+\.[0-9]+%)/'
   artifacts:
     when: always
     paths:
-      - junit.xml
+      - ${UNIT_TEST_EXECUTION_PATH}/junit.xml
+      - ${UNIT_TEST_EXECUTION_PATH}/coverage.txt
     reports:
-      junit: junit.xml
+      junit: ${UNIT_TEST_EXECUTION_PATH}/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: ${UNIT_TEST_EXECUTION_PATH}/coverage.xml
+
+unit tests:
+  extends:
+    - .unit_tests
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
+    UNIT_TEST_EXECUTION_PATH: ${CI_PROJECT_DIR}
+  before_script:
+    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
+
+deployer:unit tests:
+  extends:
+    - .unit_tests
+  variables:
+    UNIT_TEST_EXECUTION_PATH: ${CI_PROJECT_DIR}/deployer

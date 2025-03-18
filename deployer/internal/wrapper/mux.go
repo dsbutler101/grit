@@ -2,49 +2,97 @@ package wrapper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/url"
 	"os"
 	"sync"
+	"time"
 
+	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/ssh"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/terraform"
+	"gitlab.com/gitlab-org/gitlab-runner/helpers/runner_wrapper/api/client"
 )
 
 const (
 	runnerManagerAliasLogKey = "runner-manager-alias"
 )
 
-type callbackFn func(ctx context.Context, c *Client) error
+var (
+	ErrNilCallbackFunction          = errors.New("nil callback function")
+	ErrWrapperAddressParsing        = errors.New("parsing wrapper address")
+	ErrInvalidWrapperAddressNetwork = errors.New("invalid wrapper address network")
+	ErrUsernameNotProvided          = errors.New("username not provided with CLI flag nor with Terraform Output")
+	ErrSSHKeyPemNotProvided         = errors.New("ssh SSH not provided with CLI flag nor with Terraform Output")
+	ErrReadingSSHKeyFile            = errors.New("reading SSH key file")
+	ErrSSHDialerFabrication         = errors.New("SSH dialer fabrication")
+	ErrSSHDialerStart               = errors.New("SSH dialer start")
+	ErrWrapperConnect               = errors.New("wrapper connect")
+	ErrWrapperExecution             = errors.New("wrapper execution")
+)
+
+type CallbackFn func(ctx context.Context, c CallbackClient) error
+
+//go:generate mockery --name=CallbackClient --inpackage --with-expecter
+type CallbackClient interface {
+	CheckStatus(context.Context) (Status, error)
+	InitForcefulShutdown(context.Context) error
+	InitGracefulShutdown(context.Context) error
+}
 
 type runnerManagerResult struct {
 	alias string
 	err   error
 }
 
-type Mux struct {
-	logger *slog.Logger
-	tf     *terraform.Client
-
-	tfFlags      terraform.Flags
-	sshFlags     ssh.Flags
-	wrapperFlags Flags
+//go:generate mockery --name=tfClient --inpackage --with-expecter
+type tfClient interface {
+	ReadStateDir(context.Context, string) (terraform.RunnerManagers, error)
+	ReadStateFile(context.Context, string) (terraform.RunnerManagers, error)
 }
 
-func NewMux(logger *slog.Logger, tf *terraform.Client, tfFlags terraform.Flags, sshFlags ssh.Flags, wrapperFlags Flags) *Mux {
+//go:generate mockery --name=rmHandlerFactory --inpackage --with-expecter
+type rmHandlerFactory interface {
+	new(string) rmHandler
+}
+
+//go:generate mockery --name=rmHandler --inpackage --with-expecter
+type rmHandler interface {
+	handle(context.Context, terraform.RunnerManager, CallbackFn) error
+}
+
+//go:generate mockery --name=dialerFactory --inpackage --with-expecter
+type dialerFactory interface {
+	Create(flags ssh.Flags, def ssh.TargetDef) (ssh.Dialer, error)
+}
+
+type Mux struct {
+	logger *slog.Logger
+	tf     tfClient
+
+	tfFlags terraform.Flags
+
+	rmHandlerFactory rmHandlerFactory
+}
+
+func NewMux(logger *slog.Logger, tf tfClient, tfFlags terraform.Flags, sshFlags ssh.Flags, wrapperFlags Flags) *Mux {
 	return &Mux{
-		logger:       logger,
-		tf:           tf,
-		tfFlags:      tfFlags,
-		sshFlags:     sshFlags,
-		wrapperFlags: wrapperFlags,
+		logger:  logger,
+		tf:      tf,
+		tfFlags: tfFlags,
+		rmHandlerFactory: &muxRunnerManagerHandlerFactory{
+			logger:       logger,
+			sshFlags:     sshFlags,
+			wrapperFlags: wrapperFlags,
+		},
 	}
 }
 
-func (m *Mux) Execute(ctx context.Context, fn callbackFn) error {
+func (m *Mux) Execute(ctx context.Context, fn CallbackFn) error {
 	if fn == nil {
-		return fmt.Errorf("nil callback function")
+		return ErrNilCallbackFunction
 	}
 
 	runnerManagers, err := m.listRunnerManagers(ctx)
@@ -63,9 +111,11 @@ func (m *Mux) Execute(ctx context.Context, fn callbackFn) error {
 		go func() {
 			defer wg.Done()
 
+			runnerManagerHandler := m.rmHandlerFactory.new(alias)
+
 			resultCh <- runnerManagerResult{
 				alias: alias,
-				err:   m.handleRunnerManager(ctx, runnerManager, alias, fn),
+				err:   runnerManagerHandler.handle(ctx, runnerManager, fn),
 			}
 		}()
 	}
@@ -78,12 +128,10 @@ func (m *Mux) Execute(ctx context.Context, fn callbackFn) error {
 	var lastErr error
 	for {
 		select {
-		case <-ctx.Done():
-			return lastErr
 		case result := <-resultCh:
 			log := m.logger.With(runnerManagerAliasLogKey, result.alias)
 			if result.err != nil {
-				log.With("error", result.err).Error("Runner manager execution failed")
+				log.With(logger.ErrorKey, result.err).Error("Runner manager execution failed")
 				lastErr = result.err
 				continue
 			}
@@ -103,87 +151,152 @@ func (m *Mux) listRunnerManagers(ctx context.Context) (terraform.RunnerManagers,
 	return m.tf.ReadStateFile(ctx, m.tfFlags.TargetStateFile)
 }
 
-func (m *Mux) handleRunnerManager(ctx context.Context, rm terraform.RunnerManager, alias string, fn callbackFn) error {
-	log := m.logger.With("runner-manager", rm, runnerManagerAliasLogKey, alias)
-	log.Info("Handling runner manager")
+type muxRunnerManagerHandlerFactory struct {
+	logger *slog.Logger
 
-	wa, err := m.getWrapperAddress(rm)
+	sshFlags     ssh.Flags
+	wrapperFlags Flags
+
+	dialerFactory dialerFactory
+	clientFactory clientFactory
+}
+
+func (f *muxRunnerManagerHandlerFactory) new(alias string) rmHandler {
+	var df dialerFactory = ssh.NewDialerFactory()
+	if f.dialerFactory != nil {
+		df = f.dialerFactory
+	}
+
+	cf := NewConnectedClient
+	if f.clientFactory != nil {
+		cf = f.clientFactory
+	}
+
+	return &muxRunnerManagerHandler{
+		logger:        f.logger.With(runnerManagerAliasLogKey, alias),
+		sshFlags:      f.sshFlags,
+		wrapperFlags:  f.wrapperFlags,
+		dialerFactory: df,
+		clientFactory: cf,
+	}
+}
+
+type clientFactory func(ctx context.Context, logger *slog.Logger, dialer client.Dialer, connectionTimeout time.Duration, address string) (*Client, error)
+
+type muxRunnerManagerHandler struct {
+	logger *slog.Logger
+
+	sshFlags     ssh.Flags
+	wrapperFlags Flags
+
+	dialerFactory dialerFactory
+	clientFactory clientFactory
+}
+
+func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.RunnerManager, fn CallbackFn) error {
+	h.logger.Info("Handling runner manager")
+
+	wa, err := getWrapperAddress(rm)
 	if err != nil {
 		return fmt.Errorf("getting wrapper address: %w", err)
 	}
 
-	username, err := m.getUsername(rm)
+	username, err := getUsername(rm, h.sshFlags)
 	if err != nil {
 		return fmt.Errorf("getting username: %w", err)
 	}
 
-	sshKeyPemBytes, err := m.getSSHKeyPemBytes(rm)
+	sshKeyPemBytes, err := getSSHKeyPemBytes(rm, h.sshFlags)
 	if err != nil {
 		return fmt.Errorf("getting ssh key bytes: %w", err)
 	}
 
-	dialer, err := ssh.NewDialer(m.sshFlags, ssh.TargetDef{
+	log := h.logger.
+		WithGroup("dialer").
+		With("ssh-config", struct {
+			Address  string
+			Username string
+		}{
+			Address:  rm.Address,
+			Username: rm.Username,
+		}).
+		With("grpc-config", struct {
+			Network string
+			Address string
+		}{
+			Network: wa.network,
+			Address: wa.address,
+		})
+	log.Debug("Creating SSH dialer")
+
+	dialer, err := h.dialerFactory.Create(h.sshFlags, ssh.TargetDef{
 		Host: ssh.TargetHostDef{
 			Address:       rm.Address,
 			Username:      username,
 			PrivateKeyPem: sshKeyPemBytes,
 		},
 		GRPCServer: ssh.TargetGRPCServerDef{
-			Network: wa.scheme,
+			Network: wa.network,
 			Address: wa.address,
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("SSH Dialer fabrication: %w", err)
+		return fmt.Errorf("%w: %v", ErrSSHDialerFabrication, err)
 	}
+
+	var wg sync.WaitGroup
 
 	defer func() {
 		err := dialer.Close()
 		if err != nil {
-			log.With("error", err).Error("Closing SSH Dialer")
+			h.logger.With(logger.ErrorKey, err).Error("Closing SSH Dialer")
 		}
+		wg.Wait()
 	}()
 
 	err = dialer.Start(ctx)
 	if err != nil {
-		return fmt.Errorf("SSH Dialer start: %w", err)
+		return fmt.Errorf("%w: %v", ErrSSHDialerStart, err)
 	}
 
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
+
 		err := dialer.Wait()
 		if err != nil {
-			log.With("error", err).Error("SSH execution failure")
+			h.logger.With(logger.ErrorKey, err).Error("SSH execution failure")
 		}
 	}()
 
-	c, err := NewConnectedClient(ctx, log, dialer.Dial, m.wrapperFlags.ConnectionTimeout, rm.WrapperAddress)
+	c, err := h.clientFactory(ctx, h.logger, dialer.Dial, h.wrapperFlags.ConnectionTimeout, rm.WrapperAddress)
 	if err != nil {
-		return fmt.Errorf("wrapper connect: %w", err)
+		return fmt.Errorf("%w: %v", ErrWrapperConnect, err)
 	}
 
 	err = fn(ctx, c)
 	if err != nil {
-		return fmt.Errorf("wrapper execution: %w", err)
+		return fmt.Errorf("%w: %v", ErrWrapperExecution, err)
 	}
 
 	return nil
 }
 
 type wrapperAddress struct {
-	scheme  string
+	network string
 	address string
 }
 
-func (m *Mux) getWrapperAddress(rm terraform.RunnerManager) (wrapperAddress, error) {
+func getWrapperAddress(rm terraform.RunnerManager) (wrapperAddress, error) {
 	var wa wrapperAddress
 
 	u, err := url.Parse(rm.WrapperAddress)
 	if err != nil {
-		return wa, fmt.Errorf("parsing wrapper address: %w", err)
+		return wa, fmt.Errorf("%w: %v", ErrWrapperAddressParsing, err)
 	}
 
 	if u.Scheme != "unix" && u.Scheme != "tcp" {
-		return wa, fmt.Errorf("wrapper address must be unix socket or tcp socket; got %s", u.Scheme)
+		return wa, fmt.Errorf("%w: must be unix socket or tcp socket; got %s", ErrInvalidWrapperAddressNetwork, u.Scheme)
 	}
 
 	var address string
@@ -193,37 +306,38 @@ func (m *Mux) getWrapperAddress(rm terraform.RunnerManager) (wrapperAddress, err
 		address = fmt.Sprintf("%s:%s", u.Hostname(), u.Port())
 	}
 
-	wa.scheme = u.Scheme
+	wa.network = u.Scheme
 	wa.address = address
 
 	return wa, nil
 }
 
-func (m *Mux) getUsername(rm terraform.RunnerManager) (string, error) {
-	if rm.Username == nil && m.sshFlags.Username == "" {
-		return "", fmt.Errorf("username not provided with CLI flag nor with Terraform Output")
+func getUsername(rm terraform.RunnerManager, sshFlags ssh.Flags) (string, error) {
+	if rm.Username == "" && sshFlags.Username == "" {
+		return "", ErrUsernameNotProvided
 	}
 
-	if m.sshFlags.Username != "" {
-		return m.sshFlags.Username, nil
+	if sshFlags.Username != "" {
+		return sshFlags.Username, nil
 	}
 
-	return *rm.Username, nil
+	return rm.Username, nil
 }
 
-func (m *Mux) getSSHKeyPemBytes(rm terraform.RunnerManager) ([]byte, error) {
-	var sshKeyPemBytes []byte
-	if rm.SSHKeyPem != nil {
-		sshKeyPemBytes = []byte(*rm.SSHKeyPem)
+func getSSHKeyPemBytes(rm terraform.RunnerManager, sshFlags ssh.Flags) ([]byte, error) {
+	if rm.SSHKeyPem == "" && sshFlags.KeyFile == "" {
+		return nil, ErrSSHKeyPemNotProvided
 	}
 
-	if m.sshFlags.KeyFile != "" {
+	if sshFlags.KeyFile != "" {
 		var err error
-		sshKeyPemBytes, err = os.ReadFile(m.sshFlags.KeyFile)
+		sshKeyPemBytes, err := os.ReadFile(sshFlags.KeyFile)
 		if err != nil {
-			return nil, fmt.Errorf("reading ssh key file %q: %w", m.sshFlags.KeyFile, err)
+			return nil, fmt.Errorf("%w %s: %v", ErrReadingSSHKeyFile, sshFlags.KeyFile, err)
 		}
+
+		return sshKeyPemBytes, nil
 	}
 
-	return sshKeyPemBytes, nil
+	return []byte(rm.SSHKeyPem), nil
 }

@@ -49,11 +49,3 @@ golang lint:
   script:
     - apk add --no-cache make
     - make lint-go
-
-# prepare done is used as a sentinel for "Prepare" stage completion,
-# so we can kick off jobs in later stages without waiting for
-# the completion of the Prebuild stage
-prepare done:
-  stage: lint
-  extends:
-    - .stage_done

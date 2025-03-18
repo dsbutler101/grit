@@ -2,6 +2,7 @@ package wait
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -15,9 +16,20 @@ const (
 	DefaultTimeout = 30 * time.Minute
 )
 
+var (
+	errWrapperStatusCheck = errors.New("wrapper status check")
+)
+
 type Flags struct {
 	Timeout time.Duration
 }
+
+//go:generate mockery --name=tfClientMux --inpackage --with-expecter
+type tfClientMux interface {
+	Execute(ctx context.Context, fn wrapper.CallbackFn) error
+}
+
+type loopStatusCheckFn func(ctx context.Context, c wrapper.LoopStatusCheckClient, timeout time.Duration, checkForRunning bool) error
 
 type Service struct {
 	logger *slog.Logger
@@ -27,6 +39,9 @@ type Service struct {
 	sshFlags     ssh.Flags
 	wrapperFlags wrapper.Flags
 	waitFlags    Flags
+
+	tfClientMuxFactory func(*slog.Logger, *terraform.Client, terraform.Flags, ssh.Flags, wrapper.Flags) tfClientMux
+	loopStatusCheck    loopStatusCheckFn
 }
 
 func New(logger *slog.Logger, tf *terraform.Client, tfFlags terraform.Flags, sshFlags ssh.Flags, wrapperFlags wrapper.Flags, waitFlags Flags) *Service {
@@ -37,27 +52,31 @@ func New(logger *slog.Logger, tf *terraform.Client, tfFlags terraform.Flags, ssh
 		sshFlags:     sshFlags,
 		wrapperFlags: wrapperFlags,
 		waitFlags:    waitFlags,
+		tfClientMuxFactory: func(l *slog.Logger, tf *terraform.Client, tfFlags terraform.Flags, sshFlags ssh.Flags, wrapperFlags wrapper.Flags) tfClientMux {
+			return wrapper.NewMux(l, tf, tfFlags, sshFlags, wrapperFlags)
+		},
+		loopStatusCheck: wrapper.LoopStatusCheck,
 	}
 }
 
 func (s *Service) ExecuteWaitHealthy(ctx context.Context) error {
 	s.logger = s.logger.With("operation", "wait-healthy")
 
-	return s.execute(ctx, true)
+	return s.execute(ctx, wrapper.CheckForRunning)
 }
 
 func (s *Service) ExecuteWaitTerminated(ctx context.Context) error {
 	s.logger = s.logger.With("operation", "wait-terminated")
 
-	return s.execute(ctx, false)
+	return s.execute(ctx, wrapper.CheckForStopped)
 }
 
 func (s *Service) execute(ctx context.Context, checkForRunning bool) error {
-	return wrapper.NewMux(s.logger, s.tf, s.tfFlags, s.sshFlags, s.wrapperFlags).
-		Execute(ctx, func(ctx context.Context, c *wrapper.Client) error {
-			err := wrapper.LoopStatusCheck(ctx, c, s.waitFlags.Timeout, checkForRunning)
+	return s.tfClientMuxFactory(s.logger, s.tf, s.tfFlags, s.sshFlags, s.wrapperFlags).
+		Execute(ctx, func(ctx context.Context, c wrapper.CallbackClient) error {
+			err := s.loopStatusCheck(ctx, c, s.waitFlags.Timeout, checkForRunning)
 			if err != nil {
-				return fmt.Errorf("wrapper status check: %w", err)
+				return fmt.Errorf("%w: %w", errWrapperStatusCheck, err)
 			}
 
 			return nil

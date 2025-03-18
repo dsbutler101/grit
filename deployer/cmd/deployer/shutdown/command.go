@@ -20,6 +20,13 @@ const (
 	gRPCConnectionRetryExitCode = 2
 )
 
+//go:generate mockery --name=service --inpackage --with-expecter
+type service interface {
+	Execute(context.Context) error
+}
+
+type serviceFactoryFn func(*slog.Logger, *terraform.Client, terraform.Flags, ssh.Flags, wrapper.Flags, shutdown.Flags) service
+
 type cmd struct {
 	logger *slog.Logger
 	tf     *terraform.Client
@@ -28,15 +35,29 @@ type cmd struct {
 	sshFlags      *ssh.Flags
 	wrapperFlags  *wrapper.Flags
 	shutdownFlags *shutdown.Flags
+
+	serviceFactory serviceFactoryFn
+}
+
+func newCmd(logger *slog.Logger, tf *terraform.Client, sf serviceFactoryFn) *cmd {
+	return &cmd{
+		logger:         logger,
+		tf:             tf,
+		tfFlags:        new(terraform.Flags),
+		wrapperFlags:   new(wrapper.Flags),
+		sshFlags:       new(ssh.Flags),
+		shutdownFlags:  new(shutdown.Flags),
+		serviceFactory: sf,
+	}
 }
 
 func (c *cmd) Execute(ctx context.Context, _ *cobra.Command, _ []string) error {
-	err := shutdown.New(c.logger, c.tf, *c.tfFlags, *c.sshFlags, *c.wrapperFlags, *c.shutdownFlags).Execute(ctx)
+	err := c.serviceFactory(c.logger, c.tf, *c.tfFlags, *c.sshFlags, *c.wrapperFlags, *c.shutdownFlags).Execute(ctx)
 	if err == nil {
 		return nil
 	}
 
-	var rerr *wrapper.GRPCConnectionRetryExceededError
+	var rerr *wrapper.GRPCConnectionWaitTimeoutExceededError
 	if errors.As(err, &rerr) {
 		return cli.NewError(gRPCConnectionRetryExitCode, err)
 	}
@@ -45,10 +66,9 @@ func (c *cmd) Execute(ctx context.Context, _ *cobra.Command, _ []string) error {
 }
 
 func New(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group) *cobra.Command {
-	c := &cmd{
-		logger: logger,
-		tf:     tf,
-	}
+	c := newCmd(logger, tf, func(logger *slog.Logger, client *terraform.Client, tfFlags terraform.Flags, sshFlags ssh.Flags, wrapperFlags wrapper.Flags, shutdownFlags shutdown.Flags) service {
+		return shutdown.New(logger, client, tfFlags, sshFlags, wrapperFlags, shutdownFlags)
+	})
 
 	cc := &cobra.Command{
 		GroupID: cmdGroup.ID,
@@ -61,15 +81,19 @@ func New(logger *slog.Logger, tf *terraform.Client, cmdGroup cobra.Group) *cobra
 				return err
 			}
 
+			err = c.sshFlags.Validate()
+			if err != nil {
+				return err
+			}
+
 			return nil
 		},
-		RunE: cli.BuildCommandExecutor(c),
+		RunE: cli.BuildRunEFromCommandExecutor(c),
 	}
 
-	c.tfFlags = base.SetupAllTFFlags(cc)
-	c.wrapperFlags = base.SetupWrapperFlags(cc)
-	c.sshFlags = base.SetupSSHFlags(cc)
-	c.shutdownFlags = &shutdown.Flags{}
+	base.SetupAllTFFlags(cc, c.tfFlags)
+	base.SetupWrapperFlags(cc, c.wrapperFlags)
+	base.SetupSSHFlags(cc, c.sshFlags)
 
 	cc.PersistentFlags().BoolVar(&c.shutdownFlags.Forceful, "forceful", false, "Initiate Forceful Shutdown instead of Graceful Shutdown")
 

@@ -15,18 +15,28 @@ import (
 )
 
 const (
-	colorReset  = "\033[0m"
-	colorRed    = "\033[31m"
-	colorGreen  = "\033[32m"
-	colorYellow = "\033[33m"
-	colorPurple = "\033[35m"
-	colorCyan   = "\033[36m"
-	colorGray   = "\033[90m"
-	colorWhite  = "\033[97m"
+	colorReset       = "\033[0m"
+	colorRed         = "\033[31m"
+	colorGreen       = "\033[32m"
+	colorYellow      = "\033[33m"
+	colorPurple      = "\033[35m"
+	colorCyan        = "\033[36m"
+	colorGray        = "\033[90m"
+	colorLightRed    = "\033[91m"
+	colorLightYellow = "\033[93m"
+	colorWhite       = "\033[97m"
+)
+
+const (
+	ErrorKey = "error"
 )
 
 func colorize(color string, str string) string {
 	return color + str + colorReset
+}
+
+type errorEntry struct {
+	Error string `json:"error"`
 }
 
 type handler struct {
@@ -111,6 +121,22 @@ func (h *handler) Handle(ctx context.Context, record slog.Record) error {
 		return fmt.Errorf("unmarshaling inner handler's Handle: %w", err)
 	}
 
+	errorSection := ""
+	if errorField, ok := attrs[ErrorKey]; ok {
+		if errorFieldStr, ok := errorField.(string); ok {
+			delete(attrs, ErrorKey)
+			e := errorEntry{
+				Error: errorFieldStr,
+			}
+			b, err := json.MarshalIndent(e, "", "  ")
+			if err != nil {
+				return fmt.Errorf("marshaling errorEntry: %w", err)
+			}
+
+			errorSection = string(b)
+		}
+	}
+
 	details := ""
 	if len(attrs) > 0 {
 		b, err := json.MarshalIndent(attrs, "", "  ")
@@ -126,6 +152,7 @@ func (h *handler) Handle(ctx context.Context, record slog.Record) error {
 		colorize(colorPurple, record.Time.Format("[15:04:05.999 -07:00]")),
 		level,
 		colorize(colorWhite, record.Message),
+		colorize(colorLightYellow, errorSection),
 		colorize(colorGray, details),
 	)
 

@@ -11,8 +11,8 @@ func TestVPC(t *testing.T) {
 
 	expectedModules := []string{
 		"google_compute_network.default",
-		"google_compute_firewall.runner-manager-ingress-default",
-		"google_compute_firewall.runner-manager-egress-default",
+		"google_compute_firewall.runner_manager_ingress_default",
+		"google_compute_firewall.runner_manager_egress_default",
 		`google_compute_subnetwork.subnetwork["subnet-1"]`,
 		`google_compute_subnetwork.subnetwork["subnet-2"]`,
 	}

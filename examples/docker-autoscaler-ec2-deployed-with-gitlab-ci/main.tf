@@ -15,7 +15,7 @@ terraform {
   # }
 }
 
-module "runner-deployment" {
+module "runner_deployment" {
   source = "../../scenarios/aws/linux/docker-autoscaler-default"
 
   # Uncomment if you instead want to use remote source instead

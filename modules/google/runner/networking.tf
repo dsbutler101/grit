@@ -1,4 +1,4 @@
-resource "google_compute_firewall" "runner-manager-ssh-access" {
+resource "google_compute_firewall" "runner_manager_ssh_access" {
   name    = "${var.metadata.name}-runner-manager-ssh-access"
   network = var.vpc.id
   project = var.subnetwork_project
@@ -16,7 +16,7 @@ resource "google_compute_firewall" "runner-manager-ssh-access" {
   target_tags = [local.runner_manager_tag]
 }
 
-resource "google_compute_firewall" "additional-rules" {
+resource "google_compute_firewall" "additional_rules" {
   for_each = var.runner_manager_additional_firewall_rules
 
   name    = "${var.metadata.name}-runner-${each.key}-access"

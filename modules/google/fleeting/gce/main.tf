@@ -1,4 +1,4 @@
-resource "google_compute_instance_template" "ephemeral-runner" {
+resource "google_compute_instance_template" "ephemeral_runner" {
   name_prefix = "${var.name}-"
 
   lifecycle {
@@ -35,14 +35,14 @@ resource "google_compute_instance_template" "ephemeral-runner" {
   }
 }
 
-resource "google_compute_instance_group_manager" "ephemeral-runners" {
+resource "google_compute_instance_group_manager" "ephemeral_runners" {
   name = var.name
   zone = var.google_zone
 
   base_instance_name = "${var.name}-ephemeral"
 
   version {
-    instance_template = google_compute_instance_template.ephemeral-runner.id
+    instance_template = google_compute_instance_template.ephemeral_runner.id
   }
 
   wait_for_instances = false

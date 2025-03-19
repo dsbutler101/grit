@@ -10,15 +10,15 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 	name := test_tools.JobName(t)
 
 	baseExpectedModules := []string{
-		"module.common.aws_autoscaling_group.fleeting-asg",
-		"module.common.aws_key_pair.jobs-key-pair",
-		"module.common.aws_launch_template.fleeting-asg-template",
-		"module.common.tls_private_key.aws-jobs-private-key",
+		"module.common.aws_autoscaling_group.fleeting_asg",
+		"module.common.aws_key_pair.jobs_key_pair",
+		"module.common.aws_launch_template.fleeting_asg_template",
+		"module.common.tls_private_key.aws_jobs_private_key",
 	}
 
 	macExpectedModules := append(baseExpectedModules, []string{
-		"module.macos[0].aws_cloudformation_stack.jobs-cloudformation-stack",
-		"module.macos[0].aws_licensemanager_license_configuration.license-config",
+		"module.macos[0].aws_cloudformation_stack.jobs_cloudformation_stack",
+		"module.macos[0].aws_licensemanager_license_configuration.license_config",
 	}...)
 
 	testCases := map[string]struct {
@@ -28,7 +28,7 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 		"linux fleet": {
 			moduleVars: map[string]interface{}{
 				"vpc": map[string]interface{}{
-					"id":        "12345",
+					"id":         "12345",
 					"subnet_ids": []string{"12345"},
 				},
 				"os":                          "linux",
@@ -47,9 +47,9 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 				"install_cloudwatch_agent":    false,
 				"cloudwatch_agent_json":       "ewogICJhZ2VudCI6IHsKICAgICJtZXRyaWNzX2NvbGxlY3Rpb25faW50ZXJ2YWwiOiA2MCwKICAgICJsb2dmaWxlIjogIi9vcHQvYXdzL2FtYXpvbi1jbG91ZHdhdGNoLWFnZW50L2xvZ3MvYW1hem9uLWNsb3Vkd2F0Y2gtYWdlbnQubG9nIiwKICAgICJkZWJ1ZyI6IGZhbHNlLAogICAgInJ1bl9hc191c2VyIjogImN3YWdlbnQiCiAgfSwKICAibG9ncyI6IHsKICAgICJsb2dzX2NvbGxlY3RlZCI6IHsKICAgICAgImZpbGVzIjogewogICAgICAgICJjb2xsZWN0X2xpc3QiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJmaWxlX3BhdGgiOiAiL3Zhci9sb2cvc3lzbG9nIiwKICAgICAgICAgICAgImxvZ19ncm91cF9uYW1lIjogIkZsZWV0aW5nLUxvZ3MiLAogICAgICAgICAgICAibG9nX3N0cmVhbV9uYW1lIjogIkZsZWV0aW5nLVN5c2xvZy1TdHJlYW0iLAogICAgICAgICAgICAidGltZXN0YW1wX2Zvcm1hdCI6ICIlSDogJU06ICVTJXklYiUtZCIKICAgICAgICAgIH0sCgkgIHsKICAgICAgICAgICAgImZpbGVfcGF0aCI6ICIvdmFyL2xvZy9jbG91ZC1pbml0LW91dHB1dC5sb2ciLAogICAgICAgICAgICAibG9nX2dyb3VwX25hbWUiOiAiRmxlZXRpbmctTG9ncyIsCiAgICAgICAgICAgICJsb2dfc3RyZWFtX25hbWUiOiAiRmxlZXRpbmctQ2xvdWRpbml0LVN0cmVhbSIsCiAgICAgICAgICAgICJ0aW1lc3RhbXBfZm9ybWF0IjogIiVIOiAlTTogJVMleSViJS1kIgogICAgICAgICAgfQoJXQogICAgICB9CiAgICB9CiAgfQp9Cg==",
 				"instance_role_profile_name":  nil,
-				"mixed_instances_policy": nil,
-				"ebs_encryption": false,
-				"kms_key_arn": "",
+				"mixed_instances_policy":      nil,
+				"ebs_encryption":              false,
+				"kms_key_arn":                 "",
 				"node_exporter":               map[string]string{"enabled": "true", "port": "1234", "version": "1.2.3"},
 			},
 			expectedModules: baseExpectedModules,
@@ -57,7 +57,7 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 		"mac fleet": {
 			moduleVars: map[string]interface{}{
 				"vpc": map[string]interface{}{
-					"id":        "12345",
+					"id":         "12345",
 					"subnet_ids": []string{"12345"},
 				},
 				"os":                          "macos",
@@ -76,9 +76,9 @@ func TestAWSInternalEC2Fleeting(t *testing.T) {
 				"install_cloudwatch_agent":    false,
 				"cloudwatch_agent_json":       "ewogICJhZ2VudCI6IHsKICAgICJtZXRyaWNzX2NvbGxlY3Rpb25faW50ZXJ2YWwiOiA2MCwKICAgICJsb2dmaWxlIjogIi9vcHQvYXdzL2FtYXpvbi1jbG91ZHdhdGNoLWFnZW50L2xvZ3MvYW1hem9uLWNsb3Vkd2F0Y2gtYWdlbnQubG9nIiwKICAgICJkZWJ1ZyI6IGZhbHNlLAogICAgInJ1bl9hc191c2VyIjogImN3YWdlbnQiCiAgfSwKICAibG9ncyI6IHsKICAgICJsb2dzX2NvbGxlY3RlZCI6IHsKICAgICAgImZpbGVzIjogewogICAgICAgICJjb2xsZWN0X2xpc3QiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJmaWxlX3BhdGgiOiAiL3Zhci9sb2cvc3lzbG9nIiwKICAgICAgICAgICAgImxvZ19ncm91cF9uYW1lIjogIkZsZWV0aW5nLUxvZ3MiLAogICAgICAgICAgICAibG9nX3N0cmVhbV9uYW1lIjogIkZsZWV0aW5nLVN5c2xvZy1TdHJlYW0iLAogICAgICAgICAgICAidGltZXN0YW1wX2Zvcm1hdCI6ICIlSDogJU06ICVTJXklYiUtZCIKICAgICAgICAgIH0sCgkgIHsKICAgICAgICAgICAgImZpbGVfcGF0aCI6ICIvdmFyL2xvZy9jbG91ZC1pbml0LW91dHB1dC5sb2ciLAogICAgICAgICAgICAibG9nX2dyb3VwX25hbWUiOiAiRmxlZXRpbmctTG9ncyIsCiAgICAgICAgICAgICJsb2dfc3RyZWFtX25hbWUiOiAiRmxlZXRpbmctQ2xvdWRpbml0LVN0cmVhbSIsCiAgICAgICAgICAgICJ0aW1lc3RhbXBfZm9ybWF0IjogIiVIOiAlTTogJVMleSViJS1kIgogICAgICAgICAgfQoJXQogICAgICB9CiAgICB9CiAgfQp9Cg==",
 				"instance_role_profile_name":  nil,
-				"mixed_instances_policy": nil,
-				"ebs_encryption": false,
-				"kms_key_arn": "",
+				"mixed_instances_policy":      nil,
+				"ebs_encryption":              false,
+				"kms_key_arn":                 "",
 				"node_exporter":               map[string]string{"enabled": "false"},
 			},
 

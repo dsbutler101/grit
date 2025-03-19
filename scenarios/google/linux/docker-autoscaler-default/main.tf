@@ -123,7 +123,7 @@ module "runner" {
   }
 }
 
-module "prometheus-iam" {
+module "prometheus_iam" {
   source = "../../../../modules/google/iam"
 
   metadata = merge(local.metadata, {
@@ -141,7 +141,7 @@ module "prometheus" {
   google_project = var.google_project
   google_zone    = var.google_zone
 
-  service_account_email = module.prometheus-iam.service_account_email
+  service_account_email = module.prometheus_iam.service_account_email
 
   vpc = {
     id        = module.vpc.id

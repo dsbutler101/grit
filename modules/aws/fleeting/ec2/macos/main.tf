@@ -1,4 +1,4 @@
-resource "aws_licensemanager_license_configuration" "license-config" {
+resource "aws_licensemanager_license_configuration" "license_config" {
   name                     = var.name
   license_count            = var.license_count_per_asg * var.cores_per_license
   license_count_hard_limit = false
@@ -13,7 +13,7 @@ locals {
   jobs_host_resource_group = var.name
 }
 
-resource "aws_cloudformation_stack" "jobs-cloudformation-stack" {
+resource "aws_cloudformation_stack" "jobs_cloudformation_stack" {
   name = local.jobs_host_resource_group
 
   tags = merge(var.labels, {
@@ -34,7 +34,7 @@ resource "aws_cloudformation_stack" "jobs-cloudformation-stack" {
                                 {
                                     "Name": "allowed-host-based-license-configurations",
                                     "Values": [
-                                        "${aws_licensemanager_license_configuration.license-config.arn}"
+                                        "${aws_licensemanager_license_configuration.license_config.arn}"
                                     ]
                                 },
                                 {

@@ -19,11 +19,11 @@ output "bucket_location" {
 
 output "access_key_id" {
   description = "Access key ID for the user with access to the cache bucket"
-  value       = aws_iam_access_key.cache-bucket-user-key.id
+  value       = aws_iam_access_key.cache_bucket_user_key.id
 }
 
 output "secret_access_key" {
   description = "Secret access key for the user with access to the cache bucket"
-  value       = aws_iam_access_key.cache-bucket-user-key.secret
+  value       = aws_iam_access_key.cache_bucket_user_key.secret
   sensitive   = true
 }

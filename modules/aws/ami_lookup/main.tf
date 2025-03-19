@@ -2,7 +2,7 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = local.use_case
   use_case_support = tomap({

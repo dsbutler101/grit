@@ -11,10 +11,10 @@ func TestVPC(t *testing.T) {
 
 	expectedModules := []string{
 		"aws_internet_gateway.igw",
-		"aws_route.internet-route",
+		"aws_route.internet_route",
 		"aws_route_table.rtb_public",
 		"aws_route_table_association.rta_subnet_public",
-		"aws_subnet.jobs-vpc-subnet",
+		"aws_subnet.jobs_vpc_subnet",
 		"aws_vpc.vpc",
 	}
 

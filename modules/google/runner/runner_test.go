@@ -10,19 +10,19 @@ func TestRunner(t *testing.T) {
 	name := test_tools.JobName(t)
 
 	expectedModules := []string{
-		"google_project_iam_custom_role.runner-manager",
-		"google_project_iam_member.runner-manager",
-		"google_compute_firewall.runner-manager-ssh-access",
-		`google_compute_firewall.additional-rules["test-allow"]`,
-		`google_compute_firewall.additional-rules["test-deny"]`,
+		"google_project_iam_custom_role.runner_manager",
+		"google_project_iam_member.runner_manager",
+		"google_compute_firewall.runner_manager_ssh_access",
+		`google_compute_firewall.additional_rules["test-allow"]`,
+		`google_compute_firewall.additional_rules["test-deny"]`,
 		"data.cloudinit_config.config",
-		"google_compute_instance.runner-manager",
-		"google_compute_address.runner-manager",
+		"google_compute_instance.runner_manager",
+		"google_compute_address.runner_manager",
 		"google_kms_key_ring.default",
 		"google_kms_crypto_key.default",
-		"google_kms_secret_ciphertext.runner-token",
-		"google_kms_secret_ciphertext.runner-ssh-key",
-		"tls_private_key.runner-manager",
+		"google_kms_secret_ciphertext.runner_token",
+		"google_kms_secret_ciphertext.runner_ssh_key",
+		"tls_private_key.runner_manager",
 	}
 
 	testCases := map[string]struct {
@@ -118,7 +118,7 @@ func TestRunner(t *testing.T) {
 					"id":        "vpc-id",
 					"subnet_id": "subnet-id",
 				},
-      },
+			},
 			expectedModules: expectedModules,
 		},
 	}

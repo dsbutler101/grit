@@ -2,12 +2,12 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-name" {
+module "validate_name" {
   source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "any"
   use_case_support = tomap({
@@ -38,7 +38,7 @@ resource "aws_internet_gateway" "igw" {
   })
 }
 
-resource "aws_subnet" "jobs-vpc-subnet" {
+resource "aws_subnet" "jobs_vpc_subnet" {
   vpc_id     = aws_vpc.vpc.id
   cidr_block = var.subnet_cidr
 
@@ -57,12 +57,12 @@ resource "aws_route_table" "rtb_public" {
 }
 
 resource "aws_route_table_association" "rta_subnet_public" {
-  subnet_id      = aws_subnet.jobs-vpc-subnet.id
+  subnet_id      = aws_subnet.jobs_vpc_subnet.id
   route_table_id = aws_route_table.rtb_public.id
 }
 
 # both `name` and `tags` are unsupported arguments
-resource "aws_route" "internet-route" {
+resource "aws_route" "internet_route" {
   route_table_id         = aws_route_table.rtb_public.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.igw.id

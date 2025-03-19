@@ -10,8 +10,8 @@ func TestCache(t *testing.T) {
 	name := test_tools.JobName(t)
 
 	expectedModules := []string{
-		"google_storage_bucket.cache-bucket",
-		"google_storage_bucket_iam_binding.cache-bucket",
+		"google_storage_bucket.cache_bucket",
+		"google_storage_bucket_iam_binding.cache_bucket",
 	}
 
 	testCases := map[string]struct {
@@ -30,7 +30,7 @@ func TestCache(t *testing.T) {
 				"uniform_bucket_level_access": true,
 				"bucket_name":                 "optional-explicit-bucket-name",
 				"bucket_location":             "us-east1",
-				"service_account_emails":      []string{
+				"service_account_emails": []string{
 					"service-account@example.com",
 				},
 			},

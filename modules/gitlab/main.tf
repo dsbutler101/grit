@@ -2,12 +2,12 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-name" {
+module "validate_name" {
   source = "../internal/validation/name"
   name   = var.metadata.name
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../internal/validation/support"
   use_case = "any"
   use_case_support = tomap({

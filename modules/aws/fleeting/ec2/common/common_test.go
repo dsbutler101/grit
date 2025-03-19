@@ -10,10 +10,10 @@ func TestAWSInternalEC2FleetingCommon(t *testing.T) {
 	name := test_tools.JobName(t)
 
 	expectedModules := []string{
-		"aws_autoscaling_group.fleeting-asg",
-		"aws_key_pair.jobs-key-pair",
-		"aws_launch_template.fleeting-asg-template",
-		"tls_private_key.aws-jobs-private-key",
+		"aws_autoscaling_group.fleeting_asg",
+		"aws_key_pair.jobs_key_pair",
+		"aws_launch_template.fleeting_asg_template",
+		"tls_private_key.aws_jobs_private_key",
 	}
 
 	testCases := map[string]struct {
@@ -23,7 +23,7 @@ func TestAWSInternalEC2FleetingCommon(t *testing.T) {
 		"common fleet": {
 			moduleVars: map[string]interface{}{
 				"license_arn":                      "",
-				"jobs-host-resource-group-outputs": map[string]string{},
+				"jobs_host_resource_group_outputs": map[string]string{},
 				"scale_min":                        0,
 				"scale_max":                        10,
 				"storage_size":                     500,
@@ -48,7 +48,7 @@ func TestAWSInternalEC2FleetingCommon(t *testing.T) {
 		"common fleet - node exporter disabled": {
 			moduleVars: map[string]interface{}{
 				"license_arn":                      "",
-				"jobs-host-resource-group-outputs": map[string]string{},
+				"jobs_host_resource_group_outputs": map[string]string{},
 				"scale_min":                        0,
 				"scale_max":                        10,
 				"storage_size":                     500,
@@ -73,7 +73,7 @@ func TestAWSInternalEC2FleetingCommon(t *testing.T) {
 		"common fleet mix instance policy": {
 			moduleVars: map[string]interface{}{
 				"license_arn":                      "",
-				"jobs-host-resource-group-outputs": map[string]string{},
+				"jobs_host_resource_group_outputs": map[string]string{},
 				"scale_min":                        0,
 				"scale_max":                        10,
 				"storage_size":                     500,

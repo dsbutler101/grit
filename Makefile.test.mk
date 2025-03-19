@@ -1,3 +1,3 @@
 .PHONY: test
 test:
-	mage test:unit
+	mage test:unit .

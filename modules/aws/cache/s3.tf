@@ -2,7 +2,7 @@ locals {
   bucket_name = var.bucket_name != "" ? var.bucket_name : "${var.metadata.name}-runner-cache"
 }
 
-resource "aws_s3_bucket" "cache-bucket-server-logs" {
+resource "aws_s3_bucket" "cache_bucket_server_logs" {
   bucket = "${local.bucket_name}-logs"
 
   force_destroy = true
@@ -12,16 +12,16 @@ resource "aws_s3_bucket" "cache-bucket-server-logs" {
   })
 }
 
-resource "aws_s3_bucket_versioning" "cache-bucket-server-logs" {
-  bucket = aws_s3_bucket.cache-bucket-server-logs.id
+resource "aws_s3_bucket_versioning" "cache_bucket_server_logs" {
+  bucket = aws_s3_bucket.cache_bucket_server_logs.id
 
   versioning_configuration {
     status = "Disabled"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "cache-bucket-server-logs" {
-  bucket = aws_s3_bucket.cache-bucket-server-logs.id
+resource "aws_s3_bucket_public_access_block" "cache_bucket_server_logs" {
+  bucket = aws_s3_bucket.cache_bucket_server_logs.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -75,7 +75,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cache" {
 resource "aws_s3_bucket_logging" "cache" {
   bucket = aws_s3_bucket.cache.id
 
-  target_bucket = aws_s3_bucket.cache-bucket-server-logs.id
+  target_bucket = aws_s3_bucket.cache_bucket_server_logs.id
   target_prefix = "logs/"
 
   target_object_key_format {

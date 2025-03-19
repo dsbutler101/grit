@@ -22,10 +22,10 @@ func TestIam(t *testing.T) {
 				},
 			},
 			expectedModules: []string{
-				"aws_iam_access_key.fleeting-service-account-key",
-				"aws_iam_policy.fleeting-service-account-policy",
-				"aws_iam_user.fleeting-service-account",
-				"aws_iam_user_policy_attachment.fleeting-service-account-attach",
+				"aws_iam_access_key.fleeting_service_account_key",
+				"aws_iam_policy.fleeting_service_account_policy",
+				"aws_iam_user.fleeting_service_account",
+				"aws_iam_user_policy_attachment.fleeting_service_account_attach",
 			},
 		},
 	}

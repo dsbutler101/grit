@@ -40,7 +40,7 @@ variable "metadata" {
   }
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "gke"
   use_case_support = tomap({
@@ -130,7 +130,7 @@ variable "node_pools" {
   }
 }
 
-module "validate-image-type" {
+module "validate_image_type" {
   source = "../../internal/validation/is_one_of"
 
   for_each = var.node_pools

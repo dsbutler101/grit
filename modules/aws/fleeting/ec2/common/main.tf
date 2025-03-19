@@ -1,4 +1,4 @@
-resource "aws_launch_template" "fleeting-asg-template" {
+resource "aws_launch_template" "fleeting_asg_template" {
   # Name must be alphanumeric, no spaces
   name = var.name
 
@@ -7,7 +7,7 @@ resource "aws_launch_template" "fleeting-asg-template" {
   image_id      = var.ami_id
   instance_type = var.instance_type
 
-  key_name = aws_key_pair.jobs-key-pair.key_name
+  key_name = aws_key_pair.jobs_key_pair.key_name
 
   user_data = var.install_cloudwatch_agent ? data.cloudinit_config.fleeting_config.rendered : null
 
@@ -25,7 +25,7 @@ resource "aws_launch_template" "fleeting-asg-template" {
   }
 
   dynamic "placement" {
-    for_each = length(var.jobs-host-resource-group-outputs) > 0 ? [1] : []
+    for_each = length(var.jobs_host_resource_group_outputs) > 0 ? [1] : []
 
     content {
       tenancy                 = "host"
@@ -80,15 +80,15 @@ resource "aws_launch_template" "fleeting-asg-template" {
 }
 
 # tags are a deprecated property on this resource type
-resource "aws_autoscaling_group" "fleeting-asg" {
+resource "aws_autoscaling_group" "fleeting_asg" {
   name = var.name
 
   dynamic "launch_template" {
     for_each = var.mixed_instances_policy != null ? [] : [1]
 
     content {
-      id      = aws_launch_template.fleeting-asg-template.id
-      version = aws_launch_template.fleeting-asg-template.latest_version
+      id      = aws_launch_template.fleeting_asg_template.id
+      version = aws_launch_template.fleeting_asg_template.latest_version
     }
   }
 
@@ -107,8 +107,8 @@ resource "aws_autoscaling_group" "fleeting-asg" {
     content {
       launch_template {
         launch_template_specification {
-          launch_template_id = aws_launch_template.fleeting-asg-template.id
-          version            = aws_launch_template.fleeting-asg-template.latest_version
+          launch_template_id = aws_launch_template.fleeting_asg_template.id
+          version            = aws_launch_template.fleeting_asg_template.latest_version
         }
 
         dynamic "override" {

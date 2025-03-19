@@ -1,4 +1,4 @@
-resource "gitlab_project_access_token" "gandalf-security-scanning-tool" {
+resource "gitlab_project_access_token" "gandalf_security_scanning_tool" {
   project      = data.gitlab_project.grit.id
   name         = "gandalf-security-scanning-tool"
   access_level = "guest"
@@ -11,7 +11,7 @@ resource "gitlab_project_access_token" "gandalf-security-scanning-tool" {
   }
 }
 
-resource "gitlab_project_access_token" "e2e-tests-terraform" {
+resource "gitlab_project_access_token" "e2e_tests_terraform" {
   project      = data.gitlab_project.grit.id
   name         = "e2e-tests-terraform"
   access_level = "maintainer"
@@ -24,7 +24,7 @@ resource "gitlab_project_access_token" "e2e-tests-terraform" {
   }
 }
 
-resource "gitlab_project_access_token" "e2e-tests-jobs" {
+resource "gitlab_project_access_token" "e2e_tests_jobs" {
   project      = data.gitlab_project.grit.id
   name         = "e2e-tests-jobs"
   access_level = "maintainer"

@@ -10,8 +10,8 @@ func TestAWSInternalEC2FleetingMacos(t *testing.T) {
 	name := test_tools.JobName(t)
 
 	expectedModules := []string{
-		"aws_cloudformation_stack.jobs-cloudformation-stack",
-		"aws_licensemanager_license_configuration.license-config",
+		"aws_cloudformation_stack.jobs_cloudformation_stack",
+		"aws_licensemanager_license_configuration.license_config",
 	}
 
 	testCases := map[string]struct {

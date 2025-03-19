@@ -7,10 +7,8 @@ rule "terraform_required_version" {
   enabled = false
 }
 
-# TODO: enable snake_case naming checks
-# will require "moving" many existing resources
 rule "terraform_naming_convention" {
-  enabled = false
+  enabled = true
 }
 
 rule "terraform_standard_module_structure" {

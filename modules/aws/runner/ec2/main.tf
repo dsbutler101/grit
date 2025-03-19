@@ -133,7 +133,7 @@ module "node_exporter" {
   node_exporter_version = var.node_exporter.version
 }
 
-resource "aws_instance" "runner-manager" {
+resource "aws_instance" "runner_manager" {
   ami                         = var.ami != "" ? var.ami : data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
   subnet_id                   = try(length(var.vpc.subnet_ids), 0) > 0 ? var.vpc.subnet_ids[0] : var.vpc.subnet_id

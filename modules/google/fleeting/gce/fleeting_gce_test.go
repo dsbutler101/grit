@@ -10,12 +10,12 @@ func TestFleetingGCE(t *testing.T) {
 	name := test_tools.JobName(t)
 
 	expectedModules := []string{
-		"google_project_iam_custom_role.instance-group-manager",
-		"google_project_iam_member.instance-group-manager",
-		"google_compute_instance_template.ephemeral-runner",
-		"google_compute_instance_group_manager.ephemeral-runners",
-		"google_compute_firewall.ephemeral-runners-ssh-access",
-		"google_compute_firewall.ephemeral-runners-cross-vm-deny",
+		"google_project_iam_custom_role.instance_group_manager",
+		"google_project_iam_member.instance_group_manager",
+		"google_compute_instance_template.ephemeral_runner",
+		"google_compute_instance_group_manager.ephemeral_runners",
+		"google_compute_firewall.ephemeral_runners_ssh_access",
+		"google_compute_firewall.ephemeral_runners_cross_vm_deny",
 	}
 
 	testCases := map[string]struct {

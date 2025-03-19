@@ -2,12 +2,12 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-name" {
+module "validate_name" {
   source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "cache"
   use_case_support = tomap({
@@ -24,7 +24,7 @@ locals {
   bucket_name = var.bucket_name != "" ? var.bucket_name : "${var.metadata.name}-runner-cache"
 }
 
-resource "google_storage_bucket" "cache-bucket" {
+resource "google_storage_bucket" "cache_bucket" {
   name   = local.bucket_name
   labels = var.metadata.labels
 
@@ -45,8 +45,8 @@ resource "google_storage_bucket" "cache-bucket" {
   }
 }
 
-resource "google_storage_bucket_iam_binding" "cache-bucket" {
-  bucket  = google_storage_bucket.cache-bucket.name
+resource "google_storage_bucket_iam_binding" "cache_bucket" {
+  bucket  = google_storage_bucket.cache_bucket.name
   role    = "roles/storage.objectAdmin"
   members = [for email in var.service_account_emails : "serviceAccount:${email}"]
 }

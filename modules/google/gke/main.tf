@@ -6,7 +6,7 @@ locals {
   name = coalesce(var.name, var.metadata.name)
 }
 
-module "validate-name" {
+module "validate_name" {
   source = "../../internal/validation/name"
   name   = local.name
 }

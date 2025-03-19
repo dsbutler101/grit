@@ -2,12 +2,12 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-name" {
+module "validate_name" {
   source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "${var.service}-${var.executor}"
   use_case_support = tomap({
@@ -20,7 +20,7 @@ module "validate-support" {
 # RUNNER PROD MODULE #
 ######################
 
-module "validate-scale-parameters" {
+module "validate_scale_parameters" {
   source                = "../../internal/validation/scale_parameters"
   executor              = var.executor
   capacity_per_instance = var.capacity_per_instance

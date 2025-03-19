@@ -1,5 +1,5 @@
 output "private_ip" {
-  value = aws_instance.runner-manager.private_ip
+  value = aws_instance.runner_manager.private_ip
 }
 
 output "deprecated_warning" {
@@ -8,5 +8,5 @@ output "deprecated_warning" {
 }
 
 output "public_ip" {
-  value = aws_instance.runner-manager.public_ip
+  value = aws_instance.runner_manager.public_ip
 }

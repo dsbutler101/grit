@@ -2,12 +2,12 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-name" {
+module "validate_name" {
   source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "runner"
   use_case_support = tomap({
@@ -80,8 +80,8 @@ data "cloudinit_config" "config" {
             name       = var.metadata.name
             gitlab_url = var.gitlab_url
 
-            runner_token   = google_kms_secret_ciphertext.runner-token.ciphertext
-            runner_ssh_key = google_kms_secret_ciphertext.runner-ssh-key.ciphertext
+            runner_token   = google_kms_secret_ciphertext.runner_token.ciphertext
+            runner_ssh_key = google_kms_secret_ciphertext.runner_ssh_key.ciphertext
 
             use_autoscaling                       = local.use_autoscaling
             fleeting_googlecompute_plugin_version = var.fleeting_googlecompute_plugin_version
@@ -164,7 +164,7 @@ data "cloudinit_config" "config" {
   }
 }
 
-resource "google_compute_instance" "runner-manager" {
+resource "google_compute_instance" "runner_manager" {
   name         = local.runner_manager_name
   machine_type = var.machine_type != "" ? var.machine_type : local.runner_manager_machine_type
 
@@ -226,7 +226,7 @@ resource "google_compute_instance" "runner-manager" {
   }
 }
 
-resource "google_compute_address" "runner-manager" {
+resource "google_compute_address" "runner_manager" {
   name         = local.runner_manager_name
   address_type = var.address_type
   subnetwork   = var.address_type == "INTERNAL" ? var.vpc.subnet_id : null

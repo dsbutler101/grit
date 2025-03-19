@@ -39,7 +39,7 @@ variable "license_arn" {
   type = string
 }
 
-variable "jobs-host-resource-group-outputs" {
+variable "jobs_host_resource_group_outputs" {
   type = map(any)
 }
 

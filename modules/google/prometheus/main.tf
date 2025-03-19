@@ -2,12 +2,12 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-name" {
+module "validate_name" {
   source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "prometheus"
   use_case_support = tomap({
@@ -91,11 +91,11 @@ data "cloudinit_config" "config" {
 
 // This enforces Prometheus instance recreation when cloud_init configuration
 // is changed
-resource "terraform_data" "prometheus-server-replacement" {
+resource "terraform_data" "prometheus_server_replacement" {
   input = data.cloudinit_config.config.id
 }
 
-resource "google_compute_disk" "prometheus-data" {
+resource "google_compute_disk" "prometheus_data" {
   name   = "${var.metadata.name}-prometheus-data"
   labels = var.metadata.labels
 
@@ -106,8 +106,8 @@ resource "google_compute_disk" "prometheus-data" {
   type = var.data_disk.disk_type
 }
 
-resource "google_compute_instance" "prometheus-server" {
-  name         = "${var.metadata.name}-prometheus-${terraform_data.prometheus-server-replacement.output}"
+resource "google_compute_instance" "prometheus_server" {
+  name         = "${var.metadata.name}-prometheus-${terraform_data.prometheus_server_replacement.output}"
   machine_type = var.machine_type
 
   lifecycle {
@@ -119,7 +119,7 @@ resource "google_compute_instance" "prometheus-server" {
     // (as we do with the Runner Manager), so we can trigger replacement
     // on every configuration change.
     replace_triggered_by = [
-      terraform_data.prometheus-server-replacement
+      terraform_data.prometheus_server_replacement
     ]
   }
 
@@ -151,7 +151,7 @@ resource "google_compute_instance" "prometheus-server" {
   }
 
   attached_disk {
-    source      = google_compute_disk.prometheus-data.self_link
+    source      = google_compute_disk.prometheus_data.self_link
     device_name = local.data_device_id
   }
 

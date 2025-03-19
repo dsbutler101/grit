@@ -1,4 +1,4 @@
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "k8s-operator-runner"
   use_case_support = tomap({

@@ -2,12 +2,12 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-name" {
+module "validate_name" {
   source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "any"
   use_case_support = tomap({
@@ -20,7 +20,7 @@ module "validate-support" {
 # IAM PROD MODULE #
 ###################
 
-resource "aws_iam_user" "fleeting-service-account" {
+resource "aws_iam_user" "fleeting_service_account" {
   name = var.metadata.name
 
   tags = merge(var.metadata.labels, {
@@ -29,7 +29,7 @@ resource "aws_iam_user" "fleeting-service-account" {
 }
 
 # both `name` and `tags` are unsupported arguments
-data "aws_iam_policy_document" "fleeting-service-account-policy-document" {
+data "aws_iam_policy_document" "fleeting_service_account_policy_document" {
   statement {
     effect    = "Allow"
     resources = ["*"]
@@ -62,10 +62,10 @@ data "aws_iam_policy_document" "fleeting-service-account-policy-document" {
   }
 }
 
-resource "aws_iam_policy" "fleeting-service-account-policy" {
+resource "aws_iam_policy" "fleeting_service_account_policy" {
   name        = var.metadata.name
   description = "A policy for accessing autoscaling groups"
-  policy      = data.aws_iam_policy_document.fleeting-service-account-policy-document.json
+  policy      = data.aws_iam_policy_document.fleeting_service_account_policy_document.json
 
   tags = merge(var.metadata.labels, {
     Name = var.metadata.name
@@ -73,13 +73,13 @@ resource "aws_iam_policy" "fleeting-service-account-policy" {
 }
 
 # both `name` and `tags` are unsupported arguments
-resource "aws_iam_user_policy_attachment" "fleeting-service-account-attach" {
-  user       = aws_iam_user.fleeting-service-account.name
-  policy_arn = aws_iam_policy.fleeting-service-account-policy.arn
+resource "aws_iam_user_policy_attachment" "fleeting_service_account_attach" {
+  user       = aws_iam_user.fleeting_service_account.name
+  policy_arn = aws_iam_policy.fleeting_service_account_policy.arn
 }
 
 # both `name` and `tags` are unsupported arguments
-resource "aws_iam_access_key" "fleeting-service-account-key" {
-  user = aws_iam_user.fleeting-service-account.name
+resource "aws_iam_access_key" "fleeting_service_account_key" {
+  user = aws_iam_user.fleeting_service_account.name
 }
 

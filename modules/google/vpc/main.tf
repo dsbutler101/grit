@@ -2,12 +2,12 @@
 # METADATA VALIDATION #
 #######################
 
-module "validate-name" {
+module "validate_name" {
   source = "../../internal/validation/name"
   name   = var.metadata.name
 }
 
-module "validate-support" {
+module "validate_support" {
   source   = "../../internal/validation/support"
   use_case = "vpc"
   use_case_support = tomap({
@@ -26,7 +26,7 @@ resource "google_compute_network" "default" {
   auto_create_subnetworks = false
 }
 
-resource "google_compute_firewall" "runner-manager-ingress-default" {
+resource "google_compute_firewall" "runner_manager_ingress_default" {
   name    = "${var.metadata.name}-ingress-default"
   network = google_compute_network.default.id
 
@@ -40,7 +40,7 @@ resource "google_compute_firewall" "runner-manager-ingress-default" {
   source_ranges = ["0.0.0.0/0"]
 }
 
-resource "google_compute_firewall" "runner-manager-egress-default" {
+resource "google_compute_firewall" "runner_manager_egress_default" {
   name    = "${var.metadata.name}-egress-default"
   network = google_compute_network.default.id
 

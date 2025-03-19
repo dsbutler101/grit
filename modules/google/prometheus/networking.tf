@@ -1,4 +1,4 @@
-resource "google_compute_firewall" "prometheus-ssh-access" {
+resource "google_compute_firewall" "prometheus_ssh_access" {
   name    = "${var.metadata.name}-prometheus-ssh-access"
   network = var.vpc.id
 

@@ -10,12 +10,12 @@ func TestPrometheus(t *testing.T) {
 	name := test_tools.JobName(t)
 
 	expectedModules := []string{
-		"google_compute_instance.prometheus-server",
-		"google_compute_firewall.prometheus-ssh-access",
-		"terraform_data.prometheus-server-replacement",
-		"google_compute_disk.prometheus-data",
-		"google_project_iam_custom_role.prometheus-server",
-		"google_project_iam_member.prometheus-server",
+		"google_compute_instance.prometheus_server",
+		"google_compute_firewall.prometheus_ssh_access",
+		"terraform_data.prometheus_server_replacement",
+		"google_compute_disk.prometheus_data",
+		"google_project_iam_custom_role.prometheus_server",
+		"google_project_iam_member.prometheus_server",
 	}
 
 	testCases := map[string]struct {

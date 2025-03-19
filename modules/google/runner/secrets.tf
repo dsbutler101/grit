@@ -9,12 +9,12 @@ resource "google_kms_crypto_key" "default" {
   rotation_period = "604800s"
 }
 
-resource "google_kms_secret_ciphertext" "runner-token" {
+resource "google_kms_secret_ciphertext" "runner_token" {
   crypto_key = google_kms_crypto_key.default.id
   plaintext  = var.runner_token
 }
 
-resource "google_kms_secret_ciphertext" "runner-ssh-key" {
+resource "google_kms_secret_ciphertext" "runner_ssh_key" {
   crypto_key = google_kms_crypto_key.default.id
-  plaintext  = tls_private_key.runner-manager.private_key_openssh
+  plaintext  = tls_private_key.runner_manager.private_key_openssh
 }

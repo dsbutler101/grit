@@ -2,7 +2,7 @@ locals {
   ephemeral_runner_tag = "ephemeral-runner"
 }
 
-resource "google_compute_firewall" "ephemeral-runners-ssh-access" {
+resource "google_compute_firewall" "ephemeral_runners_ssh_access" {
   name    = "${var.name}-ephemeral-runners-ssh-access"
   network = var.vpc.id
   project = var.subnetwork_project
@@ -20,7 +20,7 @@ resource "google_compute_firewall" "ephemeral-runners-ssh-access" {
   target_tags = [local.ephemeral_runner_tag]
 }
 
-resource "google_compute_firewall" "ephemeral-runners-cross-vm-deny" {
+resource "google_compute_firewall" "ephemeral_runners_cross_vm_deny" {
   name    = "${var.name}-ephemeral-runners-cross-vm-deny"
   network = var.vpc.id
   project = var.subnetwork_project

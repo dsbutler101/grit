@@ -38,7 +38,7 @@ Modules are organized as follows:
 Example module source path:
 
 ```hcl
-module "my-runner" {
+module "my_runner" {
   source = "grit/modules/aws/runner"
   ...
 }

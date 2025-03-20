@@ -253,7 +253,7 @@ Variables can be:
 Module expects a list of objects of this type, for example:
 
 ```terraform
-module "grit-scenario" {
+module "grit_scenario" {
   # (...)
   autoscaling_policies = [
     {
@@ -339,7 +339,7 @@ In the following example:
 - The HEREDOC syntax is used to pass multiline content.
 
 ```terraform
-module "grit-scenario" {
+module "grit_scenario" {
   # (...)
   runners_global_section = <<EOS
   environment = [
@@ -369,7 +369,7 @@ In the following example:
 - The HEREDOC syntax is used to pass multiline content.
 
 ```terraform
-module "grit-scenario" {
+module "grit_scenario" {
   # (...)
   runners_docker_section = <<EOS
     volumes = [
@@ -445,7 +445,7 @@ variable "runner_token" {
   sensitive = true
 }
 
-module "runner-deployment" {
+module "runner_deployment" {
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/google/linux/docker-autoscaler-default"
 
   google_project = local.google_project
@@ -459,8 +459,8 @@ module "runner-deployment" {
   runner_token = var.runner_token
 }
 
-output "runner-manager-external-ip" {
-  value = module.runner-deployment.runner_manager_external_ip
+output "runner_manager_external_ip" {
+  value = module.runner_deployment.runner_manager_external_ip
 }
 ```
 
@@ -500,7 +500,7 @@ variable "runner_token" {
   sensitive = true
 }
 
-module "runner-deployment" {
+module "runner_deployment" {
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/google/linux/docker-autoscaler-default"
 
   google_project = local.google_project
@@ -569,8 +569,8 @@ EOS
 
 }
 
-output "runner-manager-external-ip" {
-  value = module.runner-deployment.runner_manager_external_ip
+output "runner_manager_external_ip" {
+  value = module.runner_deployment.runner_manager_external_ip
 }
 ```
 

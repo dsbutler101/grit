@@ -1,7 +1,7 @@
 deployer:build:
   stage: build
   extends:
-    - .rules:merge_request_pipelines
+    - .rules:merge_request_pipelines:code
   needs:
     - terraform init
   script:

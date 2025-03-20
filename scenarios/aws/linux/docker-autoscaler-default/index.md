@@ -183,7 +183,7 @@ variable "gitlab_project_id" {
   sensitive = false
 }
 
-module "runner-deployment" {
+module "runner_deployment" {
   # Pointing to GRIT's AWS Docker Autoscaler Scenario
   # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default"
@@ -236,7 +236,7 @@ variable "gitlab_project_id" {
   sensitive = false
 }
 
-module "runner-deployment" {
+module "runner_deployment" {
   # Pointing to GRIT's AWS Docker Autoscaler Scenario
   # For more scenarios, see: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/tree/main/scenarios/
   source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default?ref=aws-docker-autoscaler-scenario"

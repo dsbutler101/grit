@@ -67,7 +67,7 @@ To deploy GitLab Runner Manager on AWS by using Docker Autoscaler:
      # token = "glpat-xxxxxxxxxxxxxxxxx"
    }
 
-   module "runner-deployment" {
+   module "runner_deployment" {
      source = "git::https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit.git//scenarios/aws/linux/docker-autoscaler-default"
 
      # Required: Your GitLab project ID

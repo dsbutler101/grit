@@ -35,7 +35,7 @@ variable "instance_type" {
   type        = string
 }
 
-variable "ami" {
+variable "ephemeral_runner_ami" {
   description = "The machine image to use on the instances"
   type        = string
 }

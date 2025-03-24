@@ -189,7 +189,8 @@ variable "throughput" {
   type        = number
   default     = null
 }
-variable "ami" {
+
+variable "runner_manager_ami" {
   description = "The machine image to use on the runner manager"
   type        = string
   default     = ""

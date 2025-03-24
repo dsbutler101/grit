@@ -14,7 +14,7 @@ module "common" {
   storage_type               = var.storage_type
   storage_size               = var.storage_size
   storage_throughput         = var.storage_throughput
-  ami_id                     = var.ami
+  ephemeral_runner_ami       = var.ephemeral_runner_ami
   instance_type              = var.instance_type
   subnet_ids                 = try(length(var.vpc.subnet_ids), 0) > 0 ? var.vpc.subnet_ids : [var.vpc.subnet_id]
   security_group_ids         = var.security_group_ids

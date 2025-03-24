@@ -4,7 +4,7 @@ resource "aws_launch_template" "fleeting_asg_template" {
 
   description = "Launch template for GitLab Runner fleeting configuration"
 
-  image_id      = var.ami_id
+  image_id      = var.ephemeral_runner_ami
   instance_type = var.instance_type
 
   key_name = aws_key_pair.jobs_key_pair.key_name

@@ -128,7 +128,7 @@ variable "default_docker_image" {
   type = string
 }
 
-variable "ami" {
+variable "runner_manager_ami" {
   description = "The machine image to use on the runner manager"
   type        = string
 }

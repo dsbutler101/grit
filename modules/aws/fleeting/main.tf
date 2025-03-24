@@ -28,7 +28,7 @@ module "ec2" {
 
   name                        = var.metadata.name
   os                          = var.os
-  ami                         = var.ami
+  ephemeral_runner_ami        = var.ephemeral_runner_ami
   instance_type               = var.instance_type
   labels                      = var.metadata.labels
   storage_type                = var.storage_type

@@ -72,7 +72,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"volume_size":                 8,
 				"volume_type":                 "gp2",
 				"throughput":                  0,
-				"ami":                         "ami-05012401516a40259",
+				"runner_manager_ami":          "ami-05012401516a40259",
 				"usage_logger": map[string]interface{}{
 					"enabled": true,
 					"log_dir": "/var/log/usage",
@@ -139,7 +139,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 				"volume_size":                 8,
 				"volume_type":                 "gp2",
 				"throughput":                  0,
-				"ami":                         "ami-05012401516a40259",
+				"runner_manager_ami":          "ami-05012401516a40259",
 				"usage_logger": map[string]interface{}{
 					"enabled": true,
 					"log_dir": "/var/log/usage",

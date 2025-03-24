@@ -57,7 +57,7 @@ module "ec2" {
   enable_metrics_export      = var.enable_metrics_export
   metrics_export_endpoint    = var.metrics_export_endpoint
   default_docker_image       = var.default_docker_image
-  ami                        = var.ami
+  runner_manager_ami         = var.runner_manager_ami
   usage_logger               = var.usage_logger
   acceptable_durations       = var.acceptable_durations
   node_exporter              = var.node_exporter

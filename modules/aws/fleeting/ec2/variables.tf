@@ -14,7 +14,7 @@ variable "os" {
   type = string
 }
 
-variable "ami" {
+variable "ephemeral_runner_ami" {
   type = string
 }
 

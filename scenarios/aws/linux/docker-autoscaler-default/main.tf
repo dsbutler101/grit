@@ -36,10 +36,10 @@ module "fleeting" {
 
   security_group_ids = [module.security_groups.fleeting.id]
 
-  instance_type = var.ephemeral_runner.machine_type
-  ami           = var.ephemeral_runner.source_image != "" ? var.ephemeral_runner.source_image : module.ami_lookup.ami_id
-  scale_min     = var.autoscaling_policy.scale_min
-  scale_max     = var.max_instances
+  instance_type        = var.ephemeral_runner.machine_type
+  ephemeral_runner_ami = var.ephemeral_runner.source_image != "" ? var.ephemeral_runner.source_image : module.ami_lookup.ami_id
+  scale_min            = var.autoscaling_policy.scale_min
+  scale_max            = var.max_instances
 }
 
 module "cache" {

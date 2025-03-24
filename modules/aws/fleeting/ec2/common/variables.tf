@@ -14,7 +14,7 @@ variable "storage_throughput" {
   type = number
 }
 
-variable "ami_id" {
+variable "ephemeral_runner_ami" {
   type = string
 }
 

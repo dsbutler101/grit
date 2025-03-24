@@ -68,12 +68,12 @@ module "fleeting" {
 
   vpc = local.vpc
 
-  service       = "ec2"
-  os            = "linux"
-  ami           = module.ami_lookup.ami_id
-  instance_type = var.ami_arch == "arm64" ? "t4g.medium" : "t2.medium"
-  scale_min     = 1
-  scale_max     = 10
+  service              = "ec2"
+  os                   = "linux"
+  ephemeral_runner_ami = module.ami_lookup.ami_id
+  instance_type        = var.ami_arch == "arm64" ? "t4g.medium" : "t2.medium"
+  scale_min            = 1
+  scale_max            = 10
 
   security_group_ids = [
     module.security_groups.fleeting.id,

@@ -18,7 +18,7 @@ It involves updating configuration files in Releases and running the associated 
 
 Following the release steps automatically:
 
-- Generates a new `CHANGELOG`.
+- Generates a new `CHANGELOG` entry.
 - Tags and cuts a release on the `main` branch.
 - Creates a version branch and merge it into `main`.
 - Verifies that MRs that are flagged with a `type::` label. A job fails if any MRs are tagged incorrectly.

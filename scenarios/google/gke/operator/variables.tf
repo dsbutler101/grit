@@ -65,9 +65,34 @@ variable "autoscaling" {
 }
 
 variable "node_pools" {
-  type = map(any)
-
-  default = {}
+  description = "The configuration required for each node pool added to the GKE cluster"
+  type = map(object({
+    node_count = optional(number, 0)
+    autoscaling = optional(object({
+      min_node_count = number
+      max_node_count = number
+    }))
+    node_config = optional(object({
+      labels = optional(map(string))
+      tags   = optional(list(string), [])
+      oauth_scopes = optional(list(string), [
+        "https://www.googleapis.com/auth/logging.write",
+        "https://www.googleapis.com/auth/monitoring"
+      ])
+      metadata = optional(map(string), {
+        disable-legacy-endpoints = "true"
+      })
+      machine_type = optional(string)
+      image_type   = optional(string, "cos_containerd")
+      disk_size_gb = optional(number)
+      disk_type    = optional(string)
+      taints = optional(list(object({
+        key    = optional(string)
+        value  = optional(string)
+        effect = optional(string)
+      })))
+    }), {})
+  }))
 }
 
 ################################

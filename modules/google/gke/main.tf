@@ -66,7 +66,7 @@ resource "google_container_node_pool" "linux_node_pool" {
 
   cluster    = google_container_cluster.primary.id
   version    = data.google_container_engine_versions.gke_version.release_channel_default_version[local.release_channel]
-  node_count = each.value.node_count
+  node_count = each.value.node_count > 0 ? each.value.node_count : null
 
   node_config {
     labels       = merge(var.metadata.labels, each.value.node_config.labels)

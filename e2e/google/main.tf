@@ -92,6 +92,8 @@ module "runner" {
   gitlab_url   = module.gitlab.url
   runner_token = module.gitlab.runner_token
 
+  runner_version = "v${var.runner_version}"
+
   executor = "docker-autoscaler"
 
   fleeting_instance_group_name = module.fleeting.instance_group_name

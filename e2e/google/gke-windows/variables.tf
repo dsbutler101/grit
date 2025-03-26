@@ -10,3 +10,7 @@ variable "name" {
 variable "runner_tag" {
   type = string
 }
+
+variable "runner_version" {
+  type = string
+}

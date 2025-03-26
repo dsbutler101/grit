@@ -9,22 +9,21 @@ e2e:
     # variable values.
     # Create a separate trigger job if you need larger inputs.
     matrix:
-      - E2E_TEST_NAME: aws
+      - &aws_params
+        E2E_TEST_NAME: aws
         E2E_TEST_DIR: e2e/aws
-        E2E_TEST_IMAGE: alpine/curl:latest
         E2E_TEST_SCRIPT: 'curl http://169.254.169.254/latest/meta-data/instance-id'
-      - E2E_TEST_NAME: aws-arm
-        E2E_TEST_DIR: e2e/aws
+      - <<: *aws_params
+        E2E_TEST_NAME: aws-arm
         TF_VAR_ami_arch: arm64
-        E2E_TEST_IMAGE: alpine/curl:latest
-        E2E_TEST_SCRIPT: 'curl http://169.254.169.254/latest/meta-data/instance-id'
+      - <<: *aws_params
+        E2E_TEST_NAME: aws-wrap
+        TF_VAR_enable_runner_wrapper: "true"
       - E2E_TEST_NAME: google
         E2E_TEST_DIR: e2e/google
-        E2E_TEST_IMAGE: alpine/curl:latest
         E2E_TEST_SCRIPT: 'curl -s -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/name'
       - E2E_TEST_NAME: gke-win
         E2E_TEST_DIR: e2e/google/gke-windows
-        E2E_TEST_IMAGE: gitlab/gitlab-runner-helper:x86_64-latest-servercore1809
         E2E_TEST_SCRIPT: 'curl "http://169.254.169.254/computeMetadata/v1/instance/name" -Headers @{"Metadata-Flavor"="Google"} -UseBasicParsing'
         E2E_TEST_POWERSHELL: y
   trigger:

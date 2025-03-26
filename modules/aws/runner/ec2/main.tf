@@ -51,6 +51,12 @@ locals {
         })
       },
       ],
+      var.runner_wrapper.enabled ? [{
+        path        = "/etc/systemd/system/gitlab-runner.service.d/wrapper.conf"
+        owner       = "root:root"
+        permissions = "0644"
+        content     = templatefile("${path.module}/wrapper.conf", var.runner_wrapper)
+      }] : [],
       var.node_exporter.enabled ? module.node_exporter[0].write_files_config : [],
       var.install_cloudwatch_agent ? [local.cloudwatch_config_file] : []
     )

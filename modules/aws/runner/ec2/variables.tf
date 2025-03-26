@@ -135,10 +135,11 @@ variable "runner_manager_ami" {
 
 variable "usage_logger" {
   type = object({
-    enabled       = bool
-    log_dir       = string
-    custom_labels = map(string)
+    enabled       = optional(bool, false)
+    log_dir       = optional(string)
+    custom_labels = optional(map(string), {})
   })
+  default = {}
 }
 
 variable "acceptable_durations" {
@@ -184,6 +185,17 @@ variable "node_exporter" {
     enabled = optional(bool, false)
     port    = optional(number, 9100)
     version = optional(string, "0.9.0")
+  })
+  default = {}
+}
+
+// Context: https://gitlab.com/gitlab-org/gitlab-runner/-/issues/38216
+variable "runner_wrapper" {
+  description = "Configure runner wrapper for deployer automation"
+  type = object({
+    enabled                     = optional(bool, false)
+    process_termination_timeout = optional(string, "3h")
+    socket_path                 = optional(string, "unix:///var/run/gitlab-runner-wrapper.sock")
   })
   default = {}
 }

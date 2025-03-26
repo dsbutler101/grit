@@ -304,3 +304,16 @@ variable "usage_logger" {
     enabled = false
   }
 }
+
+##################
+# Runner Wrapper #
+##################
+variable "runner_wrapper" {
+  description = "Enable gitlab-runner wrapper"
+  type = object({
+    enabled                     = optional(bool, false)
+    process_termination_timeout = optional(string)
+    socket_path                 = optional(string)
+  })
+  default = {}
+}

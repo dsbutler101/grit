@@ -37,6 +37,7 @@ include:
     TF_VAR_runner_tag: ${RUNNER_NAME}
     TF_VAR_name: ${RUNNER_NAME}
     TF_VAR_gitlab_project_id: ${CI_PROJECT_ID}
+    TF_VAR_runner_version: "17.10.0"
 
     # Terraform backend config
     TF_HTTP_ADDRESS: "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/terraform/state/${RUNNER_NAME}"
@@ -79,7 +80,7 @@ e2e:apply:
 e2e:test:
   stage: test
   timeout: 60m
-  image: ${E2E_TEST_IMAGE}
+  image: alpine/curl:latest
   extends:
     - .e2e:base
   script:
@@ -94,7 +95,7 @@ e2e:test:
 e2e:test:powershell:
   stage: test
   timeout: 60m
-  image: ${E2E_TEST_IMAGE}
+  image: registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-latest-servercore1809
   extends:
     - .e2e:base
   script:

@@ -127,7 +127,7 @@ module "prometheus_iam" {
   source = "../../../../modules/google/iam"
 
   metadata = merge(local.metadata, {
-    name = "${local.metadata.name}-prom"
+    name = "${local.metadata.name}-p"
   })
 }
 

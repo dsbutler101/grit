@@ -114,6 +114,11 @@ module "runner" {
   security_group_ids = [
     module.security_groups.runner_manager.id,
   ]
+
+  runner_version = "${var.runner_version}-1"
+  runner_wrapper = {
+    enabled = var.enable_runner_wrapper
+  }
 }
 
 locals {

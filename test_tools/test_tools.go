@@ -37,6 +37,12 @@ func JobName(t *testing.T) string {
 }
 
 func Plan(t *testing.T, moduleVars map[string]any) *terraform.PlanStruct {
+	plan, err := PlanE(t, moduleVars)
+	require.NoError(t, err)
+	return plan
+}
+
+func PlanE(t *testing.T, moduleVars map[string]any) (*terraform.PlanStruct, error) {
 	tempDir := t.TempDir()
 	tempFilePath := filepath.Join(tempDir, "plan.json")
 
@@ -47,14 +53,17 @@ func Plan(t *testing.T, moduleVars map[string]any) *terraform.PlanStruct {
 		Vars:            moduleVars,
 	}
 
-	optionsDiscardLogger := options
-	optionsDiscardLogger.Logger = logger.Discard
-
 	// We separate InitAndPlan from ShowWithStruct to use different options.
 	//
 	// In InitAndPlan we want to have a logger that will print terraform output
 	// to the test output. That is very useful when debugging.
-	_ = terraform.InitAndPlan(t, &options)
+	_, err := terraform.InitAndPlanE(t, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	optionsDiscardLogger := options
+	optionsDiscardLogger.Logger = logger.Discard
 
 	// In ShowWithStruct we use the options set that explicitly disable logger
 	// by using logger.Discard. This is due the fact that to parse the plan output
@@ -65,7 +74,7 @@ func Plan(t *testing.T, moduleVars map[string]any) *terraform.PlanStruct {
 	// help in case of GitLab CI/CD execution.
 	//
 	// Therefore - we need to disable logging in this specific case.
-	return terraform.ShowWithStruct(t, &optionsDiscardLogger)
+	return terraform.ShowWithStruct(t, &optionsDiscardLogger), nil
 }
 
 func PlanAndAssert(t *testing.T, moduleVars map[string]any, expectedModules []string) {
@@ -88,17 +97,8 @@ func AssertWithPlan(t *testing.T, plan *terraform.PlanStruct, expectedModules []
 }
 
 func PlanAndAssertError(t *testing.T, moduleVars map[string]any, wantErr bool) {
-	tempDir := t.TempDir()
-	tempFilePath := filepath.Join(tempDir, "plan.json")
+	_, err := PlanE(t, moduleVars)
 
-	options := &terraform.Options{
-		TerraformBinary: "terraform",
-		TerraformDir:    ".",
-		PlanFilePath:    tempFilePath,
-		Vars:            moduleVars,
-	}
-
-	_, err := terraform.InitAndPlanE(t, options)
 	if wantErr {
 		require.Error(t, err)
 	} else {

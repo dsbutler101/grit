@@ -71,4 +71,6 @@ module "ec2" {
   volume_size                 = var.volume_size
   volume_type                 = var.volume_type
   throughput                  = var.throughput
+
+  runner_wrapper = var.runner_wrapper
 }

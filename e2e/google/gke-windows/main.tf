@@ -72,7 +72,6 @@ module "gke_runner" {
     environment = [ "FF_USE_POWERSHELL_PATH_RESOLVER=true" ]
     shell = "powershell"
     [runners.kubernetes]
-      image = "gitlab/gitlab-runner-helper:x86_64-latest-servercore1809"
       pod_labels_overwrite_allowed = ""
       service_account_overwrite_allowed = ""
       pod_annotations_overwrite_allowed = ""
@@ -88,9 +87,9 @@ module "gke_runner" {
     "KUBERNETES_POLL_TIMEOUT" = "3600"
     "FF_TIMESTAMPS"           = "true"
   }
-  helper_image = "gitlab/gitlab-runner-helper:x86_64-latest-servercore1809"
+  helper_image = "registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-latest-servercore1809"
   // TODO: The default runner image in operator is now registry.gitlab.com/gitlab-org/gitlab-runner:alpine-bleeding which
   // isn't ideal as it doesn't run in the security context of the Operator by default
-  runner_image                = "registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp:v17.9.0"
+  runner_image                = "registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp:v${var.runner_version}"
   override_operator_manifests = "file://../../../examples/test-runner-gke-google/operator.k8s.yaml"
 }

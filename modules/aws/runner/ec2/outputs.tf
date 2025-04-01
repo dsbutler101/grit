@@ -11,10 +11,15 @@ output "public_ip" {
   value = aws_instance.runner_manager.public_ip
 }
 
-output "grit_runner_manager" {
-  value = var.runner_wrapper.enabled ? {
-    instance_name   = aws_instance.runner_manager.id
-    address         = aws_instance.runner_manager.private_ip
-    wrapper_address = var.runner_wrapper.socket_path
-  } : {}
+output "instance_id" {
+  value = aws_instance.runner_manager.id
+}
+
+output "runner_wrapper_socket_path" {
+  value = var.runner_wrapper.socket_path
+}
+
+output "ssh_key_pem" {
+  value     = try(tls_private_key.aws_runner_key_pair[0].private_key_pem, "")
+  sensitive = true
 }

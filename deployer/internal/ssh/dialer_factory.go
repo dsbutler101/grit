@@ -29,6 +29,8 @@ type TargetDef struct {
 }
 
 type TargetHostDef struct {
+	InstanceName  string
+	InstanceID    string
 	Address       string
 	Username      string
 	PrivateKeyPem []byte

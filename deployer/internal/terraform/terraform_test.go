@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
@@ -163,7 +164,14 @@ func TestClient_ReadStateDir(t *testing.T) {
 		}
 	}
 
-	defaultPrepareCommanderMock := func(t *testing.T, cmdr *mockCommander, expectedContext context.Context, out io.Writer) {
+	defaultPrepareCommanderMock := func(t *testing.T, cmdr *mockCommander, expectedContext context.Context) {
+		var out io.Writer
+		cmdr.EXPECT().setStdout(mock.Anything).Run(func(stdout io.Writer) {
+			out = stdout
+		})
+		cmdr.EXPECT().
+			run(expectedContext, testExecPath, tfCommandInit).
+			Return(nil)
 		cmdr.EXPECT().
 			run(expectedContext, testExecPath, tfCommandShow, "-json").
 			Run(func(_ context.Context, _ string, _ ...string) {
@@ -174,17 +182,20 @@ func TestClient_ReadStateDir(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		prepareCommanderMock func(t *testing.T, cmd *mockCommander, expectedContext context.Context, out io.Writer)
+		prepareCommanderMock func(t *testing.T, cmdr *mockCommander, expectedContext context.Context)
 		mockStateReader      func(t *testing.T) stateReader
 		assertError          func(t *testing.T, err error)
 		assertRMs            func(t *testing.T, rms RunnerManagers)
 	}{
 		"reading state from dir fails": {
-			prepareCommanderMock: func(t *testing.T, cmdr *mockCommander, expectedContext context.Context, out io.Writer) {
+			prepareCommanderMock: func(t *testing.T, cmdr *mockCommander, expectedContext context.Context) {
+				cmdr.EXPECT().setStdout(mock.Anything)
+				cmdr.EXPECT().
+					run(expectedContext, testExecPath, tfCommandInit).
+					Return(nil)
 				cmdr.EXPECT().
 					run(expectedContext, testExecPath, tfCommandShow, "-json").
 					Return(assert.AnError)
-
 				cmdr.EXPECT().exitCode().Return(testExitCode)
 			},
 			mockStateReader: noopMockStateReader,
@@ -231,11 +242,13 @@ func TestClient_ReadStateDir(t *testing.T) {
 
 			cmdr := newMockCommander(t)
 
+			require.NotNil(t, tt.prepareCommanderMock, "prepareCommanderMock must be defined in test definition")
+			tt.prepareCommanderMock(t, cmdr, ctx)
+
 			c := New(logger.New())
 			c.SetExecPath(testExecPath)
 			c.commanderFactory = func(stdout io.Writer, stderr io.Writer, workdir string) commander {
-				require.NotNil(t, tt.prepareCommanderMock, "prepareCommanderMock must be defined in test definition")
-				tt.prepareCommanderMock(t, cmdr, ctx, stdout)
+				cmdr.setStdout(stdout)
 
 				return cmdr
 			}

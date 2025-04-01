@@ -14,6 +14,7 @@ const (
 type commander interface {
 	run(ctx context.Context, cmd string, args ...string) error
 	exitCode() int
+	setStdout(io.Writer)
 }
 
 type defaultCommander struct {
@@ -25,11 +26,13 @@ type defaultCommander struct {
 }
 
 func newDefaultCommander(stdout io.Writer, stderr io.Writer, workdir string) commander {
-	return &defaultCommander{
-		stdout:  stdout,
+	cmdr := &defaultCommander{
 		stderr:  stderr,
 		workdir: workdir,
 	}
+	cmdr.setStdout(stdout)
+
+	return cmdr
 }
 
 func (d *defaultCommander) run(ctx context.Context, cmd string, args ...string) error {
@@ -39,6 +42,10 @@ func (d *defaultCommander) run(ctx context.Context, cmd string, args ...string) 
 	d.cmd.Dir = d.workdir
 
 	return d.cmd.Run()
+}
+
+func (d *defaultCommander) setStdout(stdout io.Writer) {
+	d.stdout = stdout
 }
 
 func (d *defaultCommander) exitCode() int {

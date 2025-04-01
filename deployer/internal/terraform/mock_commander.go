@@ -4,6 +4,7 @@ package terraform
 
 import (
 	context "context"
+	io "io"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -124,6 +125,39 @@ func (_c *mockCommander_run_Call) Return(_a0 error) *mockCommander_run_Call {
 }
 
 func (_c *mockCommander_run_Call) RunAndReturn(run func(context.Context, string, ...string) error) *mockCommander_run_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// setStdout provides a mock function with given fields: _a0
+func (_m *mockCommander) setStdout(_a0 io.Writer) {
+	_m.Called(_a0)
+}
+
+// mockCommander_setStdout_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'setStdout'
+type mockCommander_setStdout_Call struct {
+	*mock.Call
+}
+
+// setStdout is a helper method to define mock.On call
+//   - _a0 io.Writer
+func (_e *mockCommander_Expecter) setStdout(_a0 interface{}) *mockCommander_setStdout_Call {
+	return &mockCommander_setStdout_Call{Call: _e.mock.On("setStdout", _a0)}
+}
+
+func (_c *mockCommander_setStdout_Call) Run(run func(_a0 io.Writer)) *mockCommander_setStdout_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(io.Writer))
+	})
+	return _c
+}
+
+func (_c *mockCommander_setStdout_Call) Return() *mockCommander_setStdout_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *mockCommander_setStdout_Call) RunAndReturn(run func(io.Writer)) *mockCommander_setStdout_Call {
 	_c.Call.Return(run)
 	return _c
 }

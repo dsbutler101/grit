@@ -84,6 +84,7 @@ module "runner" {
   scale_min             = var.autoscaling_policy.scale_min
   scale_max             = var.max_instances
   idle_percentage       = var.autoscaling_policy.scale_factor
+  idle_time             = var.autoscaling_policy.idle_time
   capacity_per_instance = var.capacity_per_instance
   max_use_count         = var.max_use_count
   region                = var.aws_region

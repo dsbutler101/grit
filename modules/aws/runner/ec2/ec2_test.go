@@ -49,6 +49,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 			"scale_max":                   1,
 			"max_use_count":               10,
 			"idle_percentage":             0.0,
+			"idle_time":                   "20m0s",
 			"name":                        name,
 			"labels":                      map[string]string{"env": "another place"},
 			"security_group_ids":          []string{"123456"},

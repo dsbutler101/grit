@@ -35,6 +35,7 @@ locals {
           username                = var.fleeting.username
           executor                = var.executor
           idle_count              = var.scale_min * var.capacity_per_instance
+          idle_time               = var.idle_time
           scale_max               = var.scale_max
           max_use_count           = var.max_use_count
           idle_percentage         = var.idle_percentage

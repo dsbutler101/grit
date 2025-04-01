@@ -30,6 +30,12 @@ variable "executor" {
   type        = string
 }
 
+variable "idle_time" {
+  description = "The period of inactivity after which the runner manager will terminate an instance"
+  type        = string
+  default     = "20m0s"
+}
+
 variable "scale_min" {
   description = "The minimum number of instances to maintain"
   type        = number

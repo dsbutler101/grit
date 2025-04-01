@@ -66,6 +66,11 @@ variable "idle_percentage" {
   type        = number
 }
 
+variable "idle_time" {
+  description = "The period of inactivity after which the runner manager will terminate an instance"
+  type        = string
+}
+
 variable "executor" {
   type = string
 }

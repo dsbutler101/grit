@@ -47,7 +47,7 @@ listen_address = "${metrics_export_endpoint}"
 
         [[runners.autoscaler.policy]]
             idle_count = ${idle_count}
-            idle_time = "20m0s"
+            idle_time = "${idle_time}"
             scale_factor = ${idle_percentage}
 %{ endif }
 

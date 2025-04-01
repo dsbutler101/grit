@@ -157,7 +157,7 @@ resource "aws_instance" "runner_manager" {
     Name = "${var.name}_runner-manager"
   })
 
-  key_name = var.fleeting.ssh_key_pem_name
+  key_name = try(aws_key_pair.aws_runner_key_pair[0].key_name, "")
 
   root_block_device {
     delete_on_termination = true

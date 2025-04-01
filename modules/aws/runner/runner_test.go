@@ -68,8 +68,11 @@ func TestRunner(t *testing.T) {
 						"stack_os": "os-name",
 					},
 				},
+				"create_key_pair": map[string]any{},
 			},
 			expectedModules: []string{
+				"module.ec2[0].aws_key_pair.aws_runner_key_pair[0]",
+				"module.ec2[0].tls_private_key.aws_runner_key_pair[0]",
 				"module.ec2[0].aws_instance.runner_manager",
 			},
 		},

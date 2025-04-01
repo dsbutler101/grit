@@ -231,6 +231,8 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 
 	dialer, err := h.dialerFactory.Create(h.sshFlags, ssh.TargetDef{
 		Host: ssh.TargetHostDef{
+			InstanceName:  rm.InstanceName,
+			InstanceID:    rm.InstanceID,
 			Address:       rm.Address,
 			Username:      username,
 			PrivateKeyPem: sshKeyPemBytes,

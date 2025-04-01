@@ -11,6 +11,7 @@ const (
 	OutputName = "grit_runner_managers"
 
 	OutputValueInstanceName   = "instance_name"
+	OutputValueInstanceID     = "instance_id"
 	OutputValueAddress        = "address"
 	OutputValueWrapperAddress = "wrapper_address"
 	OutputValueUsername       = "username"
@@ -30,6 +31,7 @@ type RunnerManagers map[string]RunnerManager
 
 type RunnerManager struct {
 	InstanceName   string
+	InstanceID     string
 	Address        string
 	WrapperAddress string
 	Username       string
@@ -60,6 +62,7 @@ func newRunnerManager(in any) (RunnerManager, error) {
 
 	matchingMap := map[string]keyReader{
 		OutputValueInstanceName:   optionalStringReader(rmMap, &rm.InstanceName),
+		OutputValueInstanceID:     optionalStringReader(rmMap, &rm.InstanceID),
 		OutputValueAddress:        requiredStringReader(rmMap, &rm.Address),
 		OutputValueWrapperAddress: requiredStringReader(rmMap, &rm.WrapperAddress),
 		OutputValueUsername:       optionalStringReader(rmMap, &rm.Username),

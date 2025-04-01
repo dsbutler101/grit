@@ -141,7 +141,11 @@ func (c *Client) runTerraformWithOutput(ctx context.Context, out io.Writer, work
 
 func (c *Client) ReadStateDir(ctx context.Context, workdir string) (RunnerManagers, error) {
 	buf := new(bytes.Buffer)
-	err := c.runTerraformWithOutput(ctx, buf, workdir, tfCommandShow, "-json")
+	err := c.Init(ctx, workdir)
+	if err != nil {
+		return RunnerManagers{}, fmt.Errorf("initializing terraform state: %w", err)
+	}
+	err = c.runTerraformWithOutput(ctx, buf, workdir, tfCommandShow, "-json")
 	if err != nil {
 		return RunnerManagers{}, fmt.Errorf("reading terraform state: %w", err)
 	}

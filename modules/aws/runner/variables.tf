@@ -206,6 +206,15 @@ variable "node_exporter" {
   default = {}
 }
 
+variable "create_key_pair" {
+  description = "SSH key pair to create"
+  type = object({
+    algorithm = optional(string, "RSA")
+    size      = optional(number, 4096)
+  })
+  default = null
+}
+
 ##########
 # GITLAB #
 ##########

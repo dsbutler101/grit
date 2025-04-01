@@ -61,6 +61,7 @@ module "ec2" {
   usage_logger               = var.usage_logger
   acceptable_durations       = var.acceptable_durations
   node_exporter              = var.node_exporter
+  create_key_pair            = var.create_key_pair
 
   name                        = var.metadata.name
   labels                      = var.metadata.labels

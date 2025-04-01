@@ -199,3 +199,11 @@ variable "runner_wrapper" {
   })
   default = {}
 }
+
+variable "create_key_pair" {
+  type = object({
+    algorithm = optional(string, "RSA")
+    size      = optional(number, 4096)
+  })
+  default = null
+}

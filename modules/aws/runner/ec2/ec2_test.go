@@ -13,6 +13,8 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 
 	expectedModules := []string{
 		"aws_instance.runner_manager",
+		"aws_key_pair.aws_runner_key_pair[0]",
+		"tls_private_key.aws_runner_key_pair[0]",
 	}
 
 	variables := func(overrides map[string]any) map[string]any {
@@ -71,6 +73,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 			"volume_type":                 "gp2",
 			"throughput":                  0,
 			"runner_manager_ami":          "ami-05012401516a40259",
+			"create_key_pair":             map[string]any{},
 		}
 		maps.Copy(required, overrides)
 		return required

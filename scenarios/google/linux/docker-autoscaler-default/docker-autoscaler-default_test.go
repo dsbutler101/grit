@@ -22,6 +22,7 @@ func TestScenarioGoogleLinuxDockerAutoscaler(t *testing.T) {
 				"google_zone":    "us-central1-a",
 				"gitlab_url":     "https://gitlab.example.com",
 				"runner_token":   "glrt-abcdef1234567890",
+				"runner_version": "17.10.0",
 
 				"runner_machine_type": "n2d-standard-4",
 				"runner_disk_type":    "pd-ssd",

@@ -78,8 +78,9 @@ module "runner" {
     port    = local.runner_metrics_port
   }
 
-  gitlab_url   = var.gitlab_url
-  runner_token = var.runner_token
+  gitlab_url     = var.gitlab_url
+  runner_token   = var.runner_token
+  runner_version = var.runner_version
 
   executor = "docker-autoscaler"
 

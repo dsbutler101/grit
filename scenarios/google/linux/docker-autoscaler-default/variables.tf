@@ -28,6 +28,10 @@ variable "runner_token" {
   type = string
 }
 
+variable "runner_version" {
+  type = string
+}
+
 variable "runner_machine_type" {
   type = string
 

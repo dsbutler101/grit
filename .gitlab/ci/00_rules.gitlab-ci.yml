@@ -41,7 +41,7 @@
   if: '$CI_PROJECT_NAMESPACE !~ /^gitlab-org($|\/)/'
 
 .if-stable-release: &if-stable-release
-  if: $CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_PROJECT_PATH == "gitlab-org/ci-cd/shared-runners/images/aws/grit-images"
+  if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_PROJECT_NAMESPACE =~ /^gitlab-org($|\/)/'
 
 .if-after-merge-pipeline: &if-after-merge-pipeline
   if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'

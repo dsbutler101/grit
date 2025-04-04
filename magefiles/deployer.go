@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"strings"
 
 	"github.com/magefile/mage/mg"
@@ -25,6 +26,13 @@ func (Deployer) CompileFor(platforms string) error {
 	}
 
 	return deployer.Compile(platformDefs...)
+}
+
+// Upload uploads compiled Deployer binaries to GitLab generic packages repository
+// Works only from within CI/CD job - authentication hardcoded to use
+// CI_JOB_TOKEN.
+func (Deployer) Upload(ctx context.Context) error {
+	return deployer.Upload(ctx)
 }
 
 // GoGenerate runs go generate within the deployer submodule

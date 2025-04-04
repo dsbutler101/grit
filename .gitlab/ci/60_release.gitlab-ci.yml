@@ -1,3 +1,16 @@
+deployer:upload:
+  stage: release
+  extends:
+    - .rules:after-merge
+    - .rules:stable-release
+  needs:
+    - deployer:build
+  script:
+    - mage deployer:upload
+  artifacts:
+    paths:
+      - artifacts_list.json
+
 prerelease tag on main:
   stage: release
   extends:
@@ -11,7 +24,8 @@ stable release:
   stage: release
   extends:
     - .rules:stable-release
-  dependencies: []
+  needs:
+    - deployer:upload
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   variables:
     CHANGELOG: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/blob/$CI_COMMIT_TAG/CHANGELOG.md
@@ -21,11 +35,11 @@ stable release:
     url: https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/releases
   script:
     - echo "Releasing new version $CI_COMMIT_TAG"
-  release:
-    name: '$CI_COMMIT_TAG'
-    description: |
-      See [the changelog]($CHANGELOG) :rocket:
-
-      GitLab Runner Infrastructure Toolkit (GRIT) documentation can be found at https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/blob/main/README.md
-    tag_name: '$CI_COMMIT_TAG'
-    ref: '$CI_COMMIT_TAG'
+    - apk add jq
+    - releaseSh=/tmp/release.sh
+    - echo -n "release-cli create " > ${releaseSh}
+    - echo -n "--name '${CI_COMMIT_TAG}' " >> ${releaseSh}
+    - echo -n "--tag-name '${CI_COMMIT_TAG}' " >> ${releaseSh}
+    - echo -n "--description \"See [the changelog](${CHANGELOG}) :rocket:\n\nGitLab Runner Infrastructure Toolkit (GRIT) documentation can be found at https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/blob/main/README.md\" " >> ${releaseSh}
+    - jq -j '.[] | "  --assets-link \"{\\\"name\\\":\\\"\(.file_name)\\\",\\\"url\\\":\\\"\(.web_url)\\\",\\\"direct_asset_path\\\":\\\"\(.file_name)\\\"}\" "' <artifacts_list.json >> ${releaseSh}
+    - sh ${releaseSh}

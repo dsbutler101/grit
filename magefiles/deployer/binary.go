@@ -19,7 +19,8 @@ import (
 const (
 	submodulePath = "deployer"
 
-	binaryName = "deployer"
+	binaryName    = "deployer"
+	sha256SumFile = "sha256.sum"
 
 	outputDir = "build"
 )
@@ -48,23 +49,23 @@ func Compile(platformDefs ...string) error {
 		})
 	}
 
+	fmt.Println("Establishing version information...")
+	ver, err := sh.Output("./ci/version")
+	if err != nil {
+		return err
+	}
+
+	rev := magefiles.Revision()
+
+	gitReference, err := magefiles.GitReference()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("... version=%s revision=%s gitReference=%s\n", ver, rev, gitReference)
+	fmt.Println("...DONE")
+
 	return onDeployerWD(func() error {
-		fmt.Println("Establishing version information...")
-		ver, err := magefiles.Version()
-		if err != nil {
-			return err
-		}
-
-		rev := magefiles.Revision()
-
-		gitReference, err := magefiles.GitReference()
-		if err != nil {
-			return err
-		}
-
-		fmt.Printf("... version=%s revision=%s gitReference=%s\n", ver, rev, gitReference)
-		fmt.Println("...DONE")
-
 		ldFlags := []string{
 			// Set version variables
 			fmt.Sprintf("-X %s.version=%s", packageName(), ver),
@@ -89,7 +90,7 @@ func Compile(platformDefs ...string) error {
 			hashes = append(hashes, hash)
 		}
 
-		f, err := os.Create(filepath.Join(buildDirectory(), "sha256.sum"))
+		f, err := os.Create(filepath.Join(buildDirectory(), sha256SumFile))
 		if err != nil {
 			return err
 		}
@@ -127,7 +128,7 @@ func compileForPlatform(ldFlags []string, goos string, goarch string) (string, e
 	}
 
 	inputDir := filepath.Join(workingDirectory(), "cmd", binaryName)
-	binaryPath := filepath.Join(buildDirectory(), fmt.Sprintf("%s-%s-%s%s", binaryName, goos, goarch, binaryExtension()))
+	binaryPath := filepath.Join(buildDirectory(), fmt.Sprintf("%s-%s-%s%s", binaryName, goos, goarch, binaryExtension(goos)))
 
 	fmt.Println("...running go build")
 	err := sh.RunWith(envs, "go", "build", "-o", binaryPath, "-ldflags", strings.Join(ldFlags, " "), inputDir)
@@ -194,8 +195,8 @@ func buildDirectory() string {
 	})
 }
 
-func binaryExtension() string {
-	if runtime.GOOS == "windows" {
+func binaryExtension(goos string) string {
+	if goos == "windows" {
 		return ".exe"
 	}
 

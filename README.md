@@ -61,6 +61,16 @@ to a GitLab project ([example main.tf](examples/docker-autoscaler-ec2-deployed-w
 The outputs of each optional module are exactly what is required as input to the
 `runner` module, so they should fit together easily.
 
+### Module Compatibility
+
+A key architectural principle in GRIT is that module outputs are designed
+to be a [perfect fit](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/blob/main/GORP.md#perfect-fit) 
+for the expected input types where they are consumed. For
+example, the outputs of the `modules/aws/iam` module exactly match
+the expected input structure for the `iam` parameter in the `modules/aws/runner`
+module. This strict type matching ensures seamless composition of modules
+without requiring manual data transformation or restructuring.
+
 ### Examples
 
 - [Shell runner on EC2](examples/test-shell-runner-only-ec2/main.tf)

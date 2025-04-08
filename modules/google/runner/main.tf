@@ -16,19 +16,6 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
-##################
-# DEFAULT LABELS #
-##################
-
-locals {
-  default_labels = {
-    managed = "grit"
-  }
-
-  # Merge default labels with provided labels
-  merged_labels = merge(local.default_labels, var.metadata.labels)
-}
-
 ######################
 # RUNNER PROD CONFIG #
 ######################
@@ -187,7 +174,7 @@ resource "google_compute_instance" "runner_manager" {
     cos-update-strategy = "update_disabled"
   }
 
-  labels = merge(local.merged_labels, {
+  labels = merge(var.metadata.labels, {
     purpose = local.runner_manager_tag
   })
 

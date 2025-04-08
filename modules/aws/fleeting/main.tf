@@ -16,6 +16,19 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
+##################
+# DEFAULT LABELS #
+##################
+
+locals {
+  default_labels = {
+    managed = "grit"
+  }
+
+  # Merge default labels with provided labels
+  merged_labels = merge(local.default_labels, var.metadata.labels)
+}
+
 ########################
 # FLEETING PROD MODULE #
 ########################
@@ -30,7 +43,7 @@ module "ec2" {
   os                          = var.os
   ephemeral_runner_ami        = var.ephemeral_runner_ami
   instance_type               = var.instance_type
-  labels                      = var.metadata.labels
+  labels                      = local.merged_labels
   storage_type                = var.storage_type
   storage_size                = var.storage_size
   storage_throughput          = var.storage_throughput

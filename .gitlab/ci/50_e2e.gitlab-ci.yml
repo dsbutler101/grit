@@ -29,3 +29,43 @@ e2e:
   trigger:
     include: .gitlab/ci/e2e-pipeline.gitlab-ci.yml
     strategy: depend
+
+# clean up old terraform states, limited to first 100 each run
+# ignores the "default" state and targets all "^u[0-9]" states
+# and states created in the last 24 hours
+e2e:state-clean:
+  stage: e2e
+  extends:
+    - .rules:merge_request_pipelines:e2e
+  resource_group: $CI_JOB_NAME_SLUG
+  variables:
+    GITLAB_USER: $GITLAB_USER_LOGIN
+  script:
+    # graphql query
+    - |
+      query="{
+        project(fullPath: \"gitlab-org/ci-cd/runner-tools/grit\") {
+          terraformStates(first: 100) {
+            nodes {
+              name
+              createdAt
+            }
+          }
+        }
+      }"
+    - |
+      data="$(gojq -nc --arg q "$query" '{"query": $q}')"
+    - > 
+      resp="$(curl "https://gitlab.com/api/graphql?private_token=${GITLAB_TOKEN_TERRAFORM}"
+      -H "Content-Type: application/json" -X POST -d "$data")"
+    # filter out non-e2e states and states those created in last 24 hours
+    - >
+      states="$(echo "$resp" | gojq -r '.data.project.terraformStates.nodes[] |
+      select((.name | test("^u[0-9]")) and (now - (.createdAt | fromdate) > 86400)) | .name')"
+    # destroy
+    - |
+      for state in $states; do
+        echo "Destroying terraform state $state"
+        export TF_STATE_NAME="$state"
+        ./scripts/e2e-destroy.sh
+      done

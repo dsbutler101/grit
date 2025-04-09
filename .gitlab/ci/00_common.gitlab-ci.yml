@@ -5,6 +5,7 @@ default:
     - gitlab-org
 
 variables:
+  CI_IMAGE: "${CI_REGISTRY_IMAGE}/ci:20250403"
   GO_VERSION: "1.23.6"
   DOCKER_VERSION: "24.0.9"
 

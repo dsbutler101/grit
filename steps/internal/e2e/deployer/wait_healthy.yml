@@ -15,3 +15,4 @@ run:
       runner_tag: ${{ inputs.runner_tag }}
       tf_dir: ${{ inputs.tf_dir }}
       command: wait-healthy
+      additional_flags: --wrapper-connection-timeout 20m

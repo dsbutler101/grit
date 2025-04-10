@@ -11,6 +11,9 @@ spec:
       default: "17.10.0"
     command:
       type: string
+    additional_flags:
+      type: string
+      default: ""
 ---
 env:
   E2E_TEST_ID: ${{ job.E2E_TEST_ID }}
@@ -35,11 +38,15 @@ env:
   TF_HTTP_LOCK_METHOD: POST
   TF_HTTP_UNLOCK_METHOD: DELETE
 exec:
-  work_dir: ${{ work_dir }}/deployer/cmd/deployer
   command:
     - go
     - run
-    - .
+    - ${{ work_dir }}/steps/internal/e2e/deployer/
+    - -workdir
+    - ${{ work_dir }}/deployer/cmd/deployer
+    - -command
     - ${{ inputs.command }}
-    - --tf-target
+    - -tf-target
     - ${{ work_dir }}/${{ inputs.tf_dir }}
+    - -additional-flags
+    - ${{ inputs.additional_flags }}

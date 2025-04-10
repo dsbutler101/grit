@@ -54,6 +54,8 @@ module "runner" {
     module.security_groups.runner_manager.id,
   ]
 
+  instance_type = "t3.small"
+
   runner_version = "${var.runner_version}-1"
   runner_wrapper = {
     enabled     = true

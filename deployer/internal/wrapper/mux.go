@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	crypto_ssh "golang.org/x/crypto/ssh"
+
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/ssh"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/terraform"
@@ -211,14 +213,34 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 		return fmt.Errorf("getting ssh key bytes: %w", err)
 	}
 
+	var fingerprintSHA256 string
+	var fingerprintMD5 string
+	var keyType string
+
+	if len(sshKeyPemBytes) > 0 {
+		k, err := crypto_ssh.ParsePrivateKey(sshKeyPemBytes)
+		if err == nil {
+
+			fingerprintSHA256 = crypto_ssh.FingerprintSHA256(k.PublicKey())
+			fingerprintMD5 = crypto_ssh.FingerprintLegacyMD5(k.PublicKey())
+			keyType = k.PublicKey().Type()
+		}
+	}
+
 	log := h.logger.
 		WithGroup("dialer").
 		With("ssh-config", struct {
-			Address  string
-			Username string
+			Address              string
+			Username             string
+			KeyFingerprintSHA256 string
+			KeyFingerprintMD5    string
+			KeyType              string
 		}{
-			Address:  rm.Address,
-			Username: rm.Username,
+			Address:              rm.Address,
+			Username:             rm.Username,
+			KeyFingerprintSHA256: fingerprintSHA256,
+			KeyFingerprintMD5:    fingerprintMD5,
+			KeyType:              keyType,
 		}).
 		With("grpc-config", struct {
 			Network string
@@ -227,7 +249,7 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 			Network: wa.network,
 			Address: wa.address,
 		})
-	log.Debug("Creating SSH dialer")
+	log.Info("Creating SSH dialer")
 
 	dialer, err := h.dialerFactory.Create(h.sshFlags, ssh.TargetDef{
 		Host: ssh.TargetHostDef{

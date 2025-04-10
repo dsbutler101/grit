@@ -4,15 +4,6 @@ locals {
   cloudwatch_agent_json_path = "/var/tmp/amazon-cloudwatch-agent.json"
 
   cloud_config = {
-    groups = [
-      {
-        ubuntu = ["root", "sys"]
-      },
-      "hashicorp"
-    ]
-
-    users = ["default"]
-
     packages = ["git", "git-lfs"]
 
     write_files = setunion([

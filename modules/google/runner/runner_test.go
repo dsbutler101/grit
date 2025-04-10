@@ -137,6 +137,11 @@ func TestRunner(t *testing.T) {
 				"https_proxy":           "localhost:1234",
 				"no_proxy":              "foo",
 				"additional_volumes":    []string{"a", "b"},
+				"runner_wrapper": map[string]any{
+					"enabled":                     true,
+					"process_termination_timeout": "1h",
+					"socket_path":                 "tcp://localhost:1234",
+				},
 			}),
 			expectedModules: append(expectedModules,
 				`google_compute_firewall.additional_rules["test-allow"]`,

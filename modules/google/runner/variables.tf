@@ -128,6 +128,21 @@ variable "runner_metrics_listener" {
   default = {}
 }
 
+##################
+# Runner Wrapper #
+##################
+
+variable "runner_wrapper" {
+  type = object({
+    enabled                     = optional(bool, false)
+    debug                       = optional(bool, false)
+    process_termination_timeout = optional(string, "3h")
+  })
+  description = "Enable gitlab-runner wrapper"
+
+  default = {}
+}
+
 ########################
 # Runner configuration #
 ########################

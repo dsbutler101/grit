@@ -3,7 +3,7 @@
   executor = "${executor}"
 
 %{ if runners_global_section != "" }
-  ${runners_global_section}
+  ${indent(2, runners_global_section)}
 %{ endif }
 
 %{ if use_autoscaling }
@@ -47,7 +47,7 @@
     image = "${default_docker_image}"
 
 %{ if runners_docker_section != "" }
-    ${runners_docker_section}
+    ${indent(4, runners_docker_section)}
 %{ endif }
 %{ endif }
 

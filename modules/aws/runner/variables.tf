@@ -30,6 +30,13 @@ variable "executor" {
   type        = string
 }
 
+variable "runners_global_section" {
+  type        = string
+  description = "Hook for injecting custom configuration of [[runners]] global section"
+
+  default = ""
+}
+
 variable "idle_time" {
   description = "The period of inactivity after which the runner manager will terminate an instance"
   type        = string
@@ -83,9 +90,16 @@ variable "privileged" {
 
 variable "default_docker_image" {
   type        = string
-  description = "When using docker - Default image to use in jobs that don't specify it explicitely"
+  description = "When using docker - Default image to use in jobs that don't specify it explicitly"
 
   default = "ubuntu:latest"
+}
+
+variable "runners_docker_section" {
+  type        = string
+  description = "Hook for injecting custom configuration of [runners.docker] section"
+
+  default = ""
 }
 
 variable "region" {

@@ -109,6 +109,8 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 					"process_termination_timeout": "1m",
 					"socket_path":                 "tcp://foo",
 				},
+				"runners_global_section": "foo = bar\nbar = baz",
+				"runners_docker_section": "a = b\nb = c",
 			}),
 			expectedModules: expectedModules,
 		},

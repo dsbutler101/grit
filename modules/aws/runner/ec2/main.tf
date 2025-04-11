@@ -34,6 +34,7 @@ locals {
           aws_asg_name            = var.fleeting.autoscaling_group_name
           username                = var.fleeting.username
           executor                = var.executor
+          runners_global_section  = var.runners_global_section
           idle_count              = var.scale_min * var.capacity_per_instance
           idle_time               = var.idle_time
           scale_max               = var.scale_max
@@ -46,6 +47,7 @@ locals {
           aws_plugin_version      = var.aws_plugin_version
           capacity_per_instance   = var.capacity_per_instance
           default_docker_image    = var.default_docker_image
+          runners_docker_section  = var.runners_docker_section
           usage_logger            = var.usage_logger
           s3_cache                = var.s3_cache
           acceptable_durations    = var.acceptable_durations

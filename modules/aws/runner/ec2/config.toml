@@ -9,6 +9,10 @@ listen_address = "${metrics_export_endpoint}"
     token = "${runner_token}"
     executor = "${executor}"
 
+%{ if runners_global_section != "" }
+    ${indent(4, runners_global_section)}
+%{ endif }
+
 %{ if executor == "docker-autoscaler" || executor == "instance" }
     shell = "sh" # use powershell or pwsh for Windows AMIs
 
@@ -23,6 +27,10 @@ listen_address = "${metrics_export_endpoint}"
         privileged = true
         disable_cache = false
         volumes = ["/certs/client", "/cache"]
+%{ endif }
+
+%{ if runners_docker_section != "" }
+        ${indent(8, runners_docker_section)}
 %{ endif }
 
     # Autoscaler config

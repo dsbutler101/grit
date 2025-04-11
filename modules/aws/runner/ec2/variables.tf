@@ -75,6 +75,13 @@ variable "executor" {
   type = string
 }
 
+variable "runners_global_section" {
+  type        = string
+  description = "Hook for injecting custom configuration of [[runners]] global section"
+
+  default = ""
+}
+
 variable "labels" {
   type = map(any)
 }
@@ -131,6 +138,13 @@ variable "metrics_export_endpoint" {
 
 variable "default_docker_image" {
   type = string
+}
+
+variable "runners_docker_section" {
+  type        = string
+  description = "Hook for injecting custom configuration of [runners.docker] section"
+
+  default = ""
 }
 
 variable "runner_manager_ami" {

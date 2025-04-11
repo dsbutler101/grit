@@ -7,10 +7,8 @@ import (
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/test_tools"
 )
 
-type moduleVars = map[string]any
-
-func defaultModuleVars(t *testing.T) moduleVars {
-	return moduleVars{
+func defaultModuleVars(t *testing.T) map[string]any {
+	return map[string]any{
 		"name":        test_tools.JobName(t),
 		"google_zone": "us-east1-b",
 		"metadata": map[string]any{
@@ -67,11 +65,11 @@ func TestGKE(t *testing.T) {
 	}
 
 	testCases := map[string]struct {
-		moduleVars      moduleVars
+		moduleVars      map[string]any
 		expectedModules []string
 	}{
 		"create-gke-happy": {
-			moduleVars: moduleVars{
+			moduleVars: map[string]any{
 				"metadata": map[string]any{
 					"labels":      map[string]string{"env": "another-place"},
 					"min_support": "experimental",
@@ -115,7 +113,7 @@ func TestGKEPlanErrors(t *testing.T) {
 			},
 		},
 		"valid-label-value": {
-			moduleVars: moduleVars{
+			moduleVars: map[string]any{
 				"metadata": map[string]any{
 					"labels": map[string]string{
 						"label1": "this-is-fine",
@@ -143,8 +141,8 @@ func TestGKEPlanErrors(t *testing.T) {
 // mergeModuleVars returns a new moduleVars, merging together all provided
 // moduleVars, in order.
 // Note: this is a shallow merge.
-func mergeModuleVars(mvs ...moduleVars) moduleVars {
-	newMvs := moduleVars{}
+func mergeModuleVars(mvs ...map[string]any) map[string]any {
+	newMvs := map[string]any{}
 
 	for _, mv := range mvs {
 		maps.Copy(newMvs, mv)

@@ -41,31 +41,4 @@ e2e:state-clean:
   variables:
     GITLAB_USER: $GITLAB_USER_LOGIN
   script:
-    # graphql query
-    - |
-      query="{
-        project(fullPath: \"gitlab-org/ci-cd/runner-tools/grit\") {
-          terraformStates(first: 100) {
-            nodes {
-              name
-              createdAt
-            }
-          }
-        }
-      }"
-    - |
-      data="$(gojq -nc --arg q "$query" '{"query": $q}')"
-    - > 
-      resp="$(curl "https://gitlab.com/api/graphql?private_token=${GITLAB_TOKEN_TERRAFORM}"
-      -H "Content-Type: application/json" -X POST -d "$data")"
-    # filter out non-e2e states and states those created in last 24 hours
-    - >
-      states="$(echo "$resp" | gojq -r '.data.project.terraformStates.nodes[] |
-      select((.name | test("^u[0-9]")) and (now - (.createdAt | fromdate) > 86400)) | .name')"
-    # destroy
-    - |
-      for state in $states; do
-        echo "Destroying terraform state $state"
-        export TF_STATE_NAME="$state"
-        ./scripts/e2e-destroy.sh
-      done
+    - ci/e2e-state-clean.sh

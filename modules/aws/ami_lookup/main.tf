@@ -23,3 +23,14 @@ data "local_file" "manifest" {
 locals {
   manifest = jsondecode(data.local_file.manifest.content)
 }
+
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}

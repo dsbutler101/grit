@@ -24,7 +24,7 @@ resource "aws_security_group" "jobs_security_group" {
     }
   }
 
-  tags = merge(var.metadata.labels, {
-    Name = "${var.metadata.name} fleet"
+  tags = merge(module.labels.merged, {
+    name = "${var.metadata.name}-fleet"
   })
 }

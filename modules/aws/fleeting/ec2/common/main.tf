@@ -63,7 +63,7 @@ resource "aws_launch_template" "fleeting_asg_template" {
     resource_type = "instance"
 
     tags = merge(var.labels, {
-      Name = var.name
+      name = var.name
     })
   }
 
@@ -75,7 +75,7 @@ resource "aws_launch_template" "fleeting_asg_template" {
   }
 
   tags = merge(var.labels, {
-    Name = var.name
+    name = var.name
   })
 }
 

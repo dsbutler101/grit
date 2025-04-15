@@ -24,7 +24,7 @@ resource "aws_security_group" "manager_sg" {
     }
   }
 
-  tags = merge(var.metadata.labels, {
-    Name = "${var.metadata.name} manager"
+  tags = merge(module.labels.merged, {
+    name = "${var.metadata.name} manager"
   })
 }

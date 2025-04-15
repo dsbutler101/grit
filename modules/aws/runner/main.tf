@@ -16,6 +16,17 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}
+
 ######################
 # RUNNER PROD MODULE #
 ######################
@@ -67,7 +78,7 @@ module "ec2" {
   create_key_pair            = var.create_key_pair
 
   name                        = var.metadata.name
-  labels                      = var.metadata.labels
+  labels                      = module.labels.merged
   associate_public_ip_address = var.associate_public_ip_address
   instance_type               = var.instance_type
   encrypted                   = var.encrypted

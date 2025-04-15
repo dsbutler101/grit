@@ -25,7 +25,7 @@ func TestFleetingGCE(t *testing.T) {
 		"create fleeting gce": {
 			moduleVars: map[string]interface{}{
 				"name":                  name,
-				"labels":                map[string]string{"env": "another place"},
+				"labels":                map[string]string{"env": "another-place"},
 				"google_project":        "example-project-a1b2c3",
 				"subnetwork_project":    "example-subnetwork-project-a1b2c3",
 				"google_zone":           "us-central1-a",

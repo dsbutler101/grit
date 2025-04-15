@@ -13,6 +13,6 @@ resource "aws_key_pair" "jobs_key_pair" {
   public_key = tls_private_key.aws_jobs_private_key.public_key_openssh
 
   tags = merge(var.labels, {
-    Name = var.name
+    name = var.name
   })
 }

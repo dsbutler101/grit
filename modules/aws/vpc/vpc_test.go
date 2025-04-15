@@ -26,7 +26,7 @@ func TestVPC(t *testing.T) {
 			moduleVars: map[string]interface{}{
 				"metadata": map[string]interface{}{
 					"name":        name,
-					"labels":      map[string]string{"env": "another place"},
+					"labels":      map[string]string{"env": "another-place"},
 					"min_support": "experimental",
 				},
 				"cidr":        "10.0.0.0/16",

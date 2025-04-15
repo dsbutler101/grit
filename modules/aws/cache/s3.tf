@@ -7,8 +7,8 @@ resource "aws_s3_bucket" "cache_bucket_server_logs" {
 
   force_destroy = true
 
-  tags = merge(var.metadata.labels, {
-    Name = local.bucket_name
+  tags = merge(module.labels.merged, {
+    name = local.bucket_name
   })
 }
 
@@ -34,8 +34,8 @@ resource "aws_s3_bucket" "cache" {
 
   force_destroy = true
 
-  tags = merge(var.metadata.labels, {
-    Name = local.bucket_name
+  tags = merge(module.labels.merged, {
+    name = local.bucket_name
   })
 }
 

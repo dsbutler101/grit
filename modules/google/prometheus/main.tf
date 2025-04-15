@@ -16,6 +16,17 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}
+
 ##########################
 # PROMETHEUS PROD CONFIG #
 ##########################
@@ -97,7 +108,7 @@ resource "terraform_data" "prometheus_server_replacement" {
 
 resource "google_compute_disk" "prometheus_data" {
   name   = "${var.metadata.name}-prometheus-data"
-  labels = var.metadata.labels
+  labels = module.labels.merged
 
   zone = var.google_zone
 
@@ -130,7 +141,7 @@ resource "google_compute_instance" "prometheus_server" {
     block-project-ssh-keys = true
   }
 
-  labels = merge(var.metadata.labels, {
+  labels = merge(module.labels.merged, {
     purpose : local.prometheus_server_tag,
   })
 

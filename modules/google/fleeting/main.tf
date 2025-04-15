@@ -16,6 +16,17 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}
+
 ########################
 # FLEETING PROD MODULE #
 ########################
@@ -26,7 +37,7 @@ module "gce" {
   source = "./gce"
 
   name   = var.metadata.name
-  labels = var.metadata.labels
+  labels = module.labels.merged
 
   google_project        = var.google_project
   subnetwork_project    = var.subnetwork_project

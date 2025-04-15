@@ -16,6 +16,17 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}
+
 ###################
 # IAM PROD MODULE #
 ###################

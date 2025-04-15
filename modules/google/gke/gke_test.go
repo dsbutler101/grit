@@ -117,7 +117,7 @@ func TestGKEPlanErrors(t *testing.T) {
 				"metadata": map[string]any{
 					"labels": map[string]string{
 						"label1": "this-is-fine",
-						"label2": "this.is_fine-too",
+						"label2": "this1is_fine-too",
 					},
 					"min_support": "experimental",
 					"name":        "gke",

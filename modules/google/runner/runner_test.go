@@ -28,7 +28,7 @@ func TestRunner(t *testing.T) {
 		required := map[string]any{
 			"metadata": map[string]interface{}{
 				"name":        name,
-				"labels":      map[string]string{"env": "another place"},
+				"labels":      map[string]string{"env": "another-place"},
 				"min_support": "experimental",
 			},
 			"google_project":               "example-project-a1b2c3",

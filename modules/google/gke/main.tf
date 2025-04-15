@@ -1,3 +1,14 @@
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}
+
 locals {
   node_tags = ["gke-node", "grit-gke"]
 
@@ -69,7 +80,7 @@ resource "google_container_node_pool" "linux_node_pool" {
   node_count = each.value.node_count > 0 ? each.value.node_count : null
 
   node_config {
-    labels       = merge(var.metadata.labels, each.value.node_config.labels)
+    labels       = merge(module.labels.merged, each.value.node_config.labels)
     tags         = concat(local.node_tags, each.value.node_config.tags)
     machine_type = each.value.node_config.machine_type
     image_type   = each.value.node_config.image_type
@@ -113,7 +124,7 @@ resource "google_container_node_pool" "windows_node_pool" {
   node_count = each.value.node_count
 
   node_config {
-    labels       = merge(var.metadata.labels, each.value.node_config.labels)
+    labels       = merge(module.labels.merged, each.value.node_config.labels)
     tags         = concat(local.node_tags, each.value.node_config.tags)
     machine_type = each.value.node_config.machine_type
     image_type   = each.value.node_config.image_type

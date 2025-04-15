@@ -16,6 +16,17 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}
+
 ######################
 # RUNNER PROD CONFIG #
 ######################
@@ -174,7 +185,7 @@ resource "google_compute_instance" "runner_manager" {
     cos-update-strategy = "update_disabled"
   }
 
-  labels = merge(var.metadata.labels, {
+  labels = merge(module.labels.merged, {
     purpose = local.runner_manager_tag
   })
 

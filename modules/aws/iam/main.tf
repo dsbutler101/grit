@@ -16,6 +16,17 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}
+
 ###################
 # IAM PROD MODULE #
 ###################
@@ -23,9 +34,7 @@ module "validate_support" {
 resource "aws_iam_user" "fleeting_service_account" {
   name = var.metadata.name
 
-  tags = merge(var.metadata.labels, {
-    Name = var.metadata.name
-  })
+  tags = module.labels.merged
 }
 
 # both `name` and `tags` are unsupported arguments
@@ -67,9 +76,7 @@ resource "aws_iam_policy" "fleeting_service_account_policy" {
   description = "A policy for accessing autoscaling groups"
   policy      = data.aws_iam_policy_document.fleeting_service_account_policy_document.json
 
-  tags = merge(var.metadata.labels, {
-    Name = var.metadata.name
-  })
+  tags = module.labels.merged
 }
 
 # both `name` and `tags` are unsupported arguments

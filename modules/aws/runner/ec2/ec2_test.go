@@ -53,7 +53,7 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 			"idle_percentage":             0.0,
 			"idle_time":                   "20m0s",
 			"name":                        name,
-			"labels":                      map[string]string{"env": "another place"},
+			"labels":                      map[string]string{"env": "another-place"},
 			"security_group_ids":          []string{"123456"},
 			"install_cloudwatch_agent":    false,
 			"region":                      "us-east-1",

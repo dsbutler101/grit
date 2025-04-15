@@ -16,6 +16,17 @@ module "validate_support" {
   min_support = var.metadata.min_support
 }
 
+##################
+# DEFAULT LABELS #
+##################
+
+module "labels" {
+  source = "../../internal/labels"
+
+  name              = var.metadata.name
+  additional_labels = var.metadata.labels
+}
+
 ###################
 # VPC PROD MODULE #
 ###################
@@ -25,17 +36,13 @@ resource "aws_vpc" "vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = merge(var.metadata.labels, {
-    Name = var.metadata.name
-  })
+  tags = module.labels.merged
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
-  tags = merge(var.metadata.labels, {
-    Name = var.metadata.name
-  })
+  tags = module.labels.merged
 }
 
 resource "aws_subnet" "jobs_vpc_subnet" {
@@ -46,9 +53,7 @@ resource "aws_subnet" "jobs_vpc_subnet" {
 
   map_public_ip_on_launch = true
 
-  tags = merge(var.metadata.labels, {
-    Name = var.metadata.name
-  })
+  tags = module.labels.merged
 }
 
 # adding tags to aws_route_table causes an error: query returned no results

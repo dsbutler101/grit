@@ -5,7 +5,7 @@ resource "aws_licensemanager_license_configuration" "license_config" {
   license_counting_type    = "Core"
 
   tags = merge(var.labels, {
-    Name = var.name
+    name = var.name
   })
 }
 
@@ -17,7 +17,7 @@ resource "aws_cloudformation_stack" "jobs_cloudformation_stack" {
   name = local.jobs_host_resource_group
 
   tags = merge(var.labels, {
-    Name = var.name
+    name = var.name
   })
 
   template_body = <<EOS

@@ -42,3 +42,4 @@ e2e:state-clean:
     GITLAB_USER: $GITLAB_USER_LOGIN
   script:
     - ci/e2e-state-clean.sh
+  allow_failure: true

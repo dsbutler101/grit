@@ -83,6 +83,11 @@ variable "runner_version" {
   description = "Version of GitLab Runner"
 
   default = "v16.8.0"
+
+  validation {
+    condition     = can(regex("v?[0-9]+\\.[0-9]+\\.[0-9]+", var.runner_version))
+    error_message = "runner_version must be in format of vX.Y.Z or X.Y.Z"
+  }
 }
 
 ################################

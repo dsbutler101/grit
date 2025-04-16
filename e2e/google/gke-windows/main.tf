@@ -46,7 +46,8 @@ module "gke_runner" {
     windows = {
       node_count = 1
       node_config = {
-        image_type = "windows_ltsc_containerd"
+        image_type   = "windows_ltsc_containerd"
+        machine_type = "n2d-standard-4"
       }
     }
     linux = {
@@ -54,7 +55,7 @@ module "gke_runner" {
       node_count = 2
       node_config = {
         image_type   = "cos_containerd"
-        machine_type = "e2-medium"
+        machine_type = "n2d-standard-2"
       }
     }
   }

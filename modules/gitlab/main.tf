@@ -24,8 +24,10 @@ resource "gitlab_user_runner" "primary" {
   group_id    = var.runner_type == "group_type" ? var.group_id : null
   project_id  = var.runner_type == "project_type" ? var.project_id : null
 
-  lifecycle {
+  // For non-project runners value doesn't matter
+  locked = var.runner_type == "project_type" ? var.lock_project_runner : true
 
+  lifecycle {
     precondition {
       condition     = !(var.runner_type == "group_type" && var.group_id == "")
       error_message = "The group_id must be set when runner_type is 'group_type'."

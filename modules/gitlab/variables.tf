@@ -56,3 +56,9 @@ variable "runner_type" {
     error_message = "The runner_type must be one of: instance_type, group_type, project_type."
   }
 }
+
+variable "lock_project_runner" {
+  type        = bool
+  description = "Mark runner as 'locked=true'. Usable only with project runners"
+  default     = true
+}

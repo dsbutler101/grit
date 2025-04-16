@@ -17,10 +17,10 @@ resource "tls_private_key" "aws_runner_key_pair" {
 resource "aws_key_pair" "aws_runner_key_pair" {
   count = local.create ? 1 : 0
 
-  key_name   = var.name
+  key_name   = "${var.name}-rm"
   public_key = tls_private_key.aws_runner_key_pair[0].public_key_openssh
 
   tags = merge(var.labels, {
-    name = var.name
+    Name = "${var.name}-rm"
   })
 }

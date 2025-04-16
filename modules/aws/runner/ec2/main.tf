@@ -4,15 +4,6 @@ locals {
   cloudwatch_agent_json_path = "/var/tmp/amazon-cloudwatch-agent.json"
 
   cloud_config = {
-    groups = [
-      {
-        ubuntu = ["root", "sys"]
-      },
-      "hashicorp"
-    ]
-
-    users = ["default"]
-
     packages = ["git", "git-lfs"]
 
     write_files = setunion([
@@ -108,6 +99,8 @@ locals {
   ]
 
   rendered_yaml = yamlencode(local.cloud_config)
+
+  instance_name = "${var.name}_runner-manager"
 }
 
 data "cloudinit_config" "config" {
@@ -157,7 +150,7 @@ resource "aws_instance" "runner_manager" {
   }
 
   tags = merge(var.labels, {
-    name = "${var.name}_runner-manager"
+    name = local.instance_name
   })
 
   key_name = try(aws_key_pair.aws_runner_key_pair[0].key_name, "")

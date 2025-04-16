@@ -4,7 +4,7 @@ e2e:
     - .rules:merge_request_pipelines:e2e
     - .no_dependencies
   variables:
-    E2E_TEST_ID: ${CI_PIPELINE_ID}
+    E2E_TEST_ID: ${CI_PIPELINE_IID}
   parallel:
     # Note: generated job names are limited to 255 characters which include
     # variable values.
@@ -52,7 +52,10 @@ e2e:deployer:
     - .no_dependencies
   variables:
     E2E_TEST_NAME: dep
-    E2E_TEST_ID: ${CI_PIPELINE_ID}
+    E2E_TEST_ID: ${CI_PIPELINE_IID}
   trigger:
     include: .gitlab/ci/e2e-deployer-pipeline.gitlab-ci.yml
     strategy: depend
+  parallel:
+    matrix:
+      - E2E_CLOUD: [aws, google]

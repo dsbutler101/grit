@@ -12,7 +12,7 @@ locals {
 }
 
 module "gitlab" {
-  source             = "../../../modules/gitlab"
+  source             = "../../../../modules/gitlab"
   metadata           = local.metadata
   url                = "https://gitlab.com"
   project_id         = var.gitlab_project_id
@@ -21,7 +21,7 @@ module "gitlab" {
 }
 
 module "vpc" {
-  source   = "../../../modules/aws/vpc"
+  source   = "../../../../modules/aws/vpc"
   metadata = local.metadata
 
   // assumes every region we support has a second zone
@@ -31,14 +31,14 @@ module "vpc" {
 }
 
 module "security_groups" {
-  source   = "../../../modules/aws/security_groups"
+  source   = "../../../../modules/aws/security_groups"
   metadata = local.metadata
 
   vpc_id = module.vpc.id
 }
 
 module "runner" {
-  source   = "../../../modules/aws/runner"
+  source   = "../../../../modules/aws/runner"
   metadata = local.metadata
   vpc      = local.vpc
   gitlab   = local.gitlab

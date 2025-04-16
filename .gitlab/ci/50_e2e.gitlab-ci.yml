@@ -2,6 +2,7 @@ e2e:
   stage: e2e
   extends:
     - .rules:merge_request_pipelines:e2e
+    - .no_dependencies
   variables:
     E2E_TEST_ID: ${CI_PIPELINE_ID}
   parallel:
@@ -37,7 +38,7 @@ e2e:state-clean:
   stage: e2e
   extends:
     - .rules:merge_request_pipelines:e2e
-  resource_group: $CI_JOB_NAME_SLUG
+    - .needs_ci_image
   variables:
     GITLAB_USER: $GITLAB_USER_LOGIN
   script:
@@ -48,6 +49,7 @@ e2e:deployer:
   stage: e2e
   extends:
     - .rules:merge_request_pipelines:e2e
+    - .no_dependencies
   variables:
     E2E_TEST_NAME: dep
     E2E_TEST_ID: ${CI_PIPELINE_ID}

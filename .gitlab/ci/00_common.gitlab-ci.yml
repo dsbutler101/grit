@@ -13,7 +13,7 @@ variables:
   cache: {}
 
 .no_dependencies:
-  dependencies: []
+  needs: []
 
 .no_cache_and_dependencies:
   extends:
@@ -63,3 +63,8 @@ variables:
     DOCKER_TLS_CERTDIR: "/certs"
   tags:
     - gitlab-org-docker
+
+.needs_ci_image:
+  needs:
+    - job: build CI image
+      optional: true

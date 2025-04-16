@@ -2,6 +2,7 @@ terraform formatting:
   stage: lint
   extends:
     - .rules:merge_request_pipelines:code
+    - .needs_ci_image
   script:
     - make terraform-fmt-check
 
@@ -10,6 +11,8 @@ terraform validate:
   extends:
     - .rules:merge_request_pipelines:code
     - .tf-cache
+  needs:
+    - terraform init
   script:
     # terraform init files should exist in cache, but just in case
     - make terraform-init -j4 -Oline
@@ -17,12 +20,14 @@ terraform validate:
 
 tflint:
   stage: lint
-  image:
-    name: ghcr.io/terraform-linters/tflint:v0.55.1
-    entrypoint: ['']
   extends:
     - .rules:merge_request_pipelines:code
     - .tf-cache
+  needs:
+    - terraform init
+  image:
+    name: ghcr.io/terraform-linters/tflint:v0.55.1
+    entrypoint: ['']
   script:
     - tflint --recursive --config "$(pwd)/.tflint.hcl"
 
@@ -32,7 +37,6 @@ docs lint markdown:
   extends:
     - .rules:merge_request_pipelines:docs
     - .no_cache_and_dependencies
-  needs: []
   variables:
     VALE_MIN_ALERT_LEVEL: error
   script:
@@ -40,12 +44,12 @@ docs lint markdown:
     - make lint-docs
 
 golang lint:
-  image: golangci/golangci-lint:v1.63.4-alpine
   stage: lint
-  needs: []
   extends:
     - .rules:merge_request_pipelines:code
+    - .no_dependencies
     - .go-cache
+  image: golangci/golangci-lint:v1.63.4-alpine
   script:
     - apk add --no-cache make
     - make lint-go

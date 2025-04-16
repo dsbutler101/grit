@@ -15,7 +15,7 @@ prerelease tag on main:
   stage: release
   extends:
     - .rules:after-merge
-  needs: []
+    - .no_cache_and_dependencies
   script:
     - ./ci/prerelease-tag.sh
 

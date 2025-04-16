@@ -5,9 +5,7 @@ include:
   stage: unit
   extends:
     - .rules:merge_request_pipelines:code
-    - .go-tf-cache
-  needs:
-    - job: terraform init
+    - .needs_ci_image
   script:
     - mage test:unit ${UNIT_TEST_EXECUTION_PATH}
   coverage: '/Coverage TOTAL: ([0-9]+\.[0-9]+%)/'
@@ -25,6 +23,9 @@ include:
 unit tests:
   extends:
     - .unit_tests
+    - .go-tf-cache
+  needs:
+    - terraform init
   variables:
     GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
     UNIT_TEST_EXECUTION_PATH: ${CI_PROJECT_DIR}
@@ -34,5 +35,6 @@ unit tests:
 deployer:unit tests:
   extends:
     - .unit_tests
+    - .go-cache
   variables:
     UNIT_TEST_EXECUTION_PATH: ${CI_PROJECT_DIR}/deployer

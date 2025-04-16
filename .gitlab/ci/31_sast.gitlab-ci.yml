@@ -5,9 +5,9 @@ include:
 
 kics-iac-sast:
   stage: unit
-  needs: []
   extends:
     - .rules:merge_request_pipelines:code
+    - .no_dependencies
   variables:
     GANDALF_IMAGE_LINK: registry.gitlab.com/gitlab-com/gl-security/security-operations/infrastructure-security-public/gandalf:latest
     GITLAB_TOKEN: $GANDALF_GITLAB_TOKEN

@@ -5,17 +5,20 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/url"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/cenkalti/backoff/v3"
 	crypto_ssh "golang.org/x/crypto/ssh"
+
+	"gitlab.com/gitlab-org/gitlab-runner/helpers/runner_wrapper/api/client"
 
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/ssh"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/terraform"
-	"gitlab.com/gitlab-org/gitlab-runner/helpers/runner_wrapper/api/client"
 )
 
 const (
@@ -74,16 +77,18 @@ type Mux struct {
 	logger *slog.Logger
 	tf     tfClient
 
-	tfFlags terraform.Flags
+	tfFlags      terraform.Flags
+	wrapperFlags Flags
 
 	rmHandlerFactory rmHandlerFactory
 }
 
 func NewMux(logger *slog.Logger, tf tfClient, tfFlags terraform.Flags, sshFlags ssh.Flags, wrapperFlags Flags) *Mux {
 	return &Mux{
-		logger:  logger,
-		tf:      tf,
-		tfFlags: tfFlags,
+		logger:       logger,
+		tf:           tf,
+		tfFlags:      tfFlags,
+		wrapperFlags: wrapperFlags,
 		rmHandlerFactory: &muxRunnerManagerHandlerFactory{
 			logger:       logger,
 			sshFlags:     sshFlags,
@@ -113,11 +118,11 @@ func (m *Mux) Execute(ctx context.Context, fn CallbackFn) error {
 		go func() {
 			defer wg.Done()
 
-			runnerManagerHandler := m.rmHandlerFactory.new(alias)
+			err := m.handleRunnerManager(ctx, alias, runnerManager, fn, m.wrapperFlags.ConnectionTimeout)
 
 			resultCh <- runnerManagerResult{
 				alias: alias,
-				err:   runnerManagerHandler.handle(ctx, runnerManager, fn),
+				err:   err,
 			}
 		}()
 	}
@@ -151,6 +156,40 @@ func (m *Mux) listRunnerManagers(ctx context.Context) (terraform.RunnerManagers,
 	}
 
 	return m.tf.ReadStateFile(ctx, m.tfFlags.TargetStateFile)
+}
+
+func (m *Mux) handleRunnerManager(ctx context.Context, alias string, rm terraform.RunnerManager, fn CallbackFn, connectionTimeout time.Duration) error {
+	cctx, cancelFn := context.WithTimeout(ctx, connectionTimeout)
+	defer cancelFn()
+
+	bo := backoff.NewExponentialBackOff()
+	bo.MaxInterval = 5 * time.Second
+
+	for {
+		select {
+		case <-cctx.Done():
+			err := ctx.Err()
+			if err != nil {
+				return err
+			}
+
+			return client.ErrRetryTimeoutExceeded
+		default:
+			err := m.rmHandlerFactory.new(alias).handle(ctx, rm, fn)
+
+			var eerr *net.OpError
+			if errors.As(err, &eerr) {
+				sleep := bo.NextBackOff()
+				m.logger.With(logger.ErrorKey, eerr, "sleep_seconds", sleep.Seconds()).Warn("Connection failure; retrying")
+
+				time.Sleep(sleep)
+
+				continue
+			}
+
+			return err
+		}
+	}
 }
 
 type muxRunnerManagerHandlerFactory struct {
@@ -265,7 +304,7 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrSSHDialerFabrication, err)
+		return fmt.Errorf("%w: %w", ErrSSHDialerFabrication, err)
 	}
 
 	var wg sync.WaitGroup

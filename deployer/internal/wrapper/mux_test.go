@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"os"
 	"path/filepath"
 	"testing"
@@ -14,10 +15,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"gitlab.com/gitlab-org/gitlab-runner/helpers/runner_wrapper/api/client"
+
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/logger"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/ssh"
 	"gitlab.com/gitlab-org/ci-cd/runner-tools/grit/deployer/internal/terraform"
-	"gitlab.com/gitlab-org/gitlab-runner/helpers/runner_wrapper/api/client"
 )
 
 func TestMux_Execute(t *testing.T) {
@@ -34,8 +36,13 @@ func TestMux_Execute(t *testing.T) {
 		testRMAlias1: testRM1,
 	}
 
+	defaultWrapperFlags := Flags{
+		ConnectionTimeout: DefaultTimeout,
+	}
+
 	tests := map[string]struct {
 		tfFlags                     terraform.Flags
+		wrapperFlags                Flags
 		prepareTFClientMock         func(ctx context.Context, client *mockTfClient)
 		prepareRMHandlerFactoryMock func(t *testing.T, ctx context.Context, factory *mockRmHandlerFactory)
 		callbackFn                  CallbackFn
@@ -51,6 +58,7 @@ func TestMux_Execute(t *testing.T) {
 			tfFlags: terraform.Flags{
 				Target: testTarget,
 			},
+			wrapperFlags: defaultWrapperFlags,
 			prepareTFClientMock: func(ctx context.Context, client *mockTfClient) {
 				client.EXPECT().ReadStateDir(ctx, testTarget).Return(nil, assert.AnError)
 			},
@@ -63,6 +71,7 @@ func TestMux_Execute(t *testing.T) {
 			tfFlags: terraform.Flags{
 				TargetStateFile: testTarget,
 			},
+			wrapperFlags: defaultWrapperFlags,
 			prepareTFClientMock: func(ctx context.Context, client *mockTfClient) {
 				client.EXPECT().ReadStateFile(ctx, testTarget).Return(nil, nil)
 			},
@@ -72,6 +81,7 @@ func TestMux_Execute(t *testing.T) {
 			tfFlags: terraform.Flags{
 				TargetStateFile: testTarget,
 			},
+			wrapperFlags: defaultWrapperFlags,
 			prepareTFClientMock: func(ctx context.Context, client *mockTfClient) {
 				client.EXPECT().ReadStateFile(ctx, testTarget).Return(nil, nil)
 			},
@@ -82,6 +92,7 @@ func TestMux_Execute(t *testing.T) {
 			tfFlags: terraform.Flags{
 				TargetStateFile: testTarget,
 			},
+			wrapperFlags: defaultWrapperFlags,
 			prepareTFClientMock: func(ctx context.Context, client *mockTfClient) {
 				client.EXPECT().
 					ReadStateFile(ctx, testTarget).
@@ -99,6 +110,7 @@ func TestMux_Execute(t *testing.T) {
 			tfFlags: terraform.Flags{
 				TargetStateFile: testTarget,
 			},
+			wrapperFlags: defaultWrapperFlags,
 			prepareTFClientMock: func(ctx context.Context, client *mockTfClient) {
 				client.EXPECT().
 					ReadStateFile(ctx, testTarget).
@@ -113,6 +125,48 @@ func TestMux_Execute(t *testing.T) {
 			callbackFn: testCallbackFn,
 			assertError: func(t *testing.T, err error) {
 				assert.ErrorIs(t, err, assert.AnError)
+			},
+		},
+		"runner manager failed with net.OpError once": {
+			tfFlags: terraform.Flags{
+				TargetStateFile: testTarget,
+			},
+			wrapperFlags: defaultWrapperFlags,
+			prepareTFClientMock: func(ctx context.Context, client *mockTfClient) {
+				client.EXPECT().
+					ReadStateFile(ctx, testTarget).
+					Return(testRunnerManagers, nil)
+			},
+			prepareRMHandlerFactoryMock: func(t *testing.T, ctx context.Context, factory *mockRmHandlerFactory) {
+				handler := newMockRmHandler(t)
+				factory.EXPECT().new(testRMAlias1).Return(handler)
+
+				handler.EXPECT().handle(ctx, testRM1, mock.AnythingOfType("CallbackFn")).Return(&net.OpError{Err: assert.AnError}).Once()
+				handler.EXPECT().handle(ctx, testRM1, mock.AnythingOfType("CallbackFn")).Return(nil)
+			},
+			callbackFn: testCallbackFn,
+		},
+		"runner manager failed with net.OpError beyond timeout": {
+			tfFlags: terraform.Flags{
+				TargetStateFile: testTarget,
+			},
+			wrapperFlags: Flags{
+				ConnectionTimeout: 50 * time.Millisecond,
+			},
+			prepareTFClientMock: func(ctx context.Context, client *mockTfClient) {
+				client.EXPECT().
+					ReadStateFile(ctx, testTarget).
+					Return(testRunnerManagers, nil)
+			},
+			prepareRMHandlerFactoryMock: func(t *testing.T, ctx context.Context, factory *mockRmHandlerFactory) {
+				handler := newMockRmHandler(t)
+				factory.EXPECT().new(testRMAlias1).Return(handler)
+
+				handler.EXPECT().handle(ctx, testRM1, mock.AnythingOfType("CallbackFn")).Return(&net.OpError{Err: assert.AnError})
+			},
+			callbackFn: testCallbackFn,
+			assertError: func(t *testing.T, err error) {
+				assert.ErrorIs(t, err, client.ErrRetryTimeoutExceeded)
 			},
 		},
 	}
@@ -134,10 +188,6 @@ func TestMux_Execute(t *testing.T) {
 				Command:      "",
 			}
 
-			wrapperFlags := Flags{
-				ConnectionTimeout: DefaultTimeout,
-			}
-
 			tfClientMock := newMockTfClient(t)
 			if tt.prepareTFClientMock != nil {
 				tt.prepareTFClientMock(ctx, tfClientMock)
@@ -147,7 +197,7 @@ func TestMux_Execute(t *testing.T) {
 				cancelFn()
 			}
 
-			mux := NewMux(logger.New(), tfClientMock, tt.tfFlags, sshFlags, wrapperFlags)
+			mux := NewMux(logger.New(), tfClientMock, tt.tfFlags, sshFlags, tt.wrapperFlags)
 
 			rmHandlerFactoryMock := newMockRmHandlerFactory(t)
 			mux.rmHandlerFactory = rmHandlerFactoryMock

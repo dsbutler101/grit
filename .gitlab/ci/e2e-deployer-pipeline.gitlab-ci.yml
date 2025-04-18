@@ -90,11 +90,6 @@ e2e:green-up:
     - name: green_up
       step: ./steps/internal/e2e/deployer/up.yml
       inputs: *green
-    - name: sleep
-      step: ./steps/internal/e2e/deployer/load.yml
-      inputs:
-        duration_seconds: 20
-        shuffle_seconds: 10
     - name: green_wait_healthy
       step: ./steps/internal/e2e/deployer/wait_healthy.yml
       inputs: *green

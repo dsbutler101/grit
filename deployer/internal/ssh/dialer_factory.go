@@ -68,20 +68,33 @@ func NewDialerFactory() *DialerFactory {
 	}
 }
 
+type dialerCreateFn func(flags Flags, target TargetDef) (Dialer, error)
+
 func (df *DialerFactory) Create(flags Flags, target TargetDef) (Dialer, error) {
+	var fn dialerCreateFn = df.newDirectDialer
+	name := "direct dialer"
+
 	if flags.Command != "" {
-		return df.newCommandDialer(flags, target)
+		fn = df.newCommandDialer
+		name = "command dialer"
 	}
 
 	if flags.ProxyCommand != "" {
-		return df.newProxyCommandDialer(flags, target)
+		fn = df.newProxyCommandDialer
+		name = "proxy command dialer"
 	}
 
 	if flags.ProxyJump.Address != "" {
-		return df.newProxyJumpDialer(flags, target)
+		fn = df.newProxyJumpDialer
+		name = "proxy jump dialer"
 	}
 
-	return df.newDirectDialer(flags, target)
+	d, err := fn(flags, target)
+	if err != nil {
+		return nil, fmt.Errorf("creating %s: %w", name, err)
+	}
+
+	return d, nil
 }
 
 func (df *DialerFactory) newCommandDialer(flags Flags, target TargetDef) (Dialer, error) {

@@ -83,6 +83,11 @@ variable "runner_version" {
   description = "Version of GitLab Runner"
 
   default = "v16.8.0"
+
+  validation {
+    condition     = can(regex("v?[0-9]+\\.[0-9]+\\.[0-9]+", var.runner_version))
+    error_message = "runner_version must be in format of vX.Y.Z or X.Y.Z"
+  }
 }
 
 ################################
@@ -124,6 +129,21 @@ variable "runner_metrics_listener" {
     port    = optional(number, 9252)
   })
   description = "TCP address and port to which runner metrics and debug server listener should be attached"
+
+  default = {}
+}
+
+##################
+# Runner Wrapper #
+##################
+
+variable "runner_wrapper" {
+  type = object({
+    enabled                     = optional(bool, false)
+    debug                       = optional(bool, false)
+    process_termination_timeout = optional(string, "3h")
+  })
+  description = "Enable gitlab-runner wrapper"
 
   default = {}
 }

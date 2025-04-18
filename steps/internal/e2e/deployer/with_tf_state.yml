@@ -18,12 +18,22 @@ spec:
 env:
   E2E_TEST_ID: ${{ job.E2E_TEST_ID }}
   E2E_TEST_NAME: ${{ job.E2E_TEST_NAME }}
+  E2E_CLOUD: ${{ job.E2E_CLOUD}}
+
   CI_PROJECT_ID: ${{ job.CI_PROJECT_ID }}
 
   GITLAB_TOKEN: ${{ job.GITLAB_TOKEN }}
+
   AWS_ACCESS_KEY_ID: ${{ job.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ job.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ${{ job.AWS_REGION }}
+
+  GOOGLE_CREDENTIALS_B64: ${{ job.GOOGLE_CREDENTIALS_B64 }}
+  GOOGLE_APPLICATION_CREDENTIALS: ${{ job.GOOGLE_APPLICATION_CREDENTIALS }}
+
+  TF_VAR_google_project: ${{ job.GOOGLE_PROJECT }}
+  TF_VAR_google_region: ${{ job.GOOGLE_REGION }}
+  TF_VAR_google_zone: ${{ job.GOOGLE_ZONE }}
 
   TF_VAR_runner_tag: ${{ inputs.runner_tag }}
   TF_VAR_name: ${{ inputs.runner_name }}

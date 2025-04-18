@@ -36,8 +36,16 @@ locals {
   runner_manager_tag  = "gitlab-runner-manager"
   runner_manager_tags = concat([local.runner_manager_tag], var.additional_tags)
 
+  runner_version = "v${regex("v?([0-9]+\\.[0-9]+\\.[0-9]+)", var.runner_version)[0]}"
+
   use_autoscaling = var.executor == "docker-autoscaler" || var.executor == "instance"
   use_docker      = var.executor == "docker-autoscaler" || var.executor == "docker"
+
+  runner_wrapper_grpc_tcp_port = 7777
+  runner_wrapper = merge(var.runner_wrapper, {
+    grpc_tcp_port = local.runner_wrapper_grpc_tcp_port
+    socket_path   = "tcp://127.0.0.1:${local.runner_wrapper_grpc_tcp_port}"
+  })
 
   autoscaling_policies = [
     for p in var.autoscaling_policies : {
@@ -148,9 +156,10 @@ data "cloudinit_config" "config" {
           owner       = "root:root"
           permissions = "0644"
           content = templatefile("${path.module}/templates/gitlab-runner.service", {
-            gitlab_runner_image = "${var.runner_registry}:alpine-${var.runner_version}"
+            gitlab_runner_image = "${var.runner_registry}:alpine-${local.runner_version}"
             runner_metrics_port = local.metrics_listener_port
             additional_volumes  = var.additional_volumes
+            runner_wrapper      = local.runner_wrapper
           })
         },
         {

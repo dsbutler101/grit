@@ -237,7 +237,7 @@ func (h *muxRunnerManagerHandler) handle(ctx context.Context, rm terraform.Runne
 			KeyType              string
 		}{
 			Address:              rm.Address,
-			Username:             rm.Username,
+			Username:             username,
 			KeyFingerprintSHA256: fingerprintSHA256,
 			KeyFingerprintMD5:    fingerprintMD5,
 			KeyType:              keyType,

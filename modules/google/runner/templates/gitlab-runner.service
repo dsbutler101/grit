@@ -9,15 +9,26 @@ Environment="HOME=/home/cloudservice"
 ExecStart=/usr/bin/docker run \
             --rm \
             --name=gitlab-runner \
+            %{~ if runner_wrapper.enabled ~}
+                -p 127.0.0.1:${runner_wrapper.grpc_tcp_port}:${runner_wrapper.grpc_tcp_port} \
+            %{~ endif ~}
             -p ${runner_metrics_port}:${runner_metrics_port} \
-%{ for volume in additional_volumes ~}
-            -v ${volume} \
-%{ endfor ~}
+            %{~ for volume in additional_volumes ~}
+                -v ${volume} \
+            %{~ endfor ~}
             -v /etc/gitlab-runner:/etc/gitlab-runner/ \
             -v /var/run/docker.sock:/var/run/docker.sock \
             --entrypoint /etc/gitlab-runner/entrypoint.sh \
             ${gitlab_runner_image} \
-            run \
+            %{~ if runner_wrapper.enabled ~}
+                %{~ if runner_wrapper.debug ~}
+                    --debug \
+                %{~ endif ~}
+                wrapper \
+                --grpc-listen tcp://0.0.0.0:${runner_wrapper.grpc_tcp_port} \
+                --process-termination-timeout ${runner_wrapper.process_termination_timeout} \
+            -- %{~ endif } run \
+            --config /etc/gitlab-runner/config.toml \
             --user=gitlab-runner \
             --working-directory=/home/gitlab-runner
 

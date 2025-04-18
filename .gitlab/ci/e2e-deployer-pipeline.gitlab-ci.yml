@@ -1,6 +1,6 @@
 workflow:
   # set a useful name for the pipeline
-  name: "E2E ${E2E_TEST_NAME} (ID: ${E2E_TEST_ID})"
+  name: "E2E ${E2E_TEST_NAME} ${E2E_CLOUD} (ID: ${E2E_TEST_ID})"
   auto_cancel:
     # allow everything to be cancelled except destroy
     on_new_commit: interruptible
@@ -21,10 +21,11 @@ include:
     # Used to tag created runners, name resources and state
     # E2E_TEST_NAME is set in each e2e test scenario
     # `tags` has limited variables but CI_PIPELINE_IID works
-    RUNNER_NAME: &runner_name "u${E2E_TEST_ID}-${E2E_TEST_NAME}"
+    RUNNER_NAME: &runner_name "u${E2E_TEST_ID}-${E2E_TEST_NAME}-${E2E_CLOUD}"
     FF_USE_NATIVE_STEPS: true
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   environment:
-    name: "e2e-${E2E_TEST_NAME}/${RUNNER_NAME}"
+    name: "e2e-${E2E_TEST_NAME}-${E2E_CLOUD}/${RUNNER_NAME}"
 
 e2e:setup:
   stage: apply
@@ -34,13 +35,13 @@ e2e:setup:
     - name: apply_blue
       step: ./steps/internal/e2e/deployer/up.yml
       inputs: &blue
-        tf_dir: e2e/deployer/blue
+        tf_dir: e2e/deployer/${{ job.E2E_CLOUD }}/blue
         runner_name: ${{ job.RUNNER_NAME }}-b
         runner_tag: ${{ job.RUNNER_NAME }}
     - name: destroy_green
       step: ./steps/internal/e2e/deployer/down.yml
       inputs: &green
-        tf_dir: e2e/deployer/green
+        tf_dir: e2e/deployer/${{ job.E2E_CLOUD }}/green
         runner_name: ${{ job.RUNNER_NAME }}-g
         runner_tag: ${{ job.RUNNER_NAME }}
 
@@ -89,6 +90,11 @@ e2e:green-up:
     - name: green_up
       step: ./steps/internal/e2e/deployer/up.yml
       inputs: *green
+    - name: sleep
+      step: ./steps/internal/e2e/deployer/load.yml
+      inputs:
+        duration_seconds: 20
+        shuffle_seconds: 10
     - name: green_wait_healthy
       step: ./steps/internal/e2e/deployer/wait_healthy.yml
       inputs: *green

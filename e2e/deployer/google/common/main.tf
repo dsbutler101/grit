@@ -47,9 +47,12 @@ module "runner" {
   service_account_email = module.iam.service_account_email
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids["${var.name}-runner-managers"]
+    enabled          = module.vpc.enabled
+    id               = module.vpc.id
+    subnetwork_ids   = module.vpc.subnetwork_ids
+    subnetwork_cidrs = module.vpc.subnetwork_cidrs
   }
+  manager_subnet_name = "${var.name}-runner-managers"
 
   gitlab_url     = module.gitlab.url
   runner_token   = module.gitlab.runner_token

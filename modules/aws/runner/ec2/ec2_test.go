@@ -114,17 +114,6 @@ func TestAWSInternalEC2Manager(t *testing.T) {
 			}),
 			expectedModules: expectedModules,
 		},
-		"vpc subnet_id and subnet_ids cannot be both specified": {
-			moduleVars: variables(map[string]any{
-				"vpc": map[string]any{
-					"id":         "12345",
-					"subnet_id":  "subnet-12345",
-					"subnet_ids": []string{"subnet-12345"},
-				},
-			}),
-			expectedModules: expectedModules,
-			wantErr:         true,
-		},
 	}
 
 	for tn, tc := range testCases {

@@ -35,6 +35,7 @@ variable "google_zone" {
   description = "Google Cloud zone to use"
 }
 
+# TODO: make this a top-level module like AWS
 variable "node_exporter" {
   description = "Configuration of Node Exporter to deploy on the runner instance"
   type = object({
@@ -277,10 +278,18 @@ variable "runner_manager_additional_firewall_rules" {
 
 variable "vpc" {
   type = object({
-    id        = string
-    subnet_id = string
+    enabled          = bool
+    id               = string
+    subnetwork_ids   = map(string)
+    subnetwork_cidrs = map(string)
   })
   description = "VPC and subnet to use fur runner manager deployment"
+}
+
+variable "manager_subnet_name" {
+  type        = string
+  description = "Name of the subnetwork where runner manager is deployed"
+  default     = "runner-manager"
 }
 
 variable "source_ranges" {

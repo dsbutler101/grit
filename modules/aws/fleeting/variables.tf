@@ -131,11 +131,15 @@ variable "kms_key_arn" {
 variable "node_exporter" {
   description = "Configuration for node_exporter"
   type = object({
-    enabled = optional(bool, false)
-    port    = optional(number, 9100)
-    version = optional(string, "0.9.0")
+    enabled            = bool
+    write_files_config = optional(list(string), [])
+    commands           = optional(list(string), [])
+    port               = optional(number, 9100)
+    version            = optional(string, "0.9.0")
   })
-  default = {}
+  default = {
+    enabled = false
+  }
 }
 
 #######
@@ -145,12 +149,8 @@ variable "node_exporter" {
 variable "vpc" {
   description = "Outputs from the vpc module. Or your own"
   type = object({
+    enabled    = bool
     id         = string
-    subnet_id  = optional(string)
-    subnet_ids = optional(list(string))
+    subnet_ids = list(string)
   })
-  validation {
-    condition     = (var.vpc.subnet_id != null && try(length(var.vpc.subnet_ids), 0) == 0) || (var.vpc.subnet_id == null && try(length(var.vpc.subnet_ids), 0) > 0)
-    error_message = "You cannot specify both 'subnet_id' and 'subnet_ids' OR empty values for both. Only one can be provided."
-  }
 }

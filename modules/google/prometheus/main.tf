@@ -168,7 +168,7 @@ resource "google_compute_instance" "prometheus_server" {
 
   network_interface {
     network    = var.vpc.id
-    subnetwork = var.vpc.subnet_id
+    subnetwork = var.vpc.subnetwork_ids[var.prometheus_subnet_name]
     access_config {
       nat_ip = ""
     }

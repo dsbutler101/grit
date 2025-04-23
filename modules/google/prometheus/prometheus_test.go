@@ -69,10 +69,18 @@ func TestPrometheus(t *testing.T) {
 					},
 					"instance_labels_to_include": []string{"label_1", "label_2"},
 				},
-				"vpc": map[string]string{
-					"id":        "vpc-id",
-					"subnet_id": "subnet-id",
-				}},
+				"vpc": map[string]any{
+					"enabled": true,
+					"id":      "vpc-id",
+					"subnetwork_ids": map[string]any{
+						"prometheus": "subnet-id",
+					},
+					"subnetwork_cidrs": map[string]any{
+						"prometheus": "subnet-cidr",
+					},
+				},
+				"prometheus_subnet_name": "prometheus",
+			},
 			expectedModules: expectedModules,
 		},
 	}

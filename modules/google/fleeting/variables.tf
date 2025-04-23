@@ -81,15 +81,24 @@ variable "source_image" {
 
 variable "vpc" {
   type = object({
-    id        = string
-    subnet_id = string
+    enabled          = bool
+    id               = string
+    subnetwork_ids   = map(string)
+    subnetwork_cidrs = map(string)
   })
   description = "VPC and subnet to use"
 }
 
-variable "manager_subnet_cidr" {
+variable "manager_subnet_name" {
   type        = string
-  description = "CIDR of the subnetwork where runner manager is deployed"
+  description = "Name of the subnetwork where runner manager is deployed"
+  default     = "runner-manager"
+}
+
+variable "runners_subnet_name" {
+  type        = string
+  description = "Name of the subnetwork where ephemeral runners are deployed"
+  default     = "ephemeral-runners"
 }
 
 variable "additional_tags" {

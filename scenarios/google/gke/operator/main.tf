@@ -10,8 +10,10 @@ locals {
   }
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids[local.metadata.name]
+    enabled          = module.vpc.enabled
+    id               = module.vpc.id
+    subnetwork_ids   = module.vpc.subnetwork_ids
+    subnetwork_cidrs = module.vpc.subnetwork_cidrs
   }
 }
 
@@ -39,7 +41,8 @@ module "cluster" {
 
   deletion_protection = var.deletion_protection
 
-  vpc = local.vpc
+  vpc                 = local.vpc
+  manager_subnet_name = local.metadata.name
 
   depends_on = [module.vpc]
 }

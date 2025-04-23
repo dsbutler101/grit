@@ -14,6 +14,10 @@ variable "metadata" {
     min_support = string
   })
 
+  # TODO: apply this validation to all Google modules by creating and
+  # using a google/internal/validation/labels module with these
+  # semantics. If any should apply GRIT-wide, also create and use an
+  # intneral/validation/labels module and apply to other providers.
   validation {
     # Response from the google API:
     # Error: error creating NodePool: googleapi: Error 400: Invalid field
@@ -70,6 +74,9 @@ variable "deletion_protection" {
   default     = true
 }
 
+# TODO: should we have a top-level autoscaling module for producing
+# well-known good configurations? This would become a moduled
+# dependency.
 variable "autoscaling" {
   type = object({
     enabled                     = bool
@@ -142,13 +149,19 @@ module "validate_image_type" {
 
 variable "vpc" {
   type = object({
-    id        = string
-    subnet_id = string
+    enabled          = bool
+    id               = optional(string)
+    subnetwork_ids   = optional(map(string))
+    subnetwork_cidrs = optional(map(string))
   })
-  description = "VPC and subnet to use. If ID is not provided, GRIT will create that resource for the cluster"
-
   default = {
-    id        = ""
-    subnet_id = ""
+    enabled = false
   }
+  description = "VPC and subnet to use. If ID is not provided, GRIT will create that resource for the cluster"
+}
+
+variable "manager_subnet_name" {
+  type        = string
+  description = "Name of the subnetwork where runner manager is deployed"
+  default     = "runner-manager"
 }

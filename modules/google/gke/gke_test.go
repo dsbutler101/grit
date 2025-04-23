@@ -31,9 +31,15 @@ func defaultModuleVars(t *testing.T) map[string]any {
 					},
 				},
 			},
-			"vpc": map[string]string{
-				"id":        "",
-				"subnet_id": "",
+			"vpc": map[string]any{
+				"enabled": true,
+				"id":      "",
+				"subnetwork_ids": map[string]any{
+					"runner-manager": "",
+				},
+				"subnetwork_cidrs": map[string]any{
+					"runner-manager": "",
+				},
 			},
 			"autoscaling": map[string]any{
 				"enabled":                     false,
@@ -76,8 +82,14 @@ func TestGKE(t *testing.T) {
 					"name":        "gke",
 				},
 				"vpc": map[string]any{
-					"id":        "my-vpc",
-					"subnet_id": "my-subnet",
+					"enabled": true,
+					"id":      "",
+					"subnetwork_ids": map[string]any{
+						"runner-manager": "",
+					},
+					"subnetwork_cidrs": map[string]any{
+						"runner-manager": "",
+					},
 				},
 			},
 			expectedModules: expectedModules,
@@ -110,6 +122,16 @@ func TestGKEPlanErrors(t *testing.T) {
 					"min_support": "experimental",
 					"name":        "gke",
 				},
+				"vpc": map[string]any{
+					"enabled": true,
+					"id":      "",
+					"subnetwork_ids": map[string]any{
+						"runner-manager": "",
+					},
+					"subnetwork_cidrs": map[string]any{
+						"runner-manager": "",
+					},
+				},
 			},
 		},
 		"valid-label-value": {
@@ -121,6 +143,16 @@ func TestGKEPlanErrors(t *testing.T) {
 					},
 					"min_support": "experimental",
 					"name":        "gke",
+				},
+				"vpc": map[string]any{
+					"enabled": true,
+					"id":      "",
+					"subnetwork_ids": map[string]any{
+						"runner-manager": "",
+					},
+					"subnetwork_cidrs": map[string]any{
+						"runner-manager": "",
+					},
 				},
 			},
 			shouldNotError: true,

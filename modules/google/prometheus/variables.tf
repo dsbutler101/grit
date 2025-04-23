@@ -127,7 +127,15 @@ variable "service_account_email" {
 variable "vpc" {
   description = "Configuration of VPC and subnet where Prometheus instance will be deployed"
   type = object({
-    id        = string
-    subnet_id = string
+    enabled          = bool
+    id               = string
+    subnetwork_ids   = map(string)
+    subnetwork_cidrs = map(string)
   })
+}
+
+variable "prometheus_subnet_name" {
+  description = "Name of the subnetwork where prometheus is deployed"
+  type        = string
+  default     = "prometheus"
 }

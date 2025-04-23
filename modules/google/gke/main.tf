@@ -40,7 +40,7 @@ resource "google_container_cluster" "primary" {
   initial_node_count       = 1
 
   network    = var.vpc.id
-  subnetwork = var.vpc.subnet_id
+  subnetwork = var.vpc.subnetwork_ids[var.manager_subnet_name]
 
   deletion_protection = var.deletion_protection
 

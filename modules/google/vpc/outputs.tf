@@ -1,6 +1,10 @@
+output "enabled" {
+  value = tobool(true)
+}
+
 output "id" {
   description = "ID of the created VPC"
-  value       = google_compute_network.default.id
+  value       = tostring(google_compute_network.default.id)
 }
 
 output "subnetwork_ids" {

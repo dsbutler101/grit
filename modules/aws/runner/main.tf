@@ -48,7 +48,7 @@ module "ec2" {
   fleeting = var.fleeting
   iam      = var.iam
   vpc      = var.vpc
-  s3_cache = var.s3_cache
+  s3_cache = var.cache
 
   executor                   = var.executor
   runners_global_section     = var.runners_global_section

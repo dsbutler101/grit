@@ -2,8 +2,7 @@ module "vpc" {
   source   = "../../../../modules/aws/vpc"
   metadata = local.metadata
 
-  zone = var.aws_zone
-
+  zone        = var.aws_zone
   cidr        = "10.0.0.0/16"
   subnet_cidr = "10.0.0.0/24"
 }
@@ -30,11 +29,12 @@ module "fleeting" {
   os      = "linux"
 
   vpc = {
+    enabled    = module.vpc.enabled
     id         = module.vpc.id
     subnet_ids = module.vpc.subnet_ids
   }
 
-  security_group_ids = [module.security_groups.fleeting.id]
+  security_group_ids = [module.security_groups.fleeting_id]
 
   instance_type        = var.ephemeral_runner.machine_type
   ephemeral_runner_ami = var.ephemeral_runner.source_image != "" ? var.ephemeral_runner.source_image : module.ami_lookup.ami_id
@@ -54,23 +54,27 @@ module "runner" {
   metadata = local.metadata
 
   vpc = {
+    enabled    = module.vpc.enabled
     id         = module.vpc.id
     subnet_ids = module.vpc.subnet_ids
   }
   iam = {
+    enabled                    = module.iam.enabled
     fleeting_access_key_id     = module.iam.fleeting_access_key_id
     fleeting_secret_access_key = module.iam.fleeting_secret_access_key
   }
   fleeting = {
+    enabled                = module.fleeting.enabled
     ssh_key_pem_name       = module.fleeting.ssh_key_pem_name
     ssh_key_pem            = module.fleeting.ssh_key_pem
     autoscaling_group_name = module.fleeting.autoscaling_group_name
   }
   gitlab = {
+    enabled      = module.gitlab.enabled
     runner_token = module.gitlab.runner_token
     url          = module.gitlab.url
   }
-  s3_cache = {
+  cache = {
     enabled           = module.cache.enabled
     server_address    = module.cache.server_address
     bucket_name       = module.cache.bucket_name
@@ -89,14 +93,18 @@ module "runner" {
   max_use_count         = var.max_use_count
   region                = var.aws_region
 
-  security_group_ids = [module.security_groups.runner_manager.id]
+  security_group_ids = [module.security_groups.runner_manager_id]
 }
 
 module "security_groups" {
   source   = "../../../../modules/aws/security_groups"
   metadata = local.metadata
 
-  vpc_id = module.vpc.id
+  vpc = {
+    enabled    = true
+    id         = module.vpc.id
+    subnet_ids = module.vpc.subnet_ids
+  }
 }
 
 module "gitlab" {

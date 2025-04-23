@@ -61,9 +61,13 @@ module "fleeting" {
   source   = "../../modules/google/fleeting"
   metadata = local.metadata
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids["${var.name}-ephemeral-runners"]
+    enabled          = module.vpc.enabled
+    id               = module.vpc.id
+    subnetwork_ids   = module.vpc.subnetwork_ids
+    subnetwork_cidrs = module.vpc.subnetwork_cidrs
   }
+  manager_subnet_name = "${var.name}-runner-manager"
+  runners_subnet_name = "${var.name}-ephemeral-runners"
 
   fleeting_service      = "gce"
   google_project        = data.google_client_config.current.project
@@ -71,7 +75,6 @@ module "fleeting" {
   google_zone           = data.google_client_config.current.zone
   service_account_email = module.iam.service_account_email
   machine_type          = "n2d-standard-2"
-  manager_subnet_cidr   = module.vpc.subnetwork_cidrs["${var.name}-runner-manager"]
 }
 
 module "runner" {
@@ -85,9 +88,12 @@ module "runner" {
   service_account_email = module.iam.service_account_email
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids["${var.name}-runner-manager"]
+    enabled          = module.vpc.enabled
+    id               = module.vpc.id
+    subnetwork_ids   = module.vpc.subnetwork_ids
+    subnetwork_cidrs = module.vpc.subnetwork_cidrs
   }
+  manager_subnet_name = "${var.name}-runner-manager"
 
   gitlab_url   = module.gitlab.url
   runner_token = module.gitlab.runner_token

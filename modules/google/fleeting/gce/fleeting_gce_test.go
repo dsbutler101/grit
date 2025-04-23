@@ -35,10 +35,19 @@ func TestFleetingGCE(t *testing.T) {
 				"disk_size_gb":          25,
 				"source_image":          "some-source-image",
 				"vpc": map[string]interface{}{
-					"id":        "my-vpc",
-					"subnet_id": "my-subnet",
+					"enabled": true,
+					"id":      "my-vpc",
+					"subnetwork_ids": map[string]any{
+						"runner-manager":    "manager-subnet",
+						"ephemeral-runners": "runners-subnet",
+					},
+					"subnetwork_cidrs": map[string]any{
+						"runner-manager":    "manager-subnet",
+						"ephemeral-runners": "runners-subnet",
+					},
 				},
-				"manager_subnet_cidr": "10.0.0.0/24",
+				"manager_subnet_name": "runner-manager",
+				"runners_subnet_name": "ephemeral-runners",
 			},
 			expectedModules: expectedModules,
 		},

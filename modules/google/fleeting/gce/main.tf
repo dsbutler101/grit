@@ -17,7 +17,7 @@ resource "google_compute_instance_template" "ephemeral_runner" {
 
   network_interface {
     network            = var.vpc.id
-    subnetwork         = var.vpc.subnet_id
+    subnetwork         = var.vpc.subnetwork_ids[var.runners_subnet_name]
     subnetwork_project = var.subnetwork_project
 
     dynamic "access_config" {

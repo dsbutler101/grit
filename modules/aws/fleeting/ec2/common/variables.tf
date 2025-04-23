@@ -80,10 +80,14 @@ variable "kms_key_arn" {
 }
 
 variable "node_exporter" {
-  description = "Configuration for node_exporter"
   type = object({
-    enabled = bool
-    port    = optional(number)
-    version = optional(string)
+    enabled            = bool
+    write_files_config = optional(list(string))
+    commands           = optional(list(string))
+    port               = optional(number)
+    version            = optional(string)
   })
+  default = {
+    enabled = false
+  }
 }

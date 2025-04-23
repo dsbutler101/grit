@@ -1,7 +1,7 @@
 output "namespace" {
-  value = local.namespace
+  value = tostring(local.namespace)
 }
 
 output "operator_version" {
-  value = local.operator_version
+  value = tostring(local.operator_version)
 }

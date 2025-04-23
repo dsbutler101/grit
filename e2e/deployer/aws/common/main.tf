@@ -34,7 +34,7 @@ module "security_groups" {
   source   = "../../../../modules/aws/security_groups"
   metadata = local.metadata
 
-  vpc_id = module.vpc.id
+  vpc = local.vpc
 }
 
 module "runner" {
@@ -51,7 +51,7 @@ module "runner" {
   scale_max = 1
 
   security_group_ids = [
-    module.security_groups.runner_manager.id,
+    module.security_groups.runner_manager_id,
   ]
 
   instance_type = "t3.small"
@@ -66,11 +66,13 @@ module "runner" {
 
 locals {
   vpc = {
+    enabled    = true
     id         = module.vpc.id
     subnet_ids = module.vpc.subnet_ids
   }
 
   gitlab = {
+    enabled      = true
     url          = module.gitlab.url
     runner_token = module.gitlab.runner_token
   }

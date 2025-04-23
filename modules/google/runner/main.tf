@@ -212,7 +212,7 @@ resource "google_compute_instance" "runner_manager" {
 
   network_interface {
     network            = var.vpc.id
-    subnetwork         = var.vpc.subnet_id
+    subnetwork         = var.vpc.subnetwork_ids[var.manager_subnet_name]
     subnetwork_project = var.subnetwork_project
 
     dynamic "access_config" {
@@ -249,5 +249,5 @@ resource "google_compute_instance" "runner_manager" {
 resource "google_compute_address" "runner_manager" {
   name         = local.runner_manager_name
   address_type = var.address_type
-  subnetwork   = var.address_type == "INTERNAL" ? var.vpc.subnet_id : null
+  subnetwork   = var.address_type == "INTERNAL" ? var.vpc.subnetwork_ids[var.manager_subnet_name] : null
 }

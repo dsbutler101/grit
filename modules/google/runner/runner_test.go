@@ -41,9 +41,15 @@ func TestRunner(t *testing.T) {
 			"runner_token":                 "glrt-SOME_TOKEN",
 			"executor":                     "docker-autoscaler",
 			"fleeting_instance_group_name": "instance-group-name",
-			"vpc": map[string]string{
-				"id":        "vpc-id",
-				"subnet_id": "subnet-id",
+			"vpc": map[string]any{
+				"enabled": true,
+				"id":      "vpc-id",
+				"subnetwork_ids": map[string]any{
+					"runner-manager": "subnet-id",
+				},
+				"subnetwork_cidrs": map[string]any{
+					"runner-manager": "subnet-cidr",
+				},
 			},
 		}
 		maps.Copy(required, overrides)
@@ -141,6 +147,16 @@ func TestRunner(t *testing.T) {
 					"enabled":                     true,
 					"process_termination_timeout": "1h",
 					"socket_path":                 "tcp://localhost:1234",
+				},
+				"vpc": map[string]any{
+					"enabled": true,
+					"id":      "vpc-id",
+					"subnetwork_ids": map[string]any{
+						"runner-manager": "subnet-id",
+					},
+					"subnetwork_cidrs": map[string]any{
+						"runner-manager": "subnet-cidr",
+					},
 				},
 			}),
 			expectedModules: append(expectedModules,

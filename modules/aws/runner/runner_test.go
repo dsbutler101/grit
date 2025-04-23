@@ -21,25 +21,29 @@ func TestRunner(t *testing.T) {
 					"min_support": "experimental",
 				},
 				"gitlab": map[string]interface{}{
+					"enabled":      true,
 					"runner_token": "tokenString",
 					"url":          "gitlab.com",
 				},
 				"vpc": map[string]interface{}{
+					"enabled":    true,
 					"id":         "12345",
 					"subnet_ids": []string{"12345"},
 				},
 				"fleeting": map[string]interface{}{
+					"enabled":                true,
 					"autoscaling_group_name": "abcde",
 					"ssh_key_pem_name":       "abcde",
 					"ssh_key_pem":            "abcde",
 					"username":               "abcde",
 				},
 				"iam": map[string]interface{}{
+					"enabled":                    true,
 					"fleeting_access_key_id":     "12345",
 					"fleeting_secret_access_key": "abcde",
 				},
-				"s3_cache": map[string]interface{}{
-					"enabled":           false,
+				"cache": map[string]interface{}{
+					"enabled":           true,
 					"server_address":    "s3.amazonaws.com",
 					"bucket_name":       "bucket",
 					"bucket_location":   "region",

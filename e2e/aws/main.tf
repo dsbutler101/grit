@@ -59,7 +59,7 @@ module "security_groups" {
   source   = "../../modules/aws/security_groups"
   metadata = local.metadata
 
-  vpc_id = module.vpc.id
+  vpc = local.vpc
 }
 
 module "fleeting" {
@@ -76,7 +76,7 @@ module "fleeting" {
   scale_max            = 10
 
   security_group_ids = [
-    module.security_groups.fleeting.id,
+    module.security_groups.fleeting_id,
   ]
 }
 
@@ -89,7 +89,7 @@ module "ami_lookup" {
   role     = "ephemeral"
 }
 
-module "s3_cache" {
+module "cache" {
   source                = "../../modules/aws/cache"
   metadata              = local.metadata
   cache_object_lifetime = 2
@@ -102,7 +102,7 @@ module "runner" {
   iam      = local.iam
   fleeting = local.fleeting
   gitlab   = local.gitlab
-  s3_cache = local.s3_cache
+  cache    = local.cache
 
   service               = "ec2"
   executor              = "docker-autoscaler"
@@ -112,7 +112,7 @@ module "runner" {
   capacity_per_instance = 1
 
   security_group_ids = [
-    module.security_groups.runner_manager.id,
+    module.security_groups.runner_manager_id,
   ]
 
   runner_version = "${var.runner_version}-1"
@@ -123,32 +123,36 @@ module "runner" {
 
 locals {
   iam = {
+    enabled                    = module.iam.enabled
     fleeting_access_key_id     = module.iam.fleeting_access_key_id
     fleeting_secret_access_key = module.iam.fleeting_secret_access_key
   }
 
   vpc = {
+    enabled    = module.vpc.enabled
     id         = module.vpc.id
     subnet_ids = module.vpc.subnet_ids
   }
 
   fleeting = {
+    enabled                = module.fleeting.enabled
     ssh_key_pem_name       = module.fleeting.ssh_key_pem_name
     ssh_key_pem            = module.fleeting.ssh_key_pem
     autoscaling_group_name = module.fleeting.autoscaling_group_name
   }
 
   gitlab = {
+    enabled      = module.gitlab.enabled
     url          = module.gitlab.url
     runner_token = module.gitlab.runner_token
   }
 
-  s3_cache = {
-    enabled           = module.s3_cache.enabled
-    server_address    = module.s3_cache.server_address
-    bucket_name       = module.s3_cache.bucket_name
-    bucket_location   = module.s3_cache.bucket_location
-    access_key_id     = module.s3_cache.access_key_id
-    secret_access_key = module.s3_cache.secret_access_key
+  cache = {
+    enabled           = module.cache.enabled
+    server_address    = module.cache.server_address
+    bucket_name       = module.cache.bucket_name
+    bucket_location   = module.cache.bucket_location
+    access_key_id     = module.cache.access_key_id
+    secret_access_key = module.cache.secret_access_key
   }
 }

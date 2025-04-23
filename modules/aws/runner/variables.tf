@@ -219,11 +219,15 @@ variable "runner_manager_ami" {
 variable "node_exporter" {
   description = "Configuration for node_exporter"
   type = object({
-    enabled = optional(bool, false)
-    port    = optional(number, 9100)
-    version = optional(string, "0.9.0")
+    enabled            = bool
+    write_files_config = optional(list(string), [])
+    commands           = optional(list(string), [])
+    port               = optional(number, 9100)
+    version            = optional(string, "0.9.0")
   })
-  default = {}
+  default = {
+    enabled = false
+  }
 }
 
 variable "create_key_pair" {
@@ -242,6 +246,7 @@ variable "create_key_pair" {
 variable "gitlab" {
   description = "Outputs from the gitlab module. Or your own"
   type = object({
+    enabled      = bool
     runner_token = string
     url          = string
   })
@@ -254,14 +259,10 @@ variable "gitlab" {
 variable "vpc" {
   description = "Outputs from the vpc module. Or your own"
   type = object({
+    enabled    = bool
     id         = string
-    subnet_id  = optional(string)
     subnet_ids = optional(list(string))
   })
-  validation {
-    condition     = (var.vpc.subnet_id != null && try(length(var.vpc.subnet_ids), 0) == 0) || (var.vpc.subnet_id == null && try(length(var.vpc.subnet_ids), 0) > 0)
-    error_message = "You cannot specify both 'subnet_id' and 'subnet_ids' OR empty values for both. Only one can be provided."
-  }
 }
 
 ############
@@ -271,13 +272,16 @@ variable "vpc" {
 variable "fleeting" {
   description = "Outputs from the fleeting module. Or your own"
   type = object({
+    enabled                = bool
     autoscaling_group_name = optional(string, "")
     ssh_key_pem_name       = optional(string, "")
     ssh_key_pem            = optional(string, "")
     username               = optional(string, "ubuntu")
   })
 
-  default = {}
+  default = {
+    enabled = false
+  }
 }
 
 #######
@@ -287,35 +291,33 @@ variable "fleeting" {
 variable "iam" {
   description = "Outputs from the iam module. Or your own"
   type = object({
+    enabled                    = bool
     fleeting_access_key_id     = optional(string, "")
     fleeting_secret_access_key = optional(string, "")
   })
 
-  default = {}
+  default = {
+    enabled = false
+  }
 }
 
 #########
 # CACHE #
 #########
 
-variable "s3_cache" {
+variable "cache" {
   description = "Output from the cache module. Or your own"
   type = object({
     enabled           = bool
-    server_address    = string
-    bucket_name       = string
-    bucket_location   = string
-    access_key_id     = string
-    secret_access_key = string
+    server_address    = optional(string, "")
+    bucket_name       = optional(string, "")
+    bucket_location   = optional(string, "")
+    access_key_id     = optional(string, "")
+    secret_access_key = optional(string, "")
   })
 
   default = {
-    enabled           = false
-    server_address    = ""
-    bucket_name       = ""
-    bucket_location   = ""
-    access_key_id     = ""
-    secret_access_key = ""
+    enabled = false
   }
 }
 
@@ -340,9 +342,11 @@ variable "usage_logger" {
 variable "runner_wrapper" {
   description = "Enable gitlab-runner wrapper"
   type = object({
-    enabled                     = optional(bool, false)
+    enabled                     = bool
     process_termination_timeout = optional(string)
     socket_path                 = optional(string)
   })
-  default = {}
+  default = {
+    enabled = false
+  }
 }

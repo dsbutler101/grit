@@ -50,8 +50,10 @@ module "gce" {
   disk_size_gb = var.disk_size_gb
   source_image = var.source_image
 
-  vpc                                     = var.vpc
-  manager_subnet_cidr                     = var.manager_subnet_cidr
+  vpc                 = var.vpc
+  manager_subnet_name = var.manager_subnet_name
+  runners_subnet_name = var.runners_subnet_name
+
   additional_tags                         = var.additional_tags
   cross_vm_deny_egress_destination_ranges = var.cross_vm_deny_egress_destination_ranges
 }

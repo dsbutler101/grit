@@ -16,9 +16,17 @@ variable "metadata" {
   })
 }
 
-variable "vpc_id" {
-  type        = string
-  description = "The ID of the VPC"
+#######
+# VPC #
+#######
+
+variable "vpc" {
+  description = "Outputs from the vpc module. Or your own"
+  type = object({
+    enabled    = bool
+    id         = string
+    subnet_ids = optional(list(string))
+  })
 }
 
 variable "fleeting_inbound_sg_rules" {

@@ -33,7 +33,11 @@ func TestAWSSecurityGroups(t *testing.T) {
 					"labels":      map[string]string{"env": "another-place"},
 					"min_support": "experimental",
 				},
-				"vpc_id": "1234",
+				"vpc": map[string]interface{}{
+					"enabled":    true,
+					"id":         "12345",
+					"subnet_ids": []string{"12345"},
+				},
 				"manager_outbound_sg_rules": map[string]interface{}{
 					"outbound_all": map[string]interface{}{
 						"from_port":   0,

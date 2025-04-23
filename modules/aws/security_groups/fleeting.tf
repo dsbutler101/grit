@@ -1,6 +1,6 @@
 resource "aws_security_group" "jobs_security_group" {
   name   = "${var.metadata.name} fleet"
-  vpc_id = var.vpc_id
+  vpc_id = var.vpc.id
 
   dynamic "ingress" {
     for_each = var.fleeting_inbound_sg_rules

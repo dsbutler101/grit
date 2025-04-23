@@ -40,11 +40,11 @@ module "fleeting" {
   service_account_email = module.iam.service_account_email
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids["ephemeral-runners"]
+    enabled          = module.vpc.enabled
+    id               = module.vpc.id
+    subnetwork_ids   = module.vpc.subnetwork_ids
+    subnetwork_cidrs = module.vpc.subnetwork_cidrs
   }
-
-  manager_subnet_cidr = module.vpc.subnetwork_cidrs["runner-manager"]
 
   disk_type    = var.ephemeral_runner.disk_type
   disk_size_gb = var.ephemeral_runner.disk_size
@@ -64,8 +64,10 @@ module "runner" {
   service_account_email = module.iam.service_account_email
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids["runner-manager"]
+    enabled          = module.vpc.enabled
+    id               = module.vpc.id
+    subnetwork_ids   = module.vpc.subnetwork_ids
+    subnetwork_cidrs = module.vpc.subnetwork_cidrs
   }
 
   node_exporter = {
@@ -145,8 +147,10 @@ module "prometheus" {
   service_account_email = module.prometheus_iam.service_account_email
 
   vpc = {
-    id        = module.vpc.id
-    subnet_id = module.vpc.subnetwork_ids["prometheus"]
+    enabled          = module.vpc.enabled
+    id               = module.vpc.id
+    subnetwork_ids   = module.vpc.subnetwork_ids
+    subnetwork_cidrs = module.vpc.subnetwork_cidrs
   }
 
   node_exporter_port = local.node_expoter_port

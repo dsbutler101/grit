@@ -15,7 +15,7 @@ resource "google_compute_firewall" "ephemeral_runners_ssh_access" {
     ports    = ["22"]
   }
 
-  source_ranges = [var.manager_subnet_cidr]
+  source_ranges = [var.vpc.subnetwork_cidrs[var.manager_subnet_name]]
 
   target_tags = [local.ephemeral_runner_tag]
 }

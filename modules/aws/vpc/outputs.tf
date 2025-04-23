@@ -1,11 +1,11 @@
-output "id" {
-  value = aws_vpc.vpc.id
+output "enabled" {
+  value = tobool(true)
 }
 
-output "subnet_id" {
-  value = aws_subnet.jobs_vpc_subnet.id
+output "id" {
+  value = tostring(aws_vpc.vpc.id)
 }
 
 output "subnet_ids" {
-  value = [aws_subnet.jobs_vpc_subnet.id]
+  value = tolist([aws_subnet.jobs_vpc_subnet.id])
 }

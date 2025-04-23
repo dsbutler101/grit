@@ -50,12 +50,18 @@ variable "source_image" {
 
 variable "vpc" {
   type = object({
-    id        = string
-    subnet_id = string
+    enabled          = bool
+    id               = string
+    subnetwork_ids   = map(string)
+    subnetwork_cidrs = map(string)
   })
 }
 
-variable "manager_subnet_cidr" {
+variable "manager_subnet_name" {
+  type = string
+}
+
+variable "runners_subnet_name" {
   type = string
 }
 

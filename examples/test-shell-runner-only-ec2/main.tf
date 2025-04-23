@@ -15,15 +15,17 @@ module "runner" {
 
   service = "ec2"
   gitlab = {
+    enabled      = true
     runner_token = var.runner_token
     url          = "https://gitlab.com"
   }
   vpc = {
+    enabled    = true
     id         = "vpc-0d119da238d878eef"
     subnet_ids = ["subnet-0bd3ab8c221e14bfc"]
   }
 
-  security_group_ids = [module.security_groups.runner_manager.id]
+  security_group_ids = [module.security_groups.runner_manager_id]
 
   executor = "shell"
 }
@@ -33,5 +35,9 @@ module "security_groups" {
 
   metadata = local.metadata
 
-  vpc_id = "vpc-0d119da238d878eef"
+  vpc = {
+    enabled    = true
+    id         = "vpc-0d119da238d878eef"
+    subnet_ids = ["subnet-0bd3ab8c221e14bfc"]
+  }
 }

@@ -1,6 +1,6 @@
 resource "aws_security_group" "manager_sg" {
   name   = "${var.metadata.name} manager"
-  vpc_id = var.vpc_id
+  vpc_id = var.vpc.id
 
   dynamic "ingress" {
     for_each = var.manager_inbound_sg_rules

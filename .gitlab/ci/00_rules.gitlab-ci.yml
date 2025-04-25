@@ -54,6 +54,8 @@
   rules:
     - <<: *if-merge-request-pipeline
     - <<: *if-default-branch
+    - <<: *if-stable-release
+      when: on_success
 
 .rules:after-merge:
   rules:
@@ -67,6 +69,8 @@
       changes: *code-backstage-patterns
     - <<: *if-default-branch
       changes: *code-backstage-patterns
+    - <<: *if-stable-release
+      when: on_success
 
 .rules:merge_request_pipelines:e2e:
   rules:

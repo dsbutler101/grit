@@ -1,3 +1,43 @@
+## v0.13.0 (2025-04-25)
+
+### New features
+
+- Lock registered project runners [!249](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/249)
+- Include deployer into release [!230](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/230)
+- Chore: add a word [!214](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/214)
+- Chore: Rename AMI variables for clarity [!221](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/221)
+- Add tests for the Deployer [!202](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/202)
+- Support wrapper in Google module [!248](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/248)
+- Allow configuration of AWS runner instance idle_time [!225](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/225)
+- Add AWS EC2 Docker autoscaler unit test for default configuration [!222](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/222)
+- Chore: fix copy pasta from GRIT Images config [!217](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/217)
+- Add module compatibility section to README [!226](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/226)
+- Add Google Linux Docker autoscaler unit test for default configuration [!223](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/223)
+- Improve deployer ssh connection resilience [!254](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/254)
+- Refactor default labels into a reusable module [!245](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/245)
+- Add runners_global_section and runners_docker_section to aws runner [!244](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/244)
+- Output instance ID and public IP [!220](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/220)
+- Add unit tests for gke operator scenario [!246](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/246)
+- Feature: add default labels to aws fleeting [!232](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/232)
+- Add aws runner-wrapper configuration and systemd override [!212](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/212)
+
+### Maintenance
+
+- Add job to clean up stale e2e terraform states [!228](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/228)
+- Improve e2e:state-clean job [!251](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/251)
+- Add runner_version to the "Google Cloud - Docker autoscaler default" scenario [!224](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/224)
+- Add deployer E2E [!211](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/211)
+- Add core maintainers to CODEOWNERS [!206](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/206)
+- Improve e2e:state-clean job [!250](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/250)
+- Update e2e-destroy script to work with just remote state [!227](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/227)
+- Establish GORP and shared responsibility [!215](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/215)
+- Test for Perfect Fit [!231](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/231)
+- Reorganize pipeline to speed it up [!253](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/253)
+- Correctly set node_count for gke [!209](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/209)
+- Introduce snake_case keyword linting [!218](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/218)
+- Fix rules:stable-release CI pipeline rule [!229](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/229)
+- Update some terraform references to be snake_case [!219](https://gitlab.com/gitlab-org/ci-cd/runner-tools/grit/-/merge_requests/219)
+
 ## v0.12.0 (2025-03-17)
 
 ### New features

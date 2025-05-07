@@ -64,7 +64,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "cache" {
     status = "Enabled"
 
     // Empty filter - apply to all objects in the bucket
-    filter {}
+    filter {
+      prefix = ""
+    }
 
     expiration {
       days = var.cache_object_lifetime

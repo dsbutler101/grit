@@ -28,7 +28,7 @@ if [ ! -f "$ARTIFACTS_LIST_FILE" ]; then
 fi
 
 # Set variables
-CHANGELOG_URL="$CI_PROJECT_URL/blob/$TAG_NAME/CHANGELOG.md"
+CHANGELOG_URL="$CI_PROJECT_URL/-/blob/$TAG_NAME/CHANGELOG.md"
 PROJECT_ID=$CI_PROJECT_ID
 
 echo "Releasing new version $TAG_NAME"
@@ -40,7 +40,7 @@ if ! command -v jq &> /dev/null; then
 fi
 
 if ! command -v glab &> /dev/null; then
-  echo "Error: release-cli is required but not installed."
+  echo "Error: glab is required but not installed."
   echo "You can get it from: https://gitlab.com/gitlab-org/cli"
   exit 1
 fi
@@ -52,8 +52,6 @@ GitLab Runner Infrastructure Toolkit (GRIT) documentation can be found at $CI_PR
 
 # Create a JSON array of assets
 ASSETS_ARGS=$(jq -c '[.[] | {"name": .file_name, "url": .web_url, "direct_asset_path": "/binaries/\(.file_name)"}]' < "$ARTIFACTS_LIST_FILE")
-
-echo $ASSETS_ARGS
 
 # Run the release command directly
 glab release create "$TAG_NAME" \

@@ -129,6 +129,29 @@ For creating patch releases (e.g., v1.0.1, v1.0.2):
 
    Follow steps 3 to 6 from the standard release process. The pipeline automatically detects the stable branch (for example, `1-0-stable`) and apply the changes for the patch release.
 
+## Access Tokens and Permissions
+
+Both the [Releases](https://gitlab.com/gitlab-org/ci-cd/runner-tools/releases) project and the GRIT project use a shared project access token (`grit-release`) to perform release operations. This token is associated with a [service account](https://gitlab.com/project_48756626_bot_8df22a36fa32b57a4eac1f4415b2e192) that has specific permissions in GRIT's protected branches and protected tags configurations.
+
+### Required Permissions
+
+The service account associated with the token has been configured with the necessary permissions to:
+
+- Create and modify protected branches
+- Create and push protected tags
+- Perform release operations in GRIT
+
+### Token Rotation
+
+When the `grit-release` token expires, follow these steps:
+
+1. Rotate the token in the GitLab UI.
+1. Update the token value in the environment variables for:
+   - GRIT project, `GRIT_RELEASE_GITLAB_TOKEN`.
+   - [Releases](https://gitlab.com/gitlab-org/ci-cd/runner-tools/releases) project: `RELEASER_HTTPS_CLONE_PASSWORD` in the GRIT environment.
+
+When rotating the token, always regenerate the existing token rather than deleting and creating a new one. Regenerating preserves the token's association with the service account, while creating a new token would require reconfiguring all permission settings for a new service account.
+
 ## Troubleshooting
 
 If you encounter issues during the release process:

@@ -23,7 +23,6 @@ include:
     # `tags` has limited variables but CI_PIPELINE_IID works
     RUNNER_NAME: &runner_name "u${E2E_TEST_ID}-${E2E_TEST_NAME}-${E2E_CLOUD}"
     FF_USE_NATIVE_STEPS: true
-    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
   environment:
     name: "e2e-${E2E_TEST_NAME}-${E2E_CLOUD}/${RUNNER_NAME}"
 

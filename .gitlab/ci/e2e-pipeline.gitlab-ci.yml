@@ -50,20 +50,14 @@ include:
 
     FF_TIMESTAMPS: true
 
-    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
-
   environment:
     name: "e2e-${E2E_TEST_NAME}/${RUNNER_NAME}"
 
 
   before_script:
-    # Google provider specific credentials file
-    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
   # if the job is cancelled or fails, run destroy again to clean up
   after_script:
     - if [ "$CI_JOB_STATUS" == "success" ]; then exit 0; fi
-    # export this again since after_script runs in a separate shell
-    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
     - mage -t 1h terraform:initAndDestroy "${E2E_TEST_DIR}"
 
 e2e:apply:

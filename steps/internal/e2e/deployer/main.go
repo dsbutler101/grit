@@ -5,12 +5,10 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -20,7 +18,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/auth/credentials"
-	"cloud.google.com/go/oslogin/apiv1"
+	oslogin "cloud.google.com/go/oslogin/apiv1"
 	"cloud.google.com/go/oslogin/apiv1/osloginpb"
 	"cloud.google.com/go/oslogin/common/commonpb"
 	"golang.org/x/crypto/ssh"
@@ -50,12 +48,6 @@ var (
 
 func main() {
 	flag.Parse()
-
-	err := prepareGoogleAppCredentials()
-	if err != nil {
-		printlnColor(colorLightRed, "FATAL: %v", err)
-		os.Exit(1)
-	}
 
 	ctx, cancelFn := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancelFn()
@@ -88,8 +80,7 @@ func main() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	err = cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		printlnColor(colorLightRed, "Error running command: %v", err)
 		os.Exit(1)
 	}
@@ -97,36 +88,6 @@ func main() {
 
 func printlnColor(color string, format string, a ...any) {
 	fmt.Printf("%s%s%s\n", color, fmt.Sprintf(format, a...), colorReset)
-}
-
-func prepareGoogleAppCredentials() error {
-	if !isGoogleCloud() {
-		return nil
-	}
-
-	printlnColor(colorLightYellow, "Preparing Google Application Credentials...")
-
-	googleCredentialsB64File := os.Getenv("GOOGLE_CREDENTIALS_B64")
-	googleApplicationCredentialsFile := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
-
-	in, err := os.Open(googleCredentialsB64File)
-	if err != nil {
-		return fmt.Errorf("opening input file %s: %w", googleCredentialsB64File, err)
-	}
-	defer in.Close()
-
-	out, err := os.Create(googleApplicationCredentialsFile)
-	if err != nil {
-		return fmt.Errorf("creating output file %s: %w", googleApplicationCredentialsFile, err)
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, base64.NewDecoder(base64.StdEncoding, in))
-	if err != nil {
-		return fmt.Errorf("copying from %s to %s: %w", googleCredentialsB64File, googleApplicationCredentialsFile, err)
-	}
-
-	return nil
 }
 
 func isGoogleCloud() bool {

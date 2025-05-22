@@ -5,6 +5,7 @@
 .code-backstage-patterns: &code-backstage-patterns
   - ".gitlab-ci.yml"
   - ".gitlab/ci/**/*"
+  - "ci/**/*"
   - ".gitattributes"
   - "**/*.tf"
   - "**/*.lock.hcl"

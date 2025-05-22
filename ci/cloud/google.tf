@@ -12,13 +12,14 @@ resource "google_service_account_key" "grit_ci_key" {
 locals {
   grit_ci_roles = toset([
     "roles/iam.serviceAccountAdmin",
+    "roles/iam.serviceAccountKeyAdmin",
     "roles/iam.serviceAccountUser",
     "roles/iam.roleAdmin",
     "roles/resourcemanager.projectIamAdmin",
     "roles/cloudkms.admin",
     "roles/cloudkms.cryptoKeyEncrypterDecrypter",
     "roles/compute.admin",
-    "roles/container.clusterAdmin",
+    "roles/container.admin",
   ])
 }
 

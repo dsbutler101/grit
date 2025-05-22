@@ -89,4 +89,3 @@ resource "aws_iam_user_policy_attachment" "fleeting_service_account_attach" {
 resource "aws_iam_access_key" "fleeting_service_account_key" {
   user = aws_iam_user.fleeting_service_account.name
 }
-

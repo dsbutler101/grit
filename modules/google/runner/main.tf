@@ -71,12 +71,80 @@ locals {
     )
   )
 
+  runner_container_entrypoint = "/etc/gitlab-runner/entrypoint.sh"
+
   // These few lines are added to handle listen_address deprecation and backward compatibility
   //
   // DEPRECATED: we should switch to use runner_metrics_listener variable instead of listen_address
   metrics_listen_address_and_port = split(":", var.listen_address)
   metrics_listener_address        = var.listen_address != "" ? local.metrics_listen_address_and_port[0] : var.runner_metrics_listener.address
   metrics_listener_port           = var.listen_address != "" ? local.metrics_listen_address_and_port[1] : var.runner_metrics_listener.port
+}
+
+######################
+# CONTAINER SERVICES #
+######################
+
+module "containers" {
+  source = "../../internal/systemd_containers"
+
+  containers = [
+    {
+      name  = "gitlab-runner",
+      image = "${var.runner_registry}:alpine-${local.runner_version}"
+      ports = compact([
+        "${local.metrics_listener_port}:${local.metrics_listener_port}",
+        local.runner_wrapper.enabled ? "127.0.0.1:${local.runner_wrapper.grpc_tcp_port}:${local.runner_wrapper.grpc_tcp_port}" : ""
+      ])
+      volumes = flatten([
+        "/etc/gitlab-runner:/etc/gitlab-runner/",
+        "/var/run/docker.sock:/var/run/docker.sock",
+        var.additional_volumes
+      ])
+      entrypoint = local.runner_container_entrypoint
+
+      command = <<EOT
+      %{~if local.runner_wrapper.enabled~}
+      %{~if local.runner_wrapper.debug~}
+      --debug \
+      %{~endif~}
+      wrapper \
+      --grpc-listen tcp://0.0.0.0:${local.runner_wrapper.grpc_tcp_port} \
+      --process-termination-timeout ${local.runner_wrapper.process_termination_timeout} \
+      -- %{endif}run \
+      --config /etc/gitlab-runner/config.toml \
+      --user gitlab-runner \
+      --working-directory /home/gitlab-runner
+      EOT
+
+      service_options = [
+        merge(
+          {
+            TimeoutStopSec = "7200"
+          },
+          local.metrics_listener_port != 0 ? {
+            ExecStartPost = "/sbin/iptables -A INPUT -p tcp -m tcp --dport ${local.metrics_listener_port} -j ACCEPT"
+        } : {})
+      ]
+    },
+    {
+      name    = "node-exporter"
+      image   = "prom/node-exporter:${var.node_exporter.version}"
+      network = "host"
+      pid     = "host"
+      volumes = ["/:/host:ro,rslave"]
+
+      command = <<EOT
+      --web.listen-address=0.0.0.0:${var.node_exporter.port} \
+      --path.rootfs=/host
+      EOT
+
+      service_options = [{
+        ExecStartPost  = "/sbin/iptables -A INPUT -p tcp -m tcp --dport ${var.node_exporter.port} -j ACCEPT"
+        TimeoutStopSec = "30"
+      }]
+    },
+  ]
 }
 
 data "cloudinit_config" "config" {
@@ -88,9 +156,9 @@ data "cloudinit_config" "config" {
     content_type = "text/cloud-config"
 
     content = yamlencode({
-      write_files = [
+      write_files = flatten([
         {
-          path        = "/etc/gitlab-runner/entrypoint.sh"
+          path        = local.runner_container_entrypoint
           owner       = "root:root"
           permissions = "0755"
           content = templatefile("${path.module}/templates/entrypoint.sh", {
@@ -151,38 +219,24 @@ data "cloudinit_config" "config" {
             autoscaling_policies = local.autoscaling_policies
           })
         },
-        {
-          path        = "/etc/systemd/system/gitlab-runner.service"
-          owner       = "root:root"
-          permissions = "0644"
-          content = templatefile("${path.module}/templates/gitlab-runner.service", {
-            gitlab_runner_image = "${var.runner_registry}:alpine-${local.runner_version}"
-            runner_metrics_port = local.metrics_listener_port
-            additional_volumes  = var.additional_volumes
-            runner_wrapper      = local.runner_wrapper
-          })
-        },
-        {
-          path        = "/etc/systemd/system/node-exporter.service"
-          owner       = "root:root"
-          permissions = "0644"
-          content = templatefile("${path.module}/templates/node-exporter.service", {
-            node_exporter_image = "prom/node-exporter:${var.node_exporter.version}"
-            node_exporter_port  = var.node_exporter.port
-          })
-        },
-      ]
+        [for s in module.containers.services :
+          {
+            path        = "/etc/systemd/system/${s.file_name}"
+            owner       = "root:root"
+            permissions = "0644"
+            content     = s.file_content
+          }
+        ]
+      ])
 
-      runcmd = [
-        "systemctl daemon-reload",
-        "systemctl enable node-exporter.service",
-        "systemctl start node-exporter.service",
-        "systemctl enable gitlab-runner.service",
-        "systemctl start gitlab-runner.service",
-      ]
+      runcmd = [module.containers.run_command]
     })
   }
 }
+
+###################
+# MANAGER COMPUTE #
+###################
 
 resource "google_compute_instance" "runner_manager" {
   name         = local.runner_manager_name

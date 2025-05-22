@@ -1,0 +1,44 @@
+[Unit]
+Description=Start ${name} container
+After=docker.service docker.socket
+Wants=docker.service docker.socket
+
+[Service]
+ExecStart=/usr/bin/docker run \
+            --rm \
+            --name=${name} \
+            %{~ for port in ports ~}
+            -p ${port} \
+            %{~ endfor ~}
+            %{~ for volume in volumes ~}
+            -v ${volume} \
+            %{~ endfor ~}
+            %{~ for e in env ~}
+            -e ${e} \
+            %{~ endfor ~}
+            %{~ if entrypoint != null ~}
+            --entrypoint ${entrypoint} \
+            %{~ endif ~}
+            %{~ if network != null ~}
+            --network ${network} \
+            %{~ endif ~}
+            %{~ if pid != null ~}
+            --pid ${pid} \
+            %{~ endif ~}
+            %{~ if command == null ~}
+            ${image}
+            %{~ else ~}
+            ${image} \
+            %{~ for l in split("\n", trimspace(command)) ~}
+            ${trimspace(l)}
+            %{~ endfor ~}
+            %{~ endif ~}
+
+ExecStop=/usr/bin/docker stop ${name}
+ExecStopPost=/usr/bin/docker rm ${name}
+
+%{~ for opts in service_options ~}
+%{~ for k, v in opts ~}
+${k}=${v}
+%{ endfor ~}
+%{ endfor ~}

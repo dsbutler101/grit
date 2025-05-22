@@ -2,6 +2,7 @@ package test_tools
 
 import (
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -109,4 +110,60 @@ func PlanAndAssertError(t *testing.T, moduleVars map[string]any, wantErr bool) {
 func AssertProviderConfigExists(t *testing.T, plan *terraform.PlanStruct, name string) {
 	t.Helper()
 	assert.Contains(t, plan.RawPlan.Config.ProviderConfigs, name, `Expected provider config "%s" to exist, but does not`, name)
+}
+
+func ApplyE(t *testing.T, moduleVars map[string]any) (map[string]any, error) {
+	options := terraform.Options{
+		TerraformBinary: "terraform",
+		TerraformDir:    ".",
+		Vars:            moduleVars,
+	}
+	_, err := terraform.InitAndApplyE(t, &options)
+	if err != nil {
+		return nil, err
+	}
+	return terraform.OutputAllE(t, &options)
+}
+
+func ApplyAndAssertOutputs(t *testing.T, moduleVars map[string]any, expectedOutputs map[string]any) {
+	outputs, err := ApplyE(t, moduleVars)
+	require.NoError(t, err)
+	outputsSeen := map[string]struct{}{}
+	for k, v := range outputs {
+		outputsSeen[k] = struct{}{}
+		want, ok := expectedOutputs[k]
+		if !ok {
+			t.Errorf("got unexpected output %v", k)
+			continue
+		}
+		assert.Equal(t, want, v)
+	}
+	for k := range expectedOutputs {
+		if _, ok := outputsSeen[k]; !ok {
+			t.Errorf("wanted output %v. got none", k)
+			continue
+		}
+	}
+}
+
+func ApplyAndAssertError(t *testing.T, moduleVars map[string]any, wantErr bool) {
+	_, err := ApplyE(t, moduleVars)
+	if wantErr {
+		require.Error(t, err)
+	} else {
+		require.NoError(t, err)
+	}
+}
+
+// ToModuleVars uses json marshalling to convert a struct to map[string]any
+// Fields need `json` tags to ensure they are encoded correctly.
+func ToModuleVars(t *testing.T, obj any) map[string]any {
+	t.Helper()
+	data, err := json.Marshal(obj)
+	require.NoError(t, err)
+
+	var moduleVars map[string]any
+	err = json.Unmarshal(data, &moduleVars)
+	require.NoError(t, err)
+	return moduleVars
 }

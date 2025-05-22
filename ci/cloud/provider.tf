@@ -29,3 +29,13 @@ terraform {
 provider "gitlab" {
   # remember to export GITLAB_TOKEN environment variable
 }
+
+provider "aws" {
+  region = local.aws_region
+}
+
+provider "google" {
+  project = local.google_project
+  region  = local.google_region
+  zone    = local.google_zone
+}

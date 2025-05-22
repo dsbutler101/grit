@@ -27,10 +27,8 @@ unit tests:
   needs:
     - terraform init
   variables:
-    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_CREDENTIALS_B64}.decoded
     UNIT_TEST_EXECUTION_PATH: ${CI_PROJECT_DIR}
   before_script:
-    - cat "${GOOGLE_CREDENTIALS_B64}" | base64 -d > "${GOOGLE_APPLICATION_CREDENTIALS}"
     - make terraform-init -j -Oline
 
 deployer:unit tests:

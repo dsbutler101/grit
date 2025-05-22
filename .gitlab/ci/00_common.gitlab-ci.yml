@@ -40,10 +40,18 @@ variables:
 
 .tf-cache:
   cache:
-    - key: tf-${CI_COMMIT_REF_SLUG}
+    - &tf-cache-pull
+      key: tf-${CI_COMMIT_REF_SLUG}
       paths: 
         - $CI_PROJECT_DIR/**/.terraform
         - $CI_PROJECT_DIR/**/.terraform.lock.hcl
+      # by default don't push backend configuration into this cache
+      policy: pull
+
+.tf-cache-push:
+  cache:
+    - <<: *tf-cache-pull
+      policy: pull-push
 
 .go-tf-cache:
   <<: *go-cache

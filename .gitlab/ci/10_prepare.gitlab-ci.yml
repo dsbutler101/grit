@@ -8,6 +8,35 @@ terraform init:
       optional: true
   extends:
     - .rules:merge_request_pipelines:code
-    - .tf-cache
+    - .tf-cache-push
   script:
     - make terraform-init -j -Oline
+
+ci infra plan:
+  stage: prepare
+  needs: [terraform init]
+  extends:
+    - .rules:merge_request_pipelines:code
+    - .tf-cache
+  variables:
+    TF_HTTP_USERNAME: ${GITLAB_USER_LOGIN}
+    TF_HTTP_PASSWORD: ${GITLAB_TOKEN_TERRAFORM}
+  script:
+    - cd ci/cloud
+    - terraform init
+    - terraform plan -out=tfplan
+  artifacts:
+    access: none
+    expire_in: "1 day"
+    paths:
+      - ci/cloud/tfplan
+
+ci infra apply:
+  needs: [ci infra plan]
+  extends:
+    - ci infra plan
+  script:
+    - cd ci/cloud
+    - terraform apply tfplan
+  when: manual
+  manual_confirmation: 'Are you sure? If the plan replaces access tokens it may fail halfway!'

@@ -8,6 +8,17 @@ resource "gitlab_project_variable" "google_credentials_b64" {
   description   = "Terraform managed (ci/cloud/gitlab_variables.tf)"
 }
 
+resource "gitlab_project_variable" "google_application_credentials" {
+  project = data.gitlab_project.grit.id
+  key     = "GOOGLE_APPLICATION_CREDENTIALS"
+  value   = base64decode(google_service_account_key.grit_ci_key.private_key)
+  # can't mask json
+  masked        = false
+  raw           = true
+  variable_type = "file"
+  description   = "Terraform managed (ci/cloud/gitlab_variables.tf)"
+}
+
 resource "gitlab_project_variable" "google_project" {
   project     = data.gitlab_project.grit.id
   key         = "GOOGLE_PROJECT"

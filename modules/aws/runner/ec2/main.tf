@@ -150,7 +150,7 @@ resource "aws_instance" "runner_manager" {
   }
 
   tags = merge(var.labels, {
-    name = local.instance_name
+    Name = local.instance_name
   })
 
   key_name = try(aws_key_pair.aws_runner_key_pair[0].key_name, "")

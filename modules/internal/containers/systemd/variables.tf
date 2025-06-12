@@ -34,3 +34,21 @@ variable "containers" {
     error_message = "Each container name must be unique, a valid docker container name and no more than 63 characters long."
   }
 }
+
+variable "owner" {
+  description = "The owner of the service files, defaults to \"root:root\""
+  type        = string
+  default     = "root:root"
+}
+
+variable "permissions" {
+  description = "The file mode for the service files, defaults to \"0644\""
+  type        = string
+  default     = "0644"
+}
+
+variable "service_path" {
+  description = "The directory to place the service files in, defaults to \"/etc/systemd/system\""
+  type        = string
+  default     = "/etc/systemd/system"
+}

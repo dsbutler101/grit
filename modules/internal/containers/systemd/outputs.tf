@@ -1,5 +1,5 @@
-output "services" {
-  description = "systemd service files for each container"
+output "write_files" {
+  description = "systemd service files for each container for use with cloud-init's `write_files` module."
   value       = local.services
 }
 

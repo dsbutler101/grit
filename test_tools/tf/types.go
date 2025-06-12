@@ -56,11 +56,6 @@ func LoadModuleDependencies(modulesDir string) ([]*ModuleDependency, error) {
 			// because it isn't user facing.
 			continue
 		}
-		if providerName == "gitlab" {
-			// The GitLab module doesn't yet conform to
-			// the provider/module structure.
-			continue
-		}
 		provider, ok := modulesByProvider[providerName]
 		if !ok {
 			provider = map[string]*ModuleTypes{}
@@ -71,6 +66,9 @@ func LoadModuleDependencies(modulesDir string) ([]*ModuleDependency, error) {
 			return nil, err
 		}
 		for _, dir := range dirs {
+			if !dir.IsDir() {
+				continue
+			}
 			moduleName := dir.Name()
 			m, err := LoadModuleTypes(modulesDir, providerName, moduleName)
 			if err != nil {

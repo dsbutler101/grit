@@ -6,9 +6,9 @@ spec:
       type: string
     runner_tag:
       type: string
-    runner_version:
-      type: string
-      default: "17.10.0"
+    runner_version_skew:
+      type: number
+      default: 0
     command:
       type: string
     additional_flags:
@@ -37,7 +37,7 @@ env:
   TF_VAR_runner_tag: ${{ inputs.runner_tag }}
   TF_VAR_name: ${{ inputs.runner_name }}
   TF_VAR_gitlab_project_id: ${{ job.CI_PROJECT_ID }}
-  TF_VAR_runner_version: ${{ inputs.runner_version }}
+  TF_VAR_runner_version_skew: ${{ inputs.runner_version_skew }}
 
   TF_HTTP_ADDRESS: "https://gitlab.com/api/v4/projects/${{ job.CI_PROJECT_ID }}/terraform/state/${{ inputs.runner_name }}"
   TF_HTTP_LOCK_ADDRESS: "https://gitlab.com/api/v4/projects/${{ job.CI_PROJECT_ID }}/terraform/state/${{ inputs.runner_name }}/lock"

@@ -27,7 +27,7 @@ locals {
 provider "gitlab" {}
 
 module "gitlab" {
-  source             = "../../modules/gitlab"
+  source             = "../../modules/gitlab/runner"
   metadata           = local.metadata
   url                = "https://gitlab.com"
   project_id         = var.gitlab_project_id
@@ -77,6 +77,12 @@ module "fleeting" {
   machine_type          = "n2d-standard-2"
 }
 
+module "runner_version_lookup" {
+  source   = "../../modules/gitlab/runner_version_lookup"
+  metadata = local.metadata
+  skew     = var.runner_version_skew
+}
+
 module "runner" {
   source   = "../../modules/google/runner"
   metadata = local.metadata
@@ -98,7 +104,10 @@ module "runner" {
   gitlab_url   = module.gitlab.url
   runner_token = module.gitlab.runner_token
 
-  runner_version = "v${var.runner_version}"
+  runner_version_lookup = {
+    skew           = module.runner_version_lookup.skew
+    runner_version = module.runner_version_lookup.runner_version
+  }
 
   executor = "docker-autoscaler"
 

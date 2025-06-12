@@ -27,7 +27,7 @@ locals {
 provider "gitlab" {}
 
 module "gitlab" {
-  source             = "../../modules/gitlab"
+  source             = "../../modules/gitlab/runner"
   metadata           = local.metadata
   url                = "https://gitlab.com"
   project_id         = var.gitlab_project_id
@@ -95,14 +95,21 @@ module "cache" {
   cache_object_lifetime = 2
 }
 
-module "runner" {
-  source   = "../../modules/aws/runner"
+module "runner_version_lookup" {
+  source   = "../../modules/gitlab/runner_version_lookup"
   metadata = local.metadata
-  vpc      = local.vpc
-  iam      = local.iam
-  fleeting = local.fleeting
-  gitlab   = local.gitlab
-  cache    = local.cache
+  skew     = var.runner_version_skew
+}
+
+module "runner" {
+  source                = "../../modules/aws/runner"
+  metadata              = local.metadata
+  vpc                   = local.vpc
+  iam                   = local.iam
+  fleeting              = local.fleeting
+  gitlab                = local.gitlab
+  cache                 = local.cache
+  runner_version_lookup = local.runner_version_lookup
 
   service               = "ec2"
   executor              = "docker-autoscaler"
@@ -115,7 +122,6 @@ module "runner" {
     module.security_groups.runner_manager_id,
   ]
 
-  runner_version = "${var.runner_version}-1"
   runner_wrapper = {
     enabled = var.enable_runner_wrapper
   }
@@ -154,5 +160,10 @@ locals {
     bucket_location   = module.cache.bucket_location
     access_key_id     = module.cache.access_key_id
     secret_access_key = module.cache.secret_access_key
+  }
+
+  runner_version_lookup = {
+    skew           = module.runner_version_lookup.skew
+    runner_version = module.runner_version_lookup.runner_version
   }
 }

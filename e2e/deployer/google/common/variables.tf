@@ -10,8 +10,8 @@ variable "runner_tag_list" {
   type = list(string)
 }
 
-variable "runner_version" {
-  type = string
+variable "runner_version_skew" {
+  type = number
 }
 
 variable "google_project" {

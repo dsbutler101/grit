@@ -108,7 +108,7 @@ module "security_groups" {
 }
 
 module "gitlab" {
-  source   = "../../../../modules/gitlab"
+  source   = "../../../../modules/gitlab/runner"
   metadata = local.metadata
 
   url                = var.gitlab_url

@@ -12,7 +12,7 @@ locals {
 }
 
 module "gitlab" {
-  source             = "../../../../modules/gitlab"
+  source             = "../../../../modules/gitlab/runner"
   metadata           = local.metadata
   url                = "https://gitlab.com"
   project_id         = var.gitlab_project_id
@@ -37,6 +37,12 @@ module "security_groups" {
   vpc = local.vpc
 }
 
+module "runner_version_lookup" {
+  source   = "../../../../modules/gitlab/runner_version_lookup"
+  metadata = local.metadata
+  skew     = var.runner_version_skew
+}
+
 module "runner" {
   source   = "../../../../modules/aws/runner"
   metadata = local.metadata
@@ -56,7 +62,8 @@ module "runner" {
 
   instance_type = "t3.small"
 
-  runner_version = "${var.runner_version}-1"
+  runner_version_lookup = local.runner_version_lookup
+
   runner_wrapper = {
     enabled     = true
     socket_path = "tcp://localhost:7777"
@@ -66,14 +73,19 @@ module "runner" {
 
 locals {
   vpc = {
-    enabled    = true
+    enabled    = module.vpc.enabled
     id         = module.vpc.id
     subnet_ids = module.vpc.subnet_ids
   }
 
   gitlab = {
-    enabled      = true
+    enabled      = module.gitlab.enabled
     url          = module.gitlab.url
     runner_token = module.gitlab.runner_token
+  }
+
+  runner_version_lookup = {
+    skew           = module.runner_version_lookup.skew
+    runner_version = module.runner_version_lookup.runner_version
   }
 }

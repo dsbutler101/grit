@@ -52,6 +52,14 @@ module "fleeting" {
   source_image = var.ephemeral_runner.source_image
 }
 
+module "runner_version_lookup" {
+  source = "../../../../modules/gitlab/runner_version_lookup"
+
+  metadata = local.metadata
+
+  skew = var.runner_version_skew
+}
+
 module "runner" {
   source = "../../../../modules/google/runner"
 
@@ -80,9 +88,13 @@ module "runner" {
     port    = local.runner_metrics_port
   }
 
-  gitlab_url     = var.gitlab_url
-  runner_token   = var.runner_token
-  runner_version = var.runner_version
+  gitlab_url   = var.gitlab_url
+  runner_token = var.runner_token
+
+  runner_version_lookup = {
+    skew           = module.runner_version_lookup.skew
+    runner_version = module.runner_version_lookup.runner_version
+  }
 
   executor = "docker-autoscaler"
 

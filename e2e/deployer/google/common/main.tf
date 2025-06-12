@@ -14,7 +14,7 @@ locals {
 }
 
 module "gitlab" {
-  source             = "../../../../modules/gitlab"
+  source             = "../../../../modules/gitlab/runner"
   metadata           = local.metadata
   url                = "https://gitlab.com"
   project_id         = var.gitlab_project_id
@@ -36,6 +36,12 @@ module "iam" {
   metadata = local.metadata
 }
 
+module "runner_version_lookup" {
+  source   = "../../../../modules/gitlab/runner_version_lookup"
+  metadata = local.metadata
+  skew     = var.runner_version_skew
+}
+
 module "runner" {
   source   = "../../../../modules/google/runner"
   metadata = local.metadata
@@ -54,9 +60,13 @@ module "runner" {
   }
   manager_subnet_name = "${var.name}-runner-managers"
 
-  gitlab_url     = module.gitlab.url
-  runner_token   = module.gitlab.runner_token
-  runner_version = var.runner_version
+  gitlab_url   = module.gitlab.url
+  runner_token = module.gitlab.runner_token
+
+  runner_version_lookup = {
+    skew           = module.runner_version_lookup.skew
+    runner_version = module.runner_version_lookup.runner_version
+  }
 
   executor = "shell"
 

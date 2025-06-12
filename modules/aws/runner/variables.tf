@@ -114,12 +114,6 @@ variable "runner_repository" {
   default     = "gitlab-runner"
 }
 
-variable "runner_version" {
-  description = "The version of gitlab-runner"
-  type        = string
-  default     = "16.11.1-1"
-}
-
 variable "aws_plugin_version" {
   description = "The version of fleeting-plugin-aws"
   type        = string
@@ -237,6 +231,19 @@ variable "create_key_pair" {
     size      = optional(number, 4096)
   })
   default = null
+}
+
+##################
+# RUNNER VERSION #
+##################
+
+variable "runner_version_lookup" {
+  description = "The version of gitlab-runner"
+  type = object({
+    skew           = optional(number)
+    runner_version = optional(string)
+  })
+  default = {}
 }
 
 ##########

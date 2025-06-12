@@ -15,14 +15,14 @@ func TestScenarioGoogleLinuxDockerAutoscaler(t *testing.T) {
 	}{
 		"google linux docker autoscaler default": {
 			moduleVars: map[string]interface{}{
-				"name":           name,
-				"labels":         map[string]string{"env": "prod", "managed-by": "terraform"},
-				"google_project": "my-gcp-project",
-				"google_region":  "us-central1",
-				"google_zone":    "us-central1-a",
-				"gitlab_url":     "https://gitlab.example.com",
-				"runner_token":   "glrt-abcdef1234567890",
-				"runner_version": "17.10.0",
+				"name":                name,
+				"labels":              map[string]string{"env": "prod", "managed-by": "terraform"},
+				"google_project":      "my-gcp-project",
+				"google_region":       "us-central1",
+				"google_zone":         "us-central1-a",
+				"gitlab_url":          "https://gitlab.example.com",
+				"runner_token":        "glrt-abcdef1234567890",
+				"runner_version_skew": 0,
 
 				"runner_machine_type": "n2d-standard-4",
 				"runner_disk_type":    "pd-ssd",

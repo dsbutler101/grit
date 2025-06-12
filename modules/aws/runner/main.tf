@@ -27,6 +27,17 @@ module "labels" {
   additional_labels = var.metadata.labels
 }
 
+##################
+# RUNNER VERSION #
+##################
+
+module "default_version" {
+  source = "../../gitlab/runner_version_lookup"
+
+  metadata = var.metadata
+  skew     = 0
+}
+
 ######################
 # RUNNER PROD MODULE #
 ######################
@@ -62,7 +73,7 @@ module "ec2" {
   privileged                 = var.privileged
   region                     = var.region
   runner_repository          = var.runner_repository
-  runner_version             = var.runner_version
+  runner_version             = local.runner_version
   aws_plugin_version         = var.aws_plugin_version
   instance_role_profile_name = var.instance_role_profile_name
   install_cloudwatch_agent   = var.install_cloudwatch_agent

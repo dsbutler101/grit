@@ -29,7 +29,7 @@ module "blue" {
     var.runner_tag,
     "blue",
   ]
-  runner_version = var.runner_version
+  runner_version_skew = var.runner_version_skew
 
   google_project = var.google_project
   google_region  = var.google_region

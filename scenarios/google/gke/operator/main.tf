@@ -58,7 +58,7 @@ module "operator" {
 }
 
 module "gitlab" {
-  source             = "../../../../modules/gitlab/"
+  source             = "../../../../modules/gitlab/runner"
   metadata           = local.metadata
   url                = "https://gitlab.com"
   project_id         = var.gitlab_project_id

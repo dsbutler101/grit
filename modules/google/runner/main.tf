@@ -31,12 +31,18 @@ module "labels" {
 # RUNNER PROD CONFIG #
 ######################
 
+module "default_runner_version" {
+  source   = "../../gitlab/runner_version_lookup"
+  metadata = var.metadata
+  skew     = 0
+}
+
 locals {
   runner_manager_name = "${var.metadata.name}-runner-manager"
   runner_manager_tag  = "gitlab-runner-manager"
   runner_manager_tags = concat([local.runner_manager_tag], var.additional_tags)
 
-  runner_version = "v${regex("v?([0-9]+\\.[0-9]+\\.[0-9]+)", var.runner_version)[0]}"
+  runner_version = "v${var.runner_version_lookup.runner_version != null ? var.runner_version_lookup.runner_version : module.default_runner_version.runner_version}"
 
   use_autoscaling = var.executor == "docker-autoscaler" || var.executor == "instance"
   use_docker      = var.executor == "docker-autoscaler" || var.executor == "docker"

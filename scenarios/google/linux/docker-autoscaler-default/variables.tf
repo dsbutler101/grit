@@ -28,8 +28,9 @@ variable "runner_token" {
   type = string
 }
 
-variable "runner_version" {
-  type = string
+variable "runner_version_skew" {
+  type    = number
+  default = null
 }
 
 variable "runner_machine_type" {

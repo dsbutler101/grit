@@ -79,16 +79,17 @@ variable "service_account_email" {
   description = "Email of service account that will be attached to the runner manager instance"
 }
 
-variable "runner_version" {
-  type        = string
-  description = "Version of GitLab Runner"
+##################
+# RUNNER VERSION #
+##################
 
-  default = "v16.8.0"
-
-  validation {
-    condition     = can(regex("v?[0-9]+\\.[0-9]+\\.[0-9]+", var.runner_version))
-    error_message = "runner_version must be in format of vX.Y.Z or X.Y.Z"
-  }
+variable "runner_version_lookup" {
+  description = "The version of gitlab-runner"
+  type = object({
+    skew           = optional(number)
+    runner_version = optional(string)
+  })
+  default = {}
 }
 
 ################################

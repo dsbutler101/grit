@@ -85,8 +85,15 @@ locals {
 # CONTAINER SERVICES #
 ######################
 
-module "containers" {
-  source = "../../internal/systemd_containers"
+module "node_exporter" {
+  source = "../../internal/containers/node_exporter"
+
+  image_tag = var.node_exporter.version
+  port      = var.node_exporter.port
+}
+
+module "systemd_containers" {
+  source = "../../internal/containers/systemd"
 
   containers = [
     {
@@ -127,23 +134,7 @@ module "containers" {
         } : {})
       ]
     },
-    {
-      name    = "node-exporter"
-      image   = "prom/node-exporter:${var.node_exporter.version}"
-      network = "host"
-      pid     = "host"
-      volumes = ["/:/host:ro,rslave"]
-
-      command = <<EOT
-      --web.listen-address=0.0.0.0:${var.node_exporter.port} \
-      --path.rootfs=/host
-      EOT
-
-      service_options = [{
-        ExecStartPost  = "/sbin/iptables -A INPUT -p tcp -m tcp --dport ${var.node_exporter.port} -j ACCEPT"
-        TimeoutStopSec = "30"
-      }]
-    },
+    module.node_exporter.container_config,
   ]
 }
 
@@ -219,17 +210,10 @@ data "cloudinit_config" "config" {
             autoscaling_policies = local.autoscaling_policies
           })
         },
-        [for s in module.containers.services :
-          {
-            path        = "/etc/systemd/system/${s.file_name}"
-            owner       = "root:root"
-            permissions = "0644"
-            content     = s.file_content
-          }
-        ]
+        module.systemd_containers.write_files
       ])
 
-      runcmd = [module.containers.run_command]
+      runcmd = [module.systemd_containers.run_command]
     })
   }
 }

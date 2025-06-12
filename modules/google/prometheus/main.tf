@@ -41,6 +41,40 @@ locals {
   prometheus_volume    = "${local.persistent_data_path}/prometheus"
 }
 
+module "node_exporter" {
+  source    = "../../internal/containers/node_exporter"
+  image_tag = var.node_exporter_version
+  port      = var.node_exporter_port
+}
+
+module "systemd_containers" {
+  source = "../../internal/containers/systemd"
+
+  containers = [
+    {
+      name  = "prometheus",
+      image = local.prometheus_image
+      ports = [
+        "127.0.0.1:9090:9090"
+      ]
+      volumes = [
+        "/etc/prometheus:/etc/prometheus",
+        "${local.prometheus_volume}:/prometheus"
+      ]
+      command = <<EOF
+      --web.enable-admin-api \
+      --config.file=/etc/prometheus/config.yml \
+      --storage.tsdb.path=/prometheus \
+      --storage.tsdb.retention=7d
+      EOF
+      service_options = [{
+        TimeoutStopSec = 30
+      }]
+    },
+    module.node_exporter.container_config
+  ]
+}
+
 data "cloudinit_config" "config" {
   gzip          = false
   base64_encode = false
@@ -50,30 +84,12 @@ data "cloudinit_config" "config" {
     content_type = "text/cloud-config"
 
     content = yamlencode({
-      write_files = [
+      write_files = flatten([
         {
           path        = "/etc/prometheus/config.yml"
           owner       = "root:root"
           permissions = "0644"
           content     = local.prometheus_config_yml
-        },
-        {
-          path        = "/etc/systemd/system/prometheus.service"
-          owner       = "root:root"
-          permissions = "0644"
-          content = templatefile("${path.module}/templates/prometheus.service", {
-            prometheus_image  = local.prometheus_image
-            prometheus_volume = local.prometheus_volume
-          })
-        },
-        {
-          path        = "/etc/systemd/system/node-exporter.service"
-          owner       = "root:root"
-          permissions = "0644"
-          content = templatefile("${path.module}/templates/node-exporter.service", {
-            node_exporter_image = "prom/node-exporter:${var.node_exporter_version}"
-            node_exporter_port  = var.node_exporter_port
-          })
         },
         {
           path        = "/etc/scripts/mount-prometheus-data-disk.sh"
@@ -85,17 +101,14 @@ data "cloudinit_config" "config" {
             mount_path        = local.persistent_data_path
             prometheus_volume = local.prometheus_volume
           })
-        }
-      ]
+        },
+        module.systemd_containers.write_files
+      ])
 
-      runcmd = [
+      runcmd = flatten([
         "/etc/scripts/mount-prometheus-data-disk.sh",
-        "systemctl daemon-reload",
-        "systemctl enable node-exporter.service",
-        "systemctl start node-exporter.service",
-        "systemctl enable prometheus.service",
-        "systemctl start prometheus.service",
-      ]
+        module.systemd_containers.run_command
+      ])
     })
   }
 }

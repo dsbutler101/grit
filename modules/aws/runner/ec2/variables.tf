@@ -143,7 +143,7 @@ variable "runners_docker_section" {
 }
 
 variable "runner_manager_ami" {
-  description = "The machine image to use on the runner manager"
+  description = "The machine image to use on the runner manager. Must support systemd and docker."
   type        = string
 }
 

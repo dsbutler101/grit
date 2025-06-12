@@ -51,6 +51,13 @@ ExecStopPost=/usr/bin/docker rm {{.Name}}
 {{- end }}
 `
 
+type moduleVars struct {
+	Containers  []Container `json:"containers"`
+	Owner       string      `json:"owner,omitempty"`
+	Permissions string      `json:"permissions,omitempty"`
+	ServicePath string      `json:"service_path,omitempty"`
+}
+
 type Container struct {
 	Name           string              `json:"name"`
 	Ports          []string            `json:"ports"`
@@ -64,10 +71,11 @@ type Container struct {
 	ServiceOptions []map[string]string `json:"service_options"`
 }
 
-func expectedModuleOutput(t *testing.T, cs []Container) map[string]any {
+func expectedModuleOutput(t *testing.T, mv moduleVars) map[string]any {
 	tplt := template.Must(template.New("service").Parse(serviceTemplate))
 
-	services := make([]any, len(cs))
+	cs := mv.Containers
+	write_files := make([]any, len(cs))
 	file_names := make([]string, len(cs))
 	for i, c := range cs {
 		// indent multi-line commands to replicate tf indent function
@@ -77,11 +85,30 @@ func expectedModuleOutput(t *testing.T, cs []Container) map[string]any {
 		err := tplt.Execute(&tpl, c)
 		require.NoError(t, err)
 		fn := c.Name + ".service"
-		services[i] = map[string]any{
-			"file_name":    fn,
-			"file_content": tpl.String(),
-		}
 		file_names[i] = fn
+
+		path := "/etc/systemd/system"
+		if mv.ServicePath != "" {
+			path = mv.ServicePath
+		}
+		fn = path + "/" + fn
+
+		owner := "root:root"
+		if mv.Owner != "" {
+			owner = mv.Owner
+		}
+
+		permissions := "0644"
+		if mv.Permissions != "" {
+			permissions = mv.Permissions
+		}
+
+		write_files[i] = map[string]any{
+			"path":        fn,
+			"owner":       owner,
+			"permissions": permissions,
+			"content":     tpl.String(),
+		}
 	}
 
 	runcmd := ""
@@ -90,17 +117,13 @@ func expectedModuleOutput(t *testing.T, cs []Container) map[string]any {
 	}
 
 	return map[string]any{
-		"services":    services,
+		"write_files": write_files,
 		"run_command": runcmd,
 	}
 }
 
 func TestSystemdContainers(t *testing.T) {
 	t.Parallel()
-
-	type moduleVars struct {
-		Containers []Container `json:"containers"`
-	}
 
 	testCases := map[string]struct {
 		moduleVars moduleVars
@@ -245,6 +268,15 @@ func TestSystemdContainers(t *testing.T) {
 				}},
 			false,
 		},
+		"with custom owners, permissions, and path": {
+			moduleVars{
+				Containers:  []Container{{Name: "web", Image: "nginx:latest"}},
+				Owner:       "root:docker",
+				Permissions: "0755",
+				ServicePath: "/etc/systemd/system/custom",
+			},
+			false,
+		},
 	}
 
 	for tn, tc := range testCases {
@@ -260,7 +292,7 @@ func TestSystemdContainers(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			assert.Equal(t, expectedModuleOutput(t, tc.moduleVars.Containers), op)
+			assert.Equal(t, expectedModuleOutput(t, tc.moduleVars), op)
 		})
 	}
 }

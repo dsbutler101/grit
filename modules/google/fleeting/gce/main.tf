@@ -5,6 +5,12 @@ resource "google_compute_instance_template" "ephemeral_runner" {
     create_before_destroy = true
   }
 
+  shielded_instance_config {
+    enable_secure_boot          = true
+    enable_vtpm                 = true
+    enable_integrity_monitoring = true
+  }
+
   tags   = concat([local.ephemeral_runner_tag], var.additional_tags)
   labels = var.labels
 

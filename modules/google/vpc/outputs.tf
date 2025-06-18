@@ -22,6 +22,6 @@ output "subnetwork_cidrs" {
 }
 
 output "nat_ips" {
-  description = "External IP addresses configured in NAT"
+  description = "External IP addresses allocated to NAT"
   value       = google_compute_router_nat.nat.nat_ips
 }

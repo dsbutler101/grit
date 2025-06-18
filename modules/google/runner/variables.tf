@@ -315,7 +315,7 @@ variable "address_type" {
 variable "access_config_enabled" {
   description = "Runner manager access config enabled"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "additional_tags" {

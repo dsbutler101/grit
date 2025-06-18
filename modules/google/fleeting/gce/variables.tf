@@ -80,5 +80,5 @@ variable "cross_vm_deny_egress_destination_ranges" {
 variable "access_config_enabled" {
   description = "Runner manager access config enabled"
   type        = bool
-  default     = true
+  default     = false
 }

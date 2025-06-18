@@ -20,3 +20,8 @@ output "subnetwork_cidrs" {
     for name, subnet in google_compute_subnetwork.subnetwork : name => subnet.ip_cidr_range
   })
 }
+
+output "nat_ips" {
+  description = "External IP addresses configured in NAT"
+  value       = google_compute_router_nat.nat.nat_ips
+}

@@ -58,5 +58,5 @@ variable "public_access_prevention" {
 variable "uniform_bucket_level_access" {
   description = "Whether to enable uniform bucket-level access"
   type        = bool
-  default     = false
+  default     = true
 }

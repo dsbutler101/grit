@@ -238,6 +238,12 @@ resource "google_compute_instance" "runner_manager" {
     cos-update-strategy = "update_disabled"
   }
 
+  shielded_instance_config {
+    enable_secure_boot          = true
+    enable_vtpm                 = true
+    enable_integrity_monitoring = true
+  }
+
   labels = merge(module.labels.merged, {
     purpose = local.runner_manager_tag
   })

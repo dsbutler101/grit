@@ -17,7 +17,7 @@ resource "google_compute_instance_template" "ephemeral_runner" {
   machine_type = var.machine_type
 
   metadata = {
-    enable-oslogin      = false
+    enable-oslogin      = true
     cos-update-strategy = "update_disabled"
   }
 

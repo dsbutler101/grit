@@ -25,6 +25,8 @@ variable "gitlab" {
     runner_token = string
     url          = string
   })
+
+  sensitive = true
 }
 
 variable "name" {
@@ -82,6 +84,7 @@ variable "config_template" {
   type        = string
   description = "A config.toml template provided to configure the runner"
   default     = ""
+  nullable    = false
 }
 
 variable "envvars" {

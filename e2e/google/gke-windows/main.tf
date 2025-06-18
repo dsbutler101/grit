@@ -17,6 +17,28 @@ terraform {
   backend "http" {}
 }
 
+locals {
+  metadata = {
+    name = var.name
+    labels = tomap({
+      gitlab_project_id = var.gitlab_project_id
+      env               = "grit-e2e"
+    })
+    min_support = "experimental"
+  }
+}
+
+provider "gitlab" {}
+
+module "gitlab" {
+  source             = "../../../modules/gitlab/runner"
+  metadata           = local.metadata
+  url                = "https://gitlab.com"
+  project_id         = var.gitlab_project_id
+  runner_description = var.name
+  runner_tags        = [var.runner_tag]
+}
+
 # provider defaults using env vars (GOOGLE_PROJECT etc)
 provider "google" {}
 
@@ -61,11 +83,12 @@ module "gke_runner" {
   }
   name = var.name
 
-  gitlab_project_id  = var.gitlab_project_id
-  runner_description = var.name
-
-  runner_tags     = [var.runner_tag]
-  config_template = <<EOF
+  runners = {
+    windows = {
+      runner_token    = module.gitlab.runner_token
+      url             = module.gitlab.url
+      runner_tags     = [var.runner_tag]
+      config_template = <<EOF
   [[runners]]
     name = ""
     url = "https://gitlab.com/"
@@ -84,13 +107,17 @@ module "gke_runner" {
       [runners.kubernetes.volumes]
       [runners.kubernetes.dns_config]
   EOF
-  envvars = {
-    "KUBERNETES_POLL_TIMEOUT" = "3600"
-    "FF_TIMESTAMPS"           = "true"
+      envvars = {
+        "KUBERNETES_POLL_TIMEOUT" = "3600"
+        "FF_TIMESTAMPS"           = "true"
+      }
+      helper_image = "registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-latest-servercore1809"
+      runner_image = "registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp:v${var.runner_version}"
+    }
   }
-  helper_image = "registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-latest-servercore1809"
-  // TODO: The default runner image in operator is now registry.gitlab.com/gitlab-org/gitlab-runner:alpine-bleeding which
-  // isn't ideal as it doesn't run in the security context of the Operator by default
-  runner_image                = "registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp:v${var.runner_version}"
-  override_operator_manifests = "file://../../../examples/test-runner-gke-google/operator.k8s.yaml"
+
+  operator = {
+    version            = "latest"
+    override_manifests = "file://../../../examples/test-runner-gke-google/operator.k8s.yaml"
+  }
 }

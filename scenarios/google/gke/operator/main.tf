@@ -15,6 +15,15 @@ locals {
     subnetwork_ids   = module.vpc.subnetwork_ids
     subnetwork_cidrs = module.vpc.subnetwork_cidrs
   }
+
+
+  # Use nonsensitive for for_each iteration while keeping tokens protected  
+  runners_nonsensitive = nonsensitive({
+    for name, runner in var.runners : name => {
+      for key, value in runner : key => value
+      if key != "runner_token"
+    }
+  })
 }
 
 module "vpc" {
@@ -51,41 +60,40 @@ module "operator" {
   source = "../../../../modules/k8s/operator"
 
   metadata           = local.metadata
-  operator_version   = var.operator_version
-  override_manifests = var.override_operator_manifests
+  operator_version   = var.operator.version
+  override_manifests = var.operator.override_manifests
 
   depends_on = [module.cluster]
-}
-
-module "gitlab" {
-  source             = "../../../../modules/gitlab/runner"
-  metadata           = local.metadata
-  url                = "https://gitlab.com"
-  project_id         = var.gitlab_project_id
-  runner_description = var.runner_description
-  runner_tags        = [var.name]
 }
 
 module "runner" {
   source = "../../../../modules/k8s/runner/"
 
-  metadata         = local.metadata
-  namespace        = module.operator.namespace
-  gitlab           = module.gitlab
-  concurrent       = var.concurrent
-  check_interval   = var.check_interval
-  locked           = var.locked
-  protected        = var.protected
-  run_untagged     = var.run_untagged
-  runner_tags      = var.runner_tags
-  config_template  = var.config_template
-  envvars          = var.envvars
-  pod_spec_patches = var.pod_spec_patches
-  runner_image     = var.runner_image
-  helper_image     = var.helper_image
-  runner_opts      = var.runner_opts
-  log_level        = var.log_level
-  listen_address   = var.listen_address
+  for_each = local.runners_nonsensitive
+
+  metadata  = local.metadata
+  namespace = module.operator.namespace
+  name      = each.key
+
+  gitlab = {
+    url          = each.value.url
+    runner_token = var.runners[each.key].runner_token
+  }
+
+  concurrent       = each.value.concurrent
+  check_interval   = each.value.check_interval
+  locked           = each.value.locked
+  protected        = each.value.protected
+  run_untagged     = each.value.run_untagged
+  runner_tags      = each.value.runner_tags
+  config_template  = each.value.config_template
+  envvars          = each.value.envvars
+  pod_spec_patches = each.value.pod_spec_patches
+  runner_image     = each.value.runner_image
+  helper_image     = each.value.helper_image
+  runner_opts      = each.value.runner_opts
+  log_level        = each.value.log_level
+  listen_address   = each.value.listen_address
 
   depends_on = [module.operator]
 }

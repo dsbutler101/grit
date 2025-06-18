@@ -45,6 +45,7 @@
 %{ if use_docker }
   [runners.docker]
     image = "${default_docker_image}"
+    privileged = true
 
 %{ if runners_docker_section != "" }
     ${indent(4, runners_docker_section)}
